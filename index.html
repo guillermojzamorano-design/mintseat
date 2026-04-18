@@ -3,786 +3,241 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MintSeat — Mint Your Seat. Own The Chain.</title>
-<meta name="description" content="Escrow-protected ticketing built on top of what venues already use. Artists get paid on every resale. Fans own what they buy. No hidden fees. No monopolies. Own the chain.">
+<title>MintSeat — Sell Your Extra Tickets. Keep Almost All of It.</title>
+<meta name="description" content="Can't make the game? List your tickets in 2 minutes. Get paid automatically. MintSeat takes 1.5% — not StubHub's 25%. Chicago sports fans, season ticket holders, resellers — this is for you.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-
 <style>
 :root {
-  --mint:       #00E5A0;
-  --mint-dim:   #00c488;
-  --mint-glow:  rgba(0,229,160,0.12);
-  --mint-glow2: rgba(0,229,160,0.28);
-  --ink:        #0A0F0D;
-  --ink-light:  #111711;
-  --ink-mid:    #1a221a;
-  --surface:    #1e281e;
-  --text:       #E8F0EC;
-  --text-dim:   #8A9E93;
-  --text-muted: #4A5C52;
-  --border:     rgba(0,229,160,0.10);
-  --border-b:   rgba(0,229,160,0.25);
-  --blue:       #7DD4FC;
-  --purple:     #c4b5fd;
-  --gold:       #F5C842;
-  --red:        #FF5757;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--ink);
-  color: var(--text);
-  font-family: 'Instrument Sans', sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-/* noise */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none; z-index: 999; opacity: 0.4;
-}
-
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  background-image: linear-gradient(var(--border) 1px,transparent 1px), linear-gradient(90deg,var(--border) 1px,transparent 1px);
-  background-size: 64px 64px;
-  pointer-events: none; z-index: 0;
-  mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, black 0%, transparent 100%);
-}
-
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 48px;
-  background: rgba(10,15,13,0.88);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-}
-
-.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.nav-wordmark { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.08em; color: var(--text); }
-.nav-wordmark span { color: var(--mint); }
-
-.nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
-.nav-links a { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
-.nav-links a:hover { color: var(--mint); }
-.nav-cta { background: var(--mint) !important; color: var(--ink) !important; padding: 8px 20px; border-radius: 4px; font-weight: 600 !important; }
-.nav-cta:hover { background: var(--mint-dim) !important; transform: translateY(-1px); }
-
-/* ── HERO ── */
-.hero {
-  position: relative; z-index: 1;
-  min-height: 100vh;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 140px 48px 100px;
-  text-align: center;
-}
-
-.hero-glow {
-  position: absolute; top: -300px; left: 50%; transform: translateX(-50%);
-  width: 900px; height: 900px;
-  background: radial-gradient(circle, var(--mint-glow2) 0%, transparent 65%);
-  pointer-events: none;
-}
-
-.live-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(0,229,160,0.07); border: 1px solid var(--border-b);
-  border-radius: 100px; padding: 6px 16px;
-  font-family: 'DM Mono', monospace; font-size: 11px;
-  letter-spacing: 0.08em; color: var(--mint);
-  margin-bottom: 36px;
-  opacity: 0; animation: fadeUp 0.7s ease 0.1s forwards;
-}
-
-.live-dot { width: 6px; height: 6px; background: var(--mint); border-radius: 50%; animation: pulse 2s infinite; }
-
-@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.3; transform:scale(0.6); } }
-@keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-
-.hero h1 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(64px, 9vw, 128px);
-  line-height: 0.92; letter-spacing: 0.02em;
-  margin-bottom: 8px;
-  opacity: 0; animation: fadeUp 0.9s ease 0.2s forwards;
-}
-
-.hero h1 em { color: var(--mint); font-style: normal; }
-
-.hero-sub {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(22px, 3.5vw, 44px);
-  letter-spacing: 0.06em; color: var(--text-dim);
-  margin-bottom: 28px;
-  opacity: 0; animation: fadeUp 0.9s ease 0.3s forwards;
-}
-
-.hero-sub em { color: var(--mint); font-style: normal; }
-
-.hero-desc {
-  max-width: 580px; font-size: 17px;
-  color: var(--text-dim); line-height: 1.7;
-  margin-bottom: 16px;
-  opacity: 0; animation: fadeUp 0.9s ease 0.4s forwards;
-}
-
-.verdict-note {
-  display: inline-block;
-  background: rgba(245,200,66,0.05); border: 1px solid rgba(245,200,66,0.18);
-  border-radius: 6px; padding: 10px 18px;
-  font-family: 'DM Mono', monospace; font-size: 11px;
-  color: var(--gold); line-height: 1.6;
-  margin-bottom: 44px;
-  opacity: 0; animation: fadeUp 0.9s ease 0.45s forwards;
-}
-
-/* ── AUDIENCE TABS ── */
-.audience-tabs {
-  display: flex; gap: 8px; margin-bottom: 44px;
-  opacity: 0; animation: fadeUp 0.9s ease 0.5s forwards;
-}
-
-.aud-tab {
-  padding: 10px 22px; border-radius: 100px;
-  font-family: 'DM Mono', monospace; font-size: 12px;
-  letter-spacing: 0.05em; cursor: pointer;
-  border: 1px solid var(--border-b);
-  background: none; color: var(--text-dim);
-  transition: all 0.2s;
-}
-
-.aud-tab.active { background: var(--mint); color: var(--ink); border-color: var(--mint); font-weight: 600; }
-.aud-tab:hover:not(.active) { border-color: var(--mint); color: var(--mint); }
-
-.aud-content { display: none; max-width: 480px; text-align: center; margin-bottom: 40px; }
-.aud-content.active { display: block; }
-
-.aud-content p { font-size: 15px; color: var(--text-dim); line-height: 1.7; }
-.aud-content strong { color: var(--mint); }
-
-/* ── WAITLIST FORM ── */
-.waitlist-form {
-  display: flex; gap: 8px; max-width: 460px; width: 100%;
-  opacity: 0; animation: fadeUp 0.9s ease 0.6s forwards;
-}
-
-.waitlist-form input {
-  flex: 1; background: var(--ink-mid);
-  border: 1px solid var(--border-b); border-radius: 6px;
-  padding: 13px 16px; font-family: 'Instrument Sans', sans-serif;
-  font-size: 15px; color: var(--text); outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.waitlist-form input::placeholder { color: var(--text-muted); }
-.waitlist-form input:focus { border-color: var(--mint); box-shadow: 0 0 0 3px var(--mint-glow); }
-
-.btn-mint {
-  background: var(--mint); color: var(--ink); border: none;
-  border-radius: 6px; padding: 13px 26px;
-  font-family: 'Instrument Sans', sans-serif; font-size: 15px;
-  font-weight: 600; cursor: pointer; white-space: nowrap;
-  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-}
-
-.btn-mint:hover { background: var(--mint-dim); transform: translateY(-1px); box-shadow: 0 4px 20px var(--mint-glow2); }
-
-.waitlist-count {
-  margin-top: 12px;
-  font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted);
-  opacity: 0; animation: fadeUp 0.9s ease 0.7s forwards;
-}
-
-.waitlist-count span { color: var(--mint); }
-
-/* ── STATS BAR ── */
-.stats-bar {
-  position: relative; z-index: 1;
-  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-  background: var(--ink-light);
-}
-
-.stats-inner { display: flex; justify-content: center; flex-wrap: wrap; }
-
-.stat-item {
-  flex: 1; min-width: 180px; padding: 28px 32px;
-  border-right: 1px solid var(--border); text-align: center;
-}
-
-.stat-item:last-child { border-right: none; }
-
-.stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 44px; color: var(--mint); letter-spacing: 0.02em; line-height: 1; margin-bottom: 4px; }
-.stat-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
-
-/* ── SECTIONS ── */
-section { position: relative; z-index: 1; padding: 100px 48px; max-width: 1200px; margin: 0 auto; }
-
-.section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; color: var(--mint); text-transform: uppercase; margin-bottom: 14px; }
-
-.section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(38px, 5vw, 64px); line-height: 1; letter-spacing: 0.03em; margin-bottom: 14px; }
-
-.section-desc { font-size: 16px; color: var(--text-dim); max-width: 520px; line-height: 1.7; margin-bottom: 56px; }
-
-/* ── THREE DOORS ── */
-.three-doors {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
-  border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
-}
-
-.door {
-  background: var(--ink-light); padding: 40px 32px;
-  border-right: 1px solid var(--border);
-  transition: background 0.2s;
-}
-
-.door:last-child { border-right: none; }
-.door:hover { background: var(--ink-mid); }
-
-.door-icon { font-size: 32px; margin-bottom: 16px; }
-.door-who { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--mint); text-transform: uppercase; margin-bottom: 10px; }
-.door-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 0.04em; margin-bottom: 12px; }
-.door-desc { font-size: 14px; color: var(--text-dim); line-height: 1.65; margin-bottom: 20px; }
-
-.door-features { list-style: none; }
-.door-features li { font-size: 13px; color: var(--text-muted); padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 8px; }
-.door-features li:last-child { border-bottom: none; }
-.door-features li::before { content: '✓'; color: var(--mint); font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
-
-/* ── HOW IT WORKS ── */
-.flow-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-
-.flow-step { background: var(--ink-light); padding: 32px 24px; border-right: 1px solid var(--border); transition: background 0.2s; }
-.flow-step:last-child { border-right: none; }
-.flow-step:hover { background: var(--ink-mid); }
-
-.flow-num { font-family: 'Bebas Neue', sans-serif; font-size: 56px; color: var(--border-b); line-height: 1; margin-bottom: 14px; transition: color 0.2s; }
-.flow-step:hover .flow-num { color: var(--mint); }
-
-.flow-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.04em; margin-bottom: 8px; }
-.flow-desc { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
-
-/* ── MONEY FLOW SECTION ── */
-.money-split { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-
-.split-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 28px; background: var(--ink-light);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.2s;
-}
-
-.split-row:last-child { border-bottom: none; }
-.split-row:hover { background: var(--ink-mid); }
-
-.split-left { display: flex; align-items: center; gap: 14px; }
-.split-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.d-venue   { background: var(--blue); }
-.d-artist  { background: var(--mint); }
-.d-seller  { background: var(--purple); }
-.d-fan     { background: var(--text-dim); }
-.d-ms      { background: var(--text-muted); }
-
-.split-name { font-size: 14px; color: var(--text); font-weight: 600; margin-bottom: 2px; }
-.split-note { font-size: 12px; color: var(--text-muted); }
-.split-amount { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.03em; }
-
-.amt-venue  { color: var(--blue); }
-.amt-artist { color: var(--mint); }
-.amt-seller { color: var(--purple); }
-.amt-ms     { color: var(--text-muted); }
-
-.money-note-box {
-  background: var(--mint-glow); border-top: 1px solid var(--border-b);
-  padding: 16px 28px;
-  font-family: 'DM Mono', monospace; font-size: 12px;
-  color: var(--text-dim); line-height: 1.65;
-}
-
-.money-note-box strong { color: var(--mint); }
-
-/* ── SEASON TICKET SECTION ── */
-.season-section { background: var(--ink-light); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 100px 0; }
-.season-inner { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
-
-.season-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
-
-.step-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
-
-.step-item {
-  display: flex; gap: 20px; padding: 24px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.step-item:last-child { border-bottom: none; }
-
-.step-circle {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: var(--mint-glow); border: 1px solid var(--border-b);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Bebas Neue', sans-serif; font-size: 18px;
-  color: var(--mint); flex-shrink: 0;
-}
-
-.step-body h4 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.04em; margin-bottom: 6px; }
-.step-body p { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
-
-/* calendar mockup */
-.calendar-mock {
-  background: var(--ink); border: 1px solid var(--border-b);
-  border-radius: 12px; overflow: hidden;
-}
-
-.cal-header {
-  padding: 16px 20px; background: var(--ink-mid);
-  border-bottom: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
-}
-
-.cal-header-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.04em; color: var(--text); }
-.cal-rule-badge { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--mint); background: var(--mint-glow); border: 1px solid var(--border-b); border-radius: 4px; padding: 3px 8px; }
-
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; padding: 12px; }
-
-.cal-cell {
-  aspect-ratio: 1; border-radius: 4px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-family: 'DM Mono', monospace; font-size: 11px; cursor: pointer;
-  transition: background 0.15s;
-}
-
-.cal-cell.has-ticket { background: var(--ink-mid); color: var(--text-dim); }
-.cal-cell.has-ticket:hover { background: var(--surface); }
-.cal-cell.listed { background: var(--mint-glow); color: var(--mint); border: 1px solid var(--border-b); }
-.cal-cell.keeping { background: rgba(125,212,252,0.08); color: var(--blue); border: 1px solid rgba(125,212,252,0.2); }
-.cal-cell.empty { color: var(--text-muted); opacity: 0.3; }
-
-.cal-cell-day { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
-.cal-cell-label { font-size: 8px; letter-spacing: 0.04em; }
-
-.cal-footer {
-  padding: 14px 20px; border-top: 1px solid var(--border);
-  display: flex; gap: 16px; align-items: center;
-}
-
-.cal-legend { display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); }
-.cal-dot { width: 8px; height: 8px; border-radius: 2px; }
-.cal-dot.listed { background: var(--mint); }
-.cal-dot.keeping { background: var(--blue); }
-
-.cal-publish-btn {
-  margin-left: auto; background: var(--mint); color: var(--ink);
-  border: none; border-radius: 4px; padding: 8px 16px;
-  font-family: 'DM Mono', monospace; font-size: 11px;
-  font-weight: 600; cursor: pointer; letter-spacing: 0.04em;
-  transition: background 0.2s;
-}
-
-.cal-publish-btn:hover { background: var(--mint-dim); }
-
-/* ── MINTSCORE ── */
-.mintscore-bands {
-  background: var(--ink-light);
-  border: 1px solid var(--border-b);
-  border-radius: 12px;
-  padding: 28px 32px;
-  margin-bottom: 48px;
-  overflow-x: auto;
-}
-
-.band-row {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  min-width: 600px;
-}
-
-.band-item {
-  flex: 1;
-  text-align: center;
-  padding: 16px 8px;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.band-item:hover { background: var(--ink-mid); }
-
-.band-item.active-band {
-  background: var(--mint-glow);
-  border: 1px solid var(--border-b);
-}
-
-.band-score {
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  margin-bottom: 6px;
-}
-
-.band-icon { font-size: 20px; margin-bottom: 4px; }
-
-.band-label {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 14px;
-  letter-spacing: 0.06em;
-  color: var(--text-dim);
-}
-
-.band-divider {
-  width: 1px;
-  height: 48px;
-  background: var(--border);
-  flex-shrink: 0;
-}
-
-/* Pillars */
-.pillars-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 2px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 32px;
-}
-
-.pillar-card {
-  background: var(--ink-light);
-  padding: 28px 20px;
-  border-right: 1px solid var(--border);
-  transition: background 0.2s;
-}
-
-.pillar-card:last-child { border-right: none; }
-.pillar-card:hover { background: var(--ink-mid); }
-
-.pillar-pct {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 40px;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  margin-bottom: 6px;
-}
-
-.pillar-name {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 16px;
-  letter-spacing: 0.05em;
-  margin-bottom: 8px;
-  color: var(--text);
-}
-
-.pillar-desc {
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
-/* MintScore note */
-.mintscore-note {
-  background: var(--ink-light);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 64px;
-}
-
-.mintscore-note-inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-}
-
-.mintscore-note-inner > div {
-  padding: 32px;
-}
-
-.mintscore-note-inner > div:first-child {
-  border-right: 1px solid var(--border);
-}
-
-.mintscore-moat { background: var(--ink-mid); }
-
-/* ── TRUST TIERS ── */
-.trust-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-
-.trust-card {
-  background: var(--ink-light); border: 1px solid var(--border);
-  border-radius: 10px; padding: 32px;
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-
-.trust-card:hover { border-color: var(--border-b); transform: translateY(-3px); box-shadow: 0 8px 32px var(--mint-glow); }
-
-.trust-tier {
-  font-family: 'Bebas Neue', sans-serif; font-size: 22px;
-  letter-spacing: 0.04em; margin-bottom: 6px;
-}
-
-.trust-badge {
-  display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px;
-  letter-spacing: 0.08em; padding: 3px 10px; border-radius: 100px;
-  border: 1px solid; margin-bottom: 16px;
-}
-
-.badge-p1 { color: var(--mint); border-color: var(--mint); background: var(--mint-glow); }
-.badge-p2 { color: var(--blue); border-color: rgba(125,212,252,0.3); background: rgba(125,212,252,0.08); }
-.badge-p3 { color: var(--text-dim); border-color: var(--border); background: rgba(255,255,255,0.03); }
-
-.trust-desc { font-size: 13px; color: var(--text-dim); line-height: 1.65; margin-bottom: 16px; }
-
-.trust-features { list-style: none; }
-.trust-features li { font-size: 12px; color: var(--text-muted); padding: 5px 0; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
-.trust-features li:last-child { border-bottom: none; }
-.trust-features li::before { content: '✓'; color: var(--mint); font-size: 10px; font-weight: 700; flex-shrink: 0; }
-
-/* ── PAYMENT SECTION ── */
-.payment-section { background: var(--ink-light); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 100px 0; }
-.payment-inner { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
-
-.payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-
-.payment-paths { display: flex; flex-direction: column; gap: 16px; }
-
-.payment-path {
-  background: var(--ink); border: 1px solid var(--border-b);
-  border-radius: 10px; padding: 24px;
-  display: flex; align-items: flex-start; gap: 16px;
-}
-
-.payment-path.featured { border-color: var(--mint); background: var(--mint-glow); }
-
-.path-icon { font-size: 28px; flex-shrink: 0; }
-
-.path-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.04em; margin-bottom: 6px; }
-.path-desc { font-size: 13px; color: var(--text-dim); line-height: 1.55; margin-bottom: 10px; }
-
-.path-fee {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: 'DM Mono', monospace; font-size: 11px;
-  color: var(--mint); background: var(--mint-glow);
-  border: 1px solid var(--border-b); border-radius: 4px; padding: 3px 8px;
-}
-
-.payment-logos {
-  display: flex; flex-direction: column; gap: 16px; align-items: center;
-}
-
-.powered-by { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; text-align: center; }
-
-.logo-badge {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  background: var(--ink); border: 1px solid var(--border);
-  border-radius: 8px; padding: 16px 28px;
-  font-family: 'Bebas Neue', sans-serif; font-size: 20px;
-  color: var(--text-dim); letter-spacing: 0.06em; width: 100%;
-}
-
-.logo-badge span { color: var(--mint); }
-
-/* ── PRICING WHO PAYS ── */
-.pricing-who {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 16px;
-}
-
-.who-card {
-  background: var(--ink-light);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 32px 28px;
-  text-align: center;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.who-card:hover { border-color: var(--border-b); }
-
-.who-card-free {
-  border-color: var(--border-b);
-  background: var(--mint-glow);
-}
-
-.who-card-free:hover {
-  box-shadow: 0 8px 32px var(--mint-glow);
-}
-
-.who-icon { font-size: 36px; margin-bottom: 12px; }
-
-.who-role {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px; letter-spacing: 0.05em;
-  margin-bottom: 12px; color: var(--text);
-}
-
-.who-fee {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 52px; letter-spacing: 0.02em;
-  line-height: 1; color: var(--text-dim);
-  margin-bottom: 4px;
-}
-
-.who-fee span {
-  font-size: 20px; color: var(--text-muted);
-}
-
-.free-fee { color: var(--mint) !important; }
-.free-fee span { color: var(--mint-dim) !important; }
-
-.who-note {
-  font-size: 13px; color: var(--text-muted);
-  line-height: 1.65; margin-top: 12px;
-}
-
-.who-note strong { color: var(--mint); }
-
-/* ── FEE REMINDER ── */
-.fee-reminder {
-  margin-top: 40px;
-  background: var(--ink-light);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.fee-reminder-inner {
-  display: flex;
-  align-items: stretch;
-}
-
-.fee-item {
-  flex: 1;
-  padding: 24px 20px;
-  text-align: center;
-  transition: background 0.2s;
-}
-
-.fee-item:hover { background: var(--ink-mid); }
-
-.fee-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px; letter-spacing: 0.1em;
-  color: var(--text-muted); text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.fee-amount {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 36px; letter-spacing: 0.02em;
-  color: var(--text); line-height: 1;
-  margin-bottom: 6px;
-}
-
-.fee-note {
-  font-size: 11px; color: var(--text-muted);
-  line-height: 1.5;
-}
-
-.fee-divider {
-  width: 1px;
-  background: var(--border);
-  flex-shrink: 0;
-}
-
-/* ── PRICING ── */
-.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-
-.price-card {
-  background: var(--ink-light); border: 1px solid var(--border);
-  border-radius: 12px; padding: 36px 28px;
-  transition: border-color 0.2s;
-}
-
-.price-card.featured { border-color: var(--mint); box-shadow: 0 0 40px var(--mint-glow); }
-.price-card:hover:not(.featured) { border-color: var(--border-b); }
-
-.price-tier { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
-.price-card.featured .price-tier { color: var(--mint); }
-
-.price-num { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 0.02em; line-height: 1; margin-bottom: 4px; }
-.price-num sup { font-size: 22px; vertical-align: top; margin-top: 10px; display: inline-block; }
-
-.price-period { font-size: 12px; color: var(--text-muted); margin-bottom: 28px; }
-.price-pilot { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--gold); background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.2); border-radius: 4px; padding: 3px 8px; display: inline-block; margin-bottom: 20px; letter-spacing: 0.05em; }
-
-.price-features { list-style: none; margin-bottom: 28px; }
-.price-features li { font-size: 13px; color: var(--text-dim); padding: 7px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 8px; }
-.price-features li:last-child { border-bottom: none; }
-.price-features li::before { content: '✓'; color: var(--mint); font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
-
-.btn-outline { display: block; text-align: center; border: 1px solid var(--border-b); border-radius: 6px; padding: 11px; font-family: 'Instrument Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--mint); background: none; cursor: pointer; transition: background 0.2s, border-color 0.2s; width: 100%; }
-.btn-outline:hover { background: var(--mint-glow); border-color: var(--mint); }
-
-.btn-mint-block { display: block; text-align: center; background: var(--mint); border-radius: 6px; padding: 11px; font-family: 'Instrument Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; border: none; width: 100%; transition: background 0.2s; }
-.btn-mint-block:hover { background: var(--mint-dim); }
-
-/* ── FOOTER CTA ── */
-.footer-cta { position: relative; z-index: 1; padding: 120px 48px; text-align: center; overflow: hidden; }
-.footer-cta::before { content: ''; position: absolute; bottom: -200px; left: 50%; transform: translateX(-50%); width: 700px; height: 700px; background: radial-gradient(circle, var(--mint-glow2) 0%, transparent 70%); pointer-events: none; }
-
-.footer-cta h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 7vw, 96px); line-height: 0.95; letter-spacing: 0.02em; margin-bottom: 20px; }
-.footer-cta h2 span { color: var(--mint); }
-.footer-cta p { font-size: 16px; color: var(--text-dim); max-width: 460px; margin: 0 auto 44px; line-height: 1.7; }
-
-.footer-form { display: flex; gap: 8px; max-width: 440px; margin: 0 auto; }
-.footer-form input { flex: 1; background: var(--ink-mid); border: 1px solid var(--border-b); border-radius: 6px; padding: 13px 16px; font-family: 'Instrument Sans', sans-serif; font-size: 15px; color: var(--text); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-.footer-form input::placeholder { color: var(--text-muted); }
-.footer-form input:focus { border-color: var(--mint); box-shadow: 0 0 0 3px var(--mint-glow); }
-
-.success-msg { display: none; align-items: center; gap: 8px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--mint); margin-top: 16px; justify-content: center; }
-
-/* ── FOOTER ── */
-footer { position: relative; z-index: 1; padding: 36px 48px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-.footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.08em; color: var(--text-dim); }
-.footer-brand span { color: var(--mint); }
-.footer-copy { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 0.04em; }
-.footer-links { display: flex; gap: 20px; list-style: none; }
-.footer-links a { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-.footer-links a:hover { color: var(--mint); }
-
-/* ── REVEAL ── */
-.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
-
-/* ── MOBILE ── */
-@media (max-width: 768px) {
-  nav { padding: 16px 20px; }
-  .nav-links { display: none; }
-  .hero { padding: 100px 20px 80px; }
-  .waitlist-form { flex-direction: column; }
-  .audience-tabs { flex-wrap: wrap; justify-content: center; }
-  .stats-inner { flex-direction: column; }
-  .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
-  section { padding: 64px 20px; }
-  .three-doors { grid-template-columns: 1fr; }
-  .door { border-right: none; border-bottom: 1px solid var(--border); }
-  .flow-grid { grid-template-columns: 1fr 1fr; }
-  .season-inner { padding: 0 20px; }
-  .season-grid { grid-template-columns: 1fr; }
-  .pillars-grid { grid-template-columns: 1fr 1fr; }
-  .pillar-card { border-right: none; border-bottom: 1px solid var(--border); }
-  .mintscore-note-inner { grid-template-columns: 1fr; }
-  .mintscore-note-inner > div:first-child { border-right: none; border-bottom: 1px solid var(--border); }
-  .payment-inner { padding: 0 20px; }
-  .payment-grid { grid-template-columns: 1fr; }
-  .pricing-grid { grid-template-columns: 1fr; }
-  .pricing-who { grid-template-columns: 1fr; }
-  .fee-reminder-inner { flex-direction: column; }
-  .fee-divider { width: 100%; height: 1px; }
-  .footer-cta { padding: 80px 20px; }
-  .footer-form { flex-direction: column; }
-  footer { padding: 28px 20px; flex-direction: column; text-align: center; }
+  --mint:#00E5A0;--mint-dim:#00c488;
+  --mint-glow:rgba(0,229,160,0.12);--mint-glow2:rgba(0,229,160,0.28);
+  --ink:#0A0F0D;--ink-light:#111711;--ink-mid:#1a221a;
+  --text:#E8F0EC;--text-dim:#8A9E93;--text-muted:#4A5C52;
+  --border:rgba(0,229,160,0.10);--border-b:rgba(0,229,160,0.25);
+  --gold:#F5C842;--red:#FF5757;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;}
+
+body::before{content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:999;opacity:0.4;}
+
+body::after{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:64px 64px;pointer-events:none;z-index:0;
+  mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,black 0%,transparent 100%);}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:rgba(10,15,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-wordmark{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.08em;color:var(--text);}
+.nav-wordmark span{color:var(--mint);}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none;}
+.nav-links a{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.06em;color:var(--text-dim);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover{color:var(--mint);}
+.nav-cta{background:var(--mint)!important;color:var(--ink)!important;padding:8px 20px;border-radius:4px;font-weight:600!important;}
+.nav-cta:hover{background:var(--mint-dim)!important;}
+
+/* HERO */
+.hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:140px 24px 100px;text-align:center;}
+.hero-glow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle,var(--mint-glow2) 0%,transparent 65%);pointer-events:none;}
+
+.live-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,160,0.07);border:1px solid var(--border-b);border-radius:100px;padding:6px 16px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.08em;color:var(--mint);margin-bottom:36px;opacity:0;animation:fadeUp 0.7s ease 0.1s forwards;}
+.live-dot{width:6px;height:6px;background:var(--mint);border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,9vw,120px);line-height:0.92;letter-spacing:0.02em;margin-bottom:8px;opacity:0;animation:fadeUp 0.9s ease 0.2s forwards;}
+.hero h1 em{color:var(--mint);font-style:normal;display:block;}
+
+.hero-sub{font-size:clamp(17px,2.2vw,23px);color:var(--text-dim);max-width:580px;margin:20px auto 40px;line-height:1.6;opacity:0;animation:fadeUp 0.9s ease 0.3s forwards;}
+.hero-sub strong{color:var(--text);font-weight:600;}
+
+/* FEE STRIP */
+.fee-strip{display:flex;align-items:stretch;background:var(--ink-light);border:1px solid var(--border-b);border-radius:10px;overflow:hidden;margin-bottom:40px;opacity:0;animation:fadeUp 0.9s ease 0.35s forwards;}
+.fee-block{flex:1;padding:18px 28px;text-align:center;border-right:1px solid var(--border);}
+.fee-block:last-child{border-right:none;background:var(--mint-glow);}
+.fee-platform{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;}
+.fee-block:last-child .fee-platform{color:var(--mint);}
+.fee-pct{font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:1;letter-spacing:0.02em;}
+.fee-red{color:var(--red);}
+.fee-gold{color:var(--gold);}
+.fee-mint{color:var(--mint);}
+.fee-note{font-size:11px;color:var(--text-muted);margin-top:3px;}
+.fee-block:last-child .fee-note{color:var(--mint);}
+
+/* WAITLIST */
+.waitlist-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;animation:fadeUp 0.9s ease 0.45s forwards;}
+.waitlist-row{display:flex;gap:8px;width:100%;max-width:440px;}
+.waitlist-input{flex:1;background:var(--ink-mid);border:1px solid var(--border-b);border-radius:6px;padding:12px 16px;font-family:'Instrument Sans',sans-serif;font-size:15px;color:var(--text);outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+.waitlist-input::placeholder{color:var(--text-muted);}
+.waitlist-input:focus{border-color:var(--mint);box-shadow:0 0 0 3px var(--mint-glow);}
+.btn-mint{background:var(--mint);color:var(--ink);border:none;border-radius:6px;padding:12px 22px;font-family:'Instrument Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background 0.2s,transform 0.15s,box-shadow 0.2s;}
+.btn-mint:hover{background:var(--mint-dim);transform:translateY(-1px);box-shadow:0 4px 20px var(--mint-glow2);}
+.waitlist-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.04em;}
+.waitlist-count b{color:var(--mint);}
+.hero-success{display:none;font-family:'DM Mono',monospace;font-size:12px;color:var(--mint);letter-spacing:0.04em;}
+
+/* TICKER */
+.ticker-wrap{position:relative;z-index:1;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--ink-light);overflow:hidden;padding:14px 0;}
+.ticker-track{display:flex;gap:52px;animation:scroll 22s linear infinite;white-space:nowrap;}
+@keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.ticker-item{display:inline-flex;align-items:center;gap:10px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.08em;color:var(--text-muted);flex-shrink:0;}
+.ticker-item b{color:var(--mint);}
+
+/* SHARED SECTION STYLES */
+.section-wrap{position:relative;z-index:1;padding:96px 48px;max-width:1200px;margin:0 auto;}
+.section-wrap.full{max-width:100%;padding:96px 0;}
+.section-wrap.full .inner{max-width:1200px;margin:0 auto;padding:0 48px;}
+.section-band{position:relative;z-index:1;background:var(--ink-light);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.14em;color:var(--mint);text-transform:uppercase;margin-bottom:12px;}
+.h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,4.5vw,58px);line-height:0.96;letter-spacing:0.03em;margin-bottom:14px;}
+.h2 em{color:var(--mint);font-style:normal;}
+.lead{font-size:16px;color:var(--text-dim);max-width:500px;line-height:1.7;margin-bottom:52px;}
+
+/* THREE HOOKS */
+.hooks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.hook{padding:40px 32px;background:var(--ink-light);border-right:1px solid var(--border);transition:background 0.2s;}
+.hook:last-child{border-right:none;}
+.hook:hover{background:var(--ink-mid);}
+.hook-num{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--border-b);line-height:1;margin-bottom:18px;transition:color 0.2s;}
+.hook:hover .hook-num{color:var(--mint);}
+.hook-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.04em;margin-bottom:12px;}
+.hook-body{font-size:14px;color:var(--text-dim);line-height:1.7;margin-bottom:18px;}
+.hook-proof{font-family:'DM Mono',monospace;font-size:11px;color:var(--mint);letter-spacing:0.05em;padding-top:16px;border-top:1px solid var(--border);}
+
+/* STEPS */
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.step{padding:32px 24px;background:var(--ink);border-right:1px solid var(--border);transition:background 0.2s;}
+.step:last-child{border-right:none;}
+.step:hover{background:var(--ink-mid);}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--border-b);line-height:1;margin-bottom:14px;transition:color 0.2s;}
+.step:hover .step-num{color:var(--mint);}
+.step-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;margin-bottom:8px;}
+.step-body{font-size:13px;color:var(--text-dim);line-height:1.65;}
+
+/* FEE TABLE */
+.fee-table{border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.fee-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-bottom:1px solid var(--border);}
+.fee-row:last-child{border-bottom:none;}
+.fee-row.hdr{background:var(--ink-mid);}
+.fc{padding:15px 20px;font-size:14px;border-right:1px solid var(--border);transition:background 0.15s;}
+.fc:last-child{border-right:none;}
+.fee-row:not(.hdr):hover .fc{background:var(--ink-mid);}
+.fc.lbl{font-weight:600;color:var(--text);}
+.fc.hc{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.09em;color:var(--text-muted);text-transform:uppercase;display:flex;align-items:center;}
+.fc.ms{color:var(--mint);font-weight:700;font-family:'DM Mono',monospace;}
+.fc.bad{color:var(--red);font-family:'DM Mono',monospace;}
+.fc.mid{color:var(--gold);font-family:'DM Mono',monospace;}
+.fee-callout{background:var(--mint-glow);border:1px solid var(--border-b);border-radius:8px;padding:16px 20px;margin-top:16px;font-size:14px;color:var(--text-dim);line-height:1.7;}
+.fee-callout strong{color:var(--mint);}
+
+/* CHICAGO SPORTS */
+.sports-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.sport-card{background:var(--ink);border:1px solid var(--border);border-radius:10px;padding:24px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;}
+.sport-card:hover{border-color:var(--border-b);transform:translateY(-4px);box-shadow:0 8px 32px var(--mint-glow);}
+.sport-emoji{font-size:38px;margin-bottom:10px;}
+.sport-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:0.04em;margin-bottom:3px;}
+.sport-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--mint);letter-spacing:0.08em;}
+
+/* RESELLER */
+.reseller-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
+.points{display:flex;flex-direction:column;gap:20px;}
+.point{display:flex;align-items:flex-start;gap:16px;}
+.point-num{width:36px;height:36px;border-radius:50%;background:var(--mint-glow);border:1px solid var(--border-b);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--mint);flex-shrink:0;}
+.point-title{font-weight:600;margin-bottom:4px;}
+.point-body{font-size:13px;color:var(--text-dim);line-height:1.6;}
+
+.math-card{background:var(--ink-light);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.math-header{background:var(--ink-mid);padding:14px 22px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--text-muted);}
+.math-row{display:flex;justify-content:space-between;align-items:center;padding:13px 22px;border-bottom:1px solid var(--border);}
+.math-row:last-child{border-bottom:none;}
+.math-label{font-size:13px;color:var(--text-dim);}
+.math-val{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.02em;}
+.v-dim{color:var(--text-dim);}
+.v-red{color:var(--red);}
+.v-mint{color:var(--mint);}
+.math-footer{background:var(--mint-glow);border-top:1px solid var(--border-b);padding:14px 22px;font-family:'DM Mono',monospace;font-size:12px;color:var(--mint);line-height:1.7;}
+
+/* BUYER TRUST */
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.trust-card{background:var(--ink);border:1px solid var(--border);border-radius:10px;padding:28px;transition:border-color 0.2s;}
+.trust-card:hover{border-color:var(--border-b);}
+.trust-icon{font-size:30px;margin-bottom:14px;}
+.trust-title{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:0.04em;margin-bottom:10px;}
+.trust-body{font-size:13px;color:var(--text-dim);line-height:1.65;}
+
+/* FOOTER CTA */
+.footer-cta{position:relative;z-index:1;text-align:center;padding:120px 48px;overflow:hidden;}
+.footer-cta::before{content:'';position:absolute;bottom:-160px;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,var(--mint-glow2) 0%,transparent 68%);pointer-events:none;}
+.footer-cta .big{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,96px);line-height:0.93;letter-spacing:0.02em;margin-bottom:20px;}
+.footer-cta .big span{color:var(--mint);}
+.footer-cta .sub{font-size:16px;color:var(--text-dim);max-width:420px;margin:0 auto 44px;line-height:1.7;}
+.footer-row{display:flex;gap:8px;max-width:440px;margin:0 auto;}
+.footer-input{flex:1;background:var(--ink-mid);border:1px solid var(--border-b);border-radius:6px;padding:12px 16px;font-family:'Instrument Sans',sans-serif;font-size:15px;color:var(--text);outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+.footer-input::placeholder{color:var(--text-muted);}
+.footer-input:focus{border-color:var(--mint);box-shadow:0 0 0 3px var(--mint-glow);}
+.footer-success{display:none;text-align:center;margin-top:14px;font-family:'DM Mono',monospace;font-size:12px;color:var(--mint);}
+
+footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;}
+.f-brand{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.08em;color:var(--text-dim);}
+.f-brand span{color:var(--mint);}
+.f-copy{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);}
+.f-links{display:flex;gap:20px;list-style:none;}
+.f-links a{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;transition:color 0.2s;}
+.f-links a:hover{color:var(--mint);}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ROYALTY SECTION */
+.royalty-band{position:relative;z-index:1;background:var(--ink);border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;}
+.royalty-band::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,var(--mint-glow) 0%,transparent 65%);pointer-events:none;}
+.royalty-inner{max-width:1200px;margin:0 auto;padding:96px 48px;}
+.royalty-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+.royalty-flow{display:flex;flex-direction:column;gap:0;}
+.royalty-step{display:flex;align-items:flex-start;gap:16px;padding:20px 0;border-bottom:1px solid var(--border);}
+.royalty-step:last-child{border-bottom:none;}
+.royalty-icon{width:44px;height:44px;border-radius:50%;background:var(--mint-glow);border:1px solid var(--border-b);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.royalty-step-title{font-weight:600;color:var(--text);margin-bottom:4px;}
+.royalty-step-body{font-size:13px;color:var(--text-dim);line-height:1.6;}
+.royalty-card{background:var(--ink-light);border:1px solid var(--border-b);border-radius:14px;overflow:hidden;box-shadow:0 0 60px var(--mint-glow);}
+.royalty-card-header{background:var(--mint-glow);border-bottom:1px solid var(--border-b);padding:16px 24px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--mint);text-transform:uppercase;}
+.royalty-split-row{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--border);}
+.royalty-split-row:last-child{border-bottom:none;}
+.royalty-split-label{font-size:13px;color:var(--text-dim);display:flex;align-items:center;gap:10px;}
+.royalty-split-emoji{font-size:18px;}
+.royalty-split-val{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.02em;}
+.rs-mint{color:var(--mint);}
+.rs-gold{color:var(--gold);}
+.rs-blue{color:#7DD4FC;}
+.rs-dim{color:var(--text-dim);}
+.royalty-card-footer{background:var(--mint-glow);border-top:1px solid var(--border-b);padding:14px 24px;font-family:'DM Mono',monospace;font-size:11px;color:var(--mint);line-height:1.7;}
+.royalty-tagline{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3vw,36px);letter-spacing:0.03em;line-height:1.2;margin-top:36px;color:var(--text);}
+.royalty-tagline em{color:var(--mint);font-style:normal;}
+@media(max-width:768px){.royalty-inner{padding:64px 20px;}.royalty-grid{grid-template-columns:1fr;}}
+
+@media(max-width:768px){
+  nav{padding:14px 20px;}.nav-links{display:none;}
+  .hero{padding:100px 20px 80px;}
+  .fee-strip{flex-direction:column;}
+  .fee-block{border-right:none;border-bottom:1px solid var(--border);}
+  .fee-block:last-child{border-bottom:none;}
+  .waitlist-row{flex-direction:column;}
+  .section-wrap{padding:64px 20px;}
+  .section-wrap.full .inner{padding:0 20px;}
+  .hooks-grid,.steps-grid{grid-template-columns:1fr;}
+  .hook,.step{border-right:none;border-bottom:1px solid var(--border);}
+  .fee-row{grid-template-columns:1fr 1fr;}
+  .sports-grid{grid-template-columns:repeat(3,1fr);}
+  .reseller-grid{grid-template-columns:1fr;}
+  .trust-grid{grid-template-columns:1fr;}
+  .footer-cta{padding:80px 20px;}
+  .footer-row{flex-direction:column;}
+  footer{padding:24px 20px;flex-direction:column;text-align:center;}
 }
 </style>
 </head>
@@ -790,10 +245,10 @@ footer { position: relative; z-index: 1; padding: 36px 48px; border-top: 1px sol
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo">
+  <a href="/" class="nav-logo">
     <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
       <polygon points="18,2 33,10 33,26 18,34 3,26 3,10" fill="none" stroke="#00E5A0" stroke-width="1.5"/>
-      <polygon points="18,8 28,13.5 28,24.5 18,30 8,24.5 8,13.5" fill="rgba(0,229,160,0.07)" stroke="rgba(0,229,160,0.25)" stroke-width="0.8"/>
+      <polygon points="18,8 28,13.5 28,24.5 18,30 8,24.5 8,13.5" fill="rgba(0,229,160,0.06)" stroke="rgba(0,229,160,0.2)" stroke-width="0.8"/>
       <rect x="13" y="14" width="10" height="7" rx="1.5" fill="#00E5A0" opacity="0.9"/>
       <rect x="12" y="21" width="12" height="2" rx="1" fill="#00E5A0" opacity="0.6"/>
       <rect x="12" y="21" width="2" height="4" rx="1" fill="#00E5A0" opacity="0.55"/>
@@ -802,12 +257,12 @@ footer { position: relative; z-index: 1; padding: 36px 48px; border-top: 1px sol
     <span class="nav-wordmark"><span>Mint</span>Seat</span>
   </a>
   <ul class="nav-links">
-    <li><a href="#three-doors" onclick="switchAud('venue')">Venues</a></li>
-    <li><a href="#sellers" onclick="switchAud('holder')" title="Season Ticket Holders" style="position:relative;">STH <span style="font-size:9px; opacity:0.6;">▾</span></a></li>
-    <li><a href="#fans" onclick="switchAud('fan')">Fans</a></li>
     <li><a href="#how">How It Works</a></li>
-    <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#waitlist" class="nav-cta">Get Early Access</a></li>
+    <li><a href="#fees">Fee Comparison</a></li>
+    <li><a href="#resellers">Resellers</a></li>
+    <li><a href="#trust">Buyer Protection</a></li>
+    <li><a href="/venues">For Venues</a></li>
+    <li><a href="#waitlist" class="nav-cta">Start Selling</a></li>
   </ul>
 </nav>
 
@@ -817,712 +272,422 @@ footer { position: relative; z-index: 1; padding: 36px 48px; border-top: 1px sol
 
   <div class="live-badge">
     <span class="live-dot"></span>
-    CHICAGO PILOT — Q2 2026
+    Now Open — Any Ticket, Any Event
   </div>
 
-  <h1>MINT YOUR<br><em>SEAT.</em></h1>
-  <div class="hero-sub">OWN THE <em>CHAIN.</em></div>
+  <h1>CAN'T MAKE<br><em>THE GAME?</em></h1>
 
-  <p class="hero-desc">
-    Escrow-protected ticketing built on top of what venues already use. Artists and rights holders get paid on every resale. Fans own what they buy — verified, protected, and theirs. No middlemen taking 30%. No empty seats.
+  <p class="hero-sub">
+    List any ticket in 2 minutes. Get paid automatically.<br>
+    We take <strong>1.5%</strong> — not StubHub's 25%.<br>
+    <span style="font-size:0.8em; color:var(--mint); display:block; margin-top:8px;">The artist gets their cut too. Automatically.</span>
   </p>
 
-  <div class="verdict-note">
-    ⚖️ April 16, 2026 — Federal jury finds Ticketmaster guilty of monopolizing the ticket market.<br>
-    We've been building the alternative. Quietly. Until now.
+  <div class="fee-strip">
+    <div class="fee-block">
+      <div class="fee-platform">StubHub</div>
+      <div class="fee-pct fee-red">25%</div>
+      <div class="fee-note">combined fees</div>
+    </div>
+    <div class="fee-block">
+      <div class="fee-platform">Ticketmaster</div>
+      <div class="fee-pct fee-gold">15%</div>
+      <div class="fee-note">seller fee</div>
+    </div>
+    <div class="fee-block">
+      <div class="fee-platform">MintSeat</div>
+      <div class="fee-pct fee-mint">1.5%</div>
+      <div class="fee-note">that's it</div>
+    </div>
   </div>
 
-  <!-- Audience tabs -->
-  <div class="audience-tabs">
-    <button class="aud-tab active" onclick="switchAud('venue', false)">I'm a Venue</button>
-    <button class="aud-tab" onclick="switchAud('holder', false)">I'm a Season Ticket Holder</button>
-    <button class="aud-tab" onclick="switchAud('fan', false)">I'm a Fan</button>
-  </div>
-
-  <div class="aud-content active" id="aud-venue">
-    <p>Add two lines of code to your checkout. Every ticket sold gets <strong>escrow protection</strong>, resale rules you control, and <strong>automatic artist royalties</strong> on every secondary sale. No new system. No replacing anything. Just a trust layer on top of what you already use.</p>
-  </div>
-  <div class="aud-content" id="aud-holder">
-    <p>Connect your account. Your tickets appear automatically. Select the games you can't make, set one pricing rule, hit publish. <strong>All 35 games listed in under two minutes.</strong> Get paid automatically when each one sells — no Venmo, no chasing anyone.</p>
-  </div>
-  <div class="aud-content" id="aud-fan">
-    <p>Find tickets to any event. See the <strong>real total price upfront</strong> — no surprise fees at checkout. Your money is held in escrow until your ticket is confirmed delivered. If it never arrives, you get a full automatic refund. Nobody has to chase anybody.</p>
-  </div>
-
-  <div class="waitlist-form">
-    <input type="email" id="hero-email" placeholder="your@email.com" autocomplete="email">
-    <button class="btn-mint" onclick="submitWaitlist('hero')">Get Early Access</button>
-  </div>
-  <div class="waitlist-count"><span id="count-num">—</span> people on the early access list</div>
-  <div class="success-msg" id="hero-success">✓ You're on the list. We'll be in touch.</div>
-</div>
-
-<!-- STATS BAR -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    <div class="stat-item">
-      <div class="stat-value">2.5%</div>
-      <div class="stat-label">Primary Sale Fee</div>
+  <div class="waitlist-wrap">
+    <div class="waitlist-row">
+      <input class="waitlist-input" type="email" id="hero-email" placeholder="your@email.com" autocomplete="email">
+      <button class="btn-mint" onclick="joinWaitlist('hero')">Start Selling Free</button>
     </div>
-    <div class="stat-item">
-      <div class="stat-value">1.5%</div>
-      <div class="stat-label">Resale Fee</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-value">7%</div>
-      <div class="stat-label">Artist Royalty Every Resale</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-value">$0</div>
-      <div class="stat-label">Hidden Fees. Ever.</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-value">AUTO</div>
-      <div class="stat-label">Refund on Non-Delivery</div>
-    </div>
+    <div class="waitlist-count">Season ticket holders · resellers · concert fans — <b>anyone with a ticket</b></div>
+    <div class="hero-success" id="hero-success">✓ You're on the list. We'll reach out soon.</div>
   </div>
 </div>
 
-<!-- THREE DOORS -->
-<section id="three-doors">
-  <div class="section-label">One Platform. Three Audiences.</div>
-  <h2 class="section-title">BUILT FOR EVERYONE THE OLD MODEL IGNORED</h2>
-  <p class="section-desc">Venues, season ticket holders, and fans. Three different problems. One trust layer that solves all of them.</p>
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <div class="ticker-item">⚾ <b>CUBS</b> · Wrigley Field</div>
+    <div class="ticker-item">🏈 <b>BEARS</b> · Soldier Field</div>
+    <div class="ticker-item">🏀 <b>BULLS</b> · United Center</div>
+    <div class="ticker-item">⚾ <b>WHITE SOX</b> · Guaranteed Rate Field</div>
+    <div class="ticker-item">🏒 <b>BLACKHAWKS</b> · United Center</div>
+    <div class="ticker-item">⚽ <b>FIRE</b> · SeatGeek Stadium</div>
+    <div class="ticker-item">🎵 Concerts · Theater · Any Event</div>
+    <div class="ticker-item">⚾ <b>CUBS</b> · Wrigley Field</div>
+    <div class="ticker-item">🏈 <b>BEARS</b> · Soldier Field</div>
+    <div class="ticker-item">🏀 <b>BULLS</b> · United Center</div>
+    <div class="ticker-item">⚾ <b>WHITE SOX</b> · Guaranteed Rate Field</div>
+    <div class="ticker-item">🏒 <b>BLACKHAWKS</b> · United Center</div>
+    <div class="ticker-item">⚽ <b>FIRE</b> · SeatGeek Stadium</div>
+    <div class="ticker-item">🎵 Concerts · Theater · Any Event</div>
+  </div>
+</div>
 
-  <div class="three-doors reveal">
-    <div class="door">
-      <div class="door-icon">🏛️</div>
-      <div class="door-who">For Venues & Sports Teams</div>
-      <div class="door-title">MintSeat for Venues</div>
-      <p class="door-desc">Embed our API into your existing checkout. Two lines of code. Every ticket you sell is automatically escrow-protected, resale-controlled, and royalty-configured. You see everything in one dashboard.</p>
-      <ul class="door-features">
-        <li>Resale price caps enforced automatically</li>
-        <li>Artist / rights holder royalty auto-routed</li>
-        <li>Escrow protects buyers on every purchase</li>
-        <li>Real-time revenue dashboard</li>
-        <li>You own your fan data</li>
-      </ul>
+<!-- THREE HOOKS -->
+<div class="section-wrap">
+  <div class="eyebrow">Why MintSeat</div>
+  <h2 class="h2 reveal">THREE THINGS STUBHUB<br><em>NEVER FIXED</em></h2>
+
+  <div class="hooks-grid reveal">
+    <div class="hook">
+      <div class="hook-num">01</div>
+      <div class="hook-title">The Fees Are Insane</div>
+      <p class="hook-body">StubHub takes up to 25% between buyer and seller. Ticketmaster takes 15%. On a $200 ticket you're handing over $30–50 for doing nothing wrong. MintSeat charges 1.5% to the seller and 1.5% to the buyer. Shown upfront. No surprises at checkout.</p>
+      <div class="hook-proof">$200 ticket · StubHub keeps $50 · MintSeat keeps $6</div>
     </div>
-    <div class="door">
-      <div class="door-icon">🎟️</div>
-      <div class="door-who">For Season Ticket Holders</div>
-      <div class="door-title">MintSeat for Holders</div>
-      <p class="door-desc">Connect your account, see all your games at once, list the ones you can't make in bulk with one pricing rule. Stop doing this one ticket at a time. Stop chasing payment after the game.</p>
-      <ul class="door-features">
-        <li>Bulk import — all games, one screen</li>
-        <li>One pricing rule covers all listings</li>
-        <li>Automatic payout on delivery confirmation</li>
-        <li>15-minute cancel window after a buyer commits</li>
-        <li>Cubs, Bulls, Bears, Sox — any team</li>
-      </ul>
+    <div class="hook">
+      <div class="hook-num">02</div>
+      <div class="hook-title">Listing Takes Forever</div>
+      <p class="hook-body">You have 40 games. You can make 25. That's 15 tickets to list — one at a time, same information, over and over. MintSeat: connect your account, every game appears automatically. Select the ones you can't make. Set one price rule. Hit publish. Done in two minutes.</p>
+      <div class="hook-proof">40 games · listed simultaneously · one price rule</div>
     </div>
-    <div class="door">
-      <div class="door-icon">🙋</div>
-      <div class="door-who">For Fans & Buyers</div>
-      <div class="door-title">MintSeat for Fans</div>
-      <p class="door-desc">Search any event. See the real total price before you click — no fee reveal at the last screen. Pay with your card or USDC wallet. Your money doesn't move until your ticket does.</p>
-      <ul class="door-features">
-        <li>Transparent fee breakdown upfront</li>
-        <li>Escrow holds funds until ticket confirmed</li>
-        <li>Automatic full refund on non-delivery</li>
-        <li>Trust tier shown on every listing</li>
-        <li>Credit card or USDC — your choice</li>
-      </ul>
+    <div class="hook">
+      <div class="hook-num">03</div>
+      <div class="hook-title">Chasing Payment Is Embarrassing</div>
+      <p class="hook-body">You transferred the ticket. Now you're waiting. Did they Venmo you? Do you follow up? MintSeat holds the buyer's payment securely until delivery is confirmed. The moment delivery is confirmed the money hits your account. Automatically. No follow-up. No awkward texts.</p>
+      <div class="hook-proof">payment held securely · you transfer · money releases automatically</div>
     </div>
   </div>
-</section>
+</div>
 
 <!-- HOW IT WORKS -->
-<section id="how" style="background:none; border-top:1px solid var(--border); border-bottom:1px solid var(--border); max-width:100%; padding:100px 48px;">
-  <div style="max-width:1200px; margin:0 auto;">
-    <div class="section-label">The Flow</div>
-    <h2 class="section-title">HOW A TRANSACTION WORKS</h2>
-    <p class="section-desc">From buyer pays to everyone gets paid — automatic, transparent, on-chain verified.</p>
+<div class="section-band" id="how">
+  <div class="section-wrap">
+    <div class="eyebrow">For Sellers</div>
+    <h2 class="h2 reveal">HOW IT WORKS</h2>
+    <p class="lead reveal">Four steps. Under two minutes for your whole season.</p>
 
-    <div class="flow-grid reveal">
-      <div class="flow-step">
-        <div class="flow-num">01</div>
-        <div class="flow-title">Buyer Pays</div>
-        <p class="flow-desc">Fan pays by credit card or USDC wallet. Funds lock immediately in escrow — not in MintSeat's account, not in the seller's account. Held securely until delivery.</p>
+    <div class="steps-grid reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Connect & Import</div>
+        <p class="step-body">Connect your Ticketmaster, MLB Ballpark, or team app account. Every ticket you own appears automatically. No manual entry required.</p>
       </div>
-      <div class="flow-step">
-        <div class="flow-num">02</div>
-        <div class="flow-title">Ticket Transfers</div>
-        <p class="flow-desc">Seller transfers ticket through normal channels. MintSeat gets confirmation automatically from the venue system, or buyer taps "Confirm Received" for external tickets.</p>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Select & Price</div>
+        <p class="step-body">Check the games or events you can't make. Set one pricing rule — face value, market rate, or a custom price. It applies to all selected tickets at once.</p>
       </div>
-      <div class="flow-step">
-        <div class="flow-num">03</div>
-        <div class="flow-title">Splits Route</div>
-        <p class="flow-desc">On confirmed delivery, payments route automatically: artist royalty, seller payout, platform fee — all in one settlement. No manual transfers. No waiting.</p>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Publish Everything</div>
+        <p class="step-body">Hit publish. All selected tickets go live simultaneously. When a buyer commits, their payment is held securely before you transfer anything.</p>
       </div>
-      <div class="flow-step">
-        <div class="flow-num">04</div>
-        <div class="flow-title">Everyone's Paid</div>
-        <p class="flow-desc">Artist gets their 7%. Seller gets their money. MintSeat takes 1.5%. Buyer gets a verified receipt. If anything goes wrong — automatic full refund, no questions.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- MONEY FLOW -->
-<section>
-  <div class="section-label">Show The Math</div>
-  <h2 class="section-title">WHERE EVERY DOLLAR GOES</h2>
-  <p class="section-desc">Example: $120 resale ticket. Here's the full breakdown before you click buy.</p>
-
-  <div class="money-split reveal">
-    <div class="split-row">
-      <div class="split-left">
-        <div class="split-dot d-artist"></div>
-        <div>
-          <div class="split-name">Artist / Rights Holder</div>
-          <div class="split-note">7% auto-routed on every resale. First time in ticketing history at the contract layer.</div>
-        </div>
-      </div>
-      <div class="split-amount amt-artist">$8.40</div>
-    </div>
-    <div class="split-row">
-      <div class="split-left">
-        <div class="split-dot d-seller"></div>
-        <div>
-          <div class="split-name">Seller Receives</div>
-          <div class="split-note">Paid automatically on delivery confirmation. No chasing. No Venmo.</div>
-        </div>
-      </div>
-      <div class="split-amount amt-seller">$109.80</div>
-    </div>
-    <div class="split-row">
-      <div class="split-left">
-        <div class="split-dot d-ms"></div>
-        <div>
-          <div class="split-name">MintSeat Platform Fee</div>
-          <div class="split-note">1.5% resale. Shown upfront. No surprises at checkout.</div>
-        </div>
-      </div>
-      <div class="split-amount amt-ms">$1.80</div>
-    </div>
-    <div class="split-row">
-      <div class="split-left">
-        <div class="split-dot d-fan"></div>
-        <div>
-          <div class="split-name">Buyer Pays Total</div>
-          <div class="split-note">$120 resale + $1.80 fee = $121.80 all-in. Shown before checkout. No surprises.</div>
-        </div>
-      </div>
-      <div class="split-amount" style="color:var(--text)">$121.80</div>
-    </div>
-    <div class="money-note-box">
-      <strong>vs. Ticketmaster:</strong> On a $120 ticket, Ticketmaster averages $34–$37 in service fees taken from the buyer — with zero going to the artist. MintSeat's total fee: $1.80. The artist gets $8.40. The math is not close.
-    </div>
-  </div>
-</section>
-
-<!-- SEASON TICKET SECTION -->
-<div class="season-section" id="sellers">
-  <div class="season-inner">
-    <div class="season-grid">
-      <div>
-        <div class="section-label">For Season Ticket Holders</div>
-        <h2 class="section-title">40 GAMES.<br>TWO MINUTES.</h2>
-        <p class="section-desc">You shouldn't have to spend an hour listing tickets one by one. You shouldn't have to chase payment after the game. MintSeat solves both.</p>
-
-        <ul class="step-list">
-          <li class="step-item">
-            <div class="step-circle">1</div>
-            <div class="step-body">
-              <h4>Connect Your Account</h4>
-              <p>Link your Ticketmaster or team app account. Your entire season appears automatically — every game, every seat, all at once.</p>
-            </div>
-          </li>
-          <li class="step-item">
-            <div class="step-circle">2</div>
-            <div class="step-body">
-              <h4>Select & Set One Rule</h4>
-              <p>Check the games you can't make. Set one pricing rule for all of them — face value, market rate, or a custom floor. Applies to every selected game instantly.</p>
-            </div>
-          </li>
-          <li class="step-item">
-            <div class="step-circle">3</div>
-            <div class="step-body">
-              <h4>Publish Everything at Once</h4>
-              <p>One button. All selected games go live simultaneously. No repeating the same steps 35 times.</p>
-            </div>
-          </li>
-          <li class="step-item">
-            <div class="step-circle">4</div>
-            <div class="step-body">
-              <h4>Get Paid Automatically</h4>
-              <p>When a game sells, buyer pays into escrow, you transfer the ticket, payout hits your account. No manual anything. No Venmo. No "did you get the money?"</p>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Calendar mockup -->
-      <div>
-        <div class="calendar-mock">
-          <div class="cal-header">
-            <div class="cal-header-title">Cubs 2026 — My Tickets</div>
-            <div class="cal-rule-badge">Rule: Face Value</div>
-          </div>
-          <div class="cal-grid" id="cal-grid"></div>
-          <div class="cal-footer">
-            <div class="cal-legend"><div class="cal-dot listed"></div> Listed (32)</div>
-            <div class="cal-legend"><div class="cal-dot keeping"></div> Keeping (9)</div>
-            <button class="cal-publish-btn" onclick="publishAll()">Publish All →</button>
-          </div>
-        </div>
-        <p style="font-family:'DM Mono',monospace; font-size:11px; color:var(--text-muted); margin-top:12px; text-align:center; letter-spacing:0.04em;">Click dates to toggle listed / keeping. Hit Publish All.</p>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Get Paid</div>
+        <p class="step-body">Transfer the ticket. Delivery confirmed. Payment releases to your account automatically. No Venmo. No chasing. No waiting around after the game.</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- TRUST TIERS / MINTSCORE -->
-<section id="trust">
+<!-- FEE TABLE -->
+<div class="section-wrap" id="fees">
+  <div class="eyebrow">The Math</div>
+  <h2 class="h2 reveal">WHAT YOU ACTUALLY KEEP</h2>
+  <p class="lead reveal">Real numbers. The difference is not small.</p>
 
-  <!-- MintScore intro -->
-  <div class="section-label">Proprietary Trust Algorithm</div>
-  <h2 class="section-title">INTRODUCING <em style="color:var(--mint); font-style:normal;">MINTSCORE</em></h2>
-  <p class="section-desc">Every seller on MintSeat has a MintScore — a proprietary trust rating built from verified on-chain history. Not star ratings. Not self-reported. Not gameable.</p>
-
-  <!-- Score band display -->
-  <div class="mintscore-bands reveal">
-    <div class="band-row">
-      <div class="band-item">
-        <div class="band-score" style="color:#ff5757;">0–299</div>
-        <div class="band-icon">⚠️</div>
-        <div class="band-label">Risky</div>
-      </div>
-      <div class="band-divider"></div>
-      <div class="band-item">
-        <div class="band-score" style="color:var(--text-muted);">300–599</div>
-        <div class="band-icon">🔘</div>
-        <div class="band-label">New</div>
-      </div>
-      <div class="band-divider"></div>
-      <div class="band-item">
-        <div class="band-score" style="color:var(--blue);">600–1,499</div>
-        <div class="band-icon">🔵</div>
-        <div class="band-label">Established</div>
-      </div>
-      <div class="band-divider"></div>
-      <div class="band-item active-band">
-        <div class="band-score" style="color:var(--mint);">1,500–2,999</div>
-        <div class="band-icon">🟢</div>
-        <div class="band-label">Trusted</div>
-      </div>
-      <div class="band-divider"></div>
-      <div class="band-item">
-        <div class="band-score" style="color:#f59e0b;">3,000–4,999</div>
-        <div class="band-icon">🌟</div>
-        <div class="band-label">Verified</div>
-      </div>
-      <div class="band-divider"></div>
-      <div class="band-item">
-        <div class="band-score" style="color:#818cf8;">5,000–7,499</div>
-        <div class="band-icon">💎</div>
-        <div class="band-label">Elite</div>
-      </div>
-      <div class="band-divider"></div>
-      <div class="band-item">
-        <div class="band-score" style="color:#e879f9;">7,500–10,000</div>
-        <div class="band-icon">👑</div>
-        <div class="band-label">Legend</div>
-      </div>
+  <div class="fee-table reveal">
+    <div class="fee-row hdr">
+      <div class="fc hc">Your Ticket Price</div>
+      <div class="fc hc" style="color:var(--red);">StubHub</div>
+      <div class="fc hc" style="color:var(--gold);">Ticketmaster</div>
+      <div class="fc hc" style="color:var(--mint);">MintSeat</div>
+    </div>
+    <div class="fee-row">
+      <div class="fc lbl">$100 ticket</div>
+      <div class="fc bad">You keep $75</div>
+      <div class="fc mid">You keep $85</div>
+      <div class="fc ms">You keep $98.50</div>
+    </div>
+    <div class="fee-row">
+      <div class="fc lbl">$200 ticket</div>
+      <div class="fc bad">You keep $150</div>
+      <div class="fc mid">You keep $170</div>
+      <div class="fc ms">You keep $197</div>
+    </div>
+    <div class="fee-row">
+      <div class="fc lbl">$500 ticket</div>
+      <div class="fc bad">You keep $375</div>
+      <div class="fc mid">You keep $425</div>
+      <div class="fc ms">You keep $492.50</div>
+    </div>
+    <div class="fee-row">
+      <div class="fc lbl">$1,000 ticket</div>
+      <div class="fc bad">You keep $750</div>
+      <div class="fc mid">You keep $850</div>
+      <div class="fc ms">You keep $985</div>
+    </div>
+    <div class="fee-row">
+      <div class="fc lbl">$5,000 / month</div>
+      <div class="fc bad">StubHub keeps $1,250</div>
+      <div class="fc mid">TM keeps $750</div>
+      <div class="fc ms">MintSeat keeps $75</div>
     </div>
   </div>
 
-  <!-- Five pillars -->
-  <div class="pillars-grid reveal">
-    <div class="pillar-card">
-      <div class="pillar-pct" style="color:var(--mint);">30%</div>
-      <div class="pillar-name">Delivery Rate</div>
-      <p class="pillar-desc">Did you transfer the ticket after a buyer paid? Every completed transaction builds your score. Every bail costs you.</p>
-    </div>
-    <div class="pillar-card">
-      <div class="pillar-pct" style="color:var(--blue);">25%</div>
-      <div class="pillar-name">Delivery Speed</div>
-      <p class="pillar-desc">Transaction timestamps are verified on-chain. Sellers who transfer within hours score higher than those who wait until game day.</p>
-    </div>
-    <div class="pillar-card">
-      <div class="pillar-pct" style="color:var(--purple);">20%</div>
-      <div class="pillar-name">Peer Ratings</div>
-      <p class="pillar-desc">After every settled transaction, buyer rates seller and seller rates buyer. Recency-weighted. Both sides accountable.</p>
-    </div>
-    <div class="pillar-card">
-      <div class="pillar-pct" style="color:var(--gold);">15%</div>
-      <div class="pillar-name">Cancellation Rate</div>
-      <p class="pillar-desc">How often did you cancel after a buyer committed funds? Late cancellations after the grace window count heavily against your score.</p>
-    </div>
-    <div class="pillar-card">
-      <div class="pillar-pct" style="color:#f87171;">10%</div>
-      <div class="pillar-name">On-Chain History</div>
-      <p class="pillar-desc">Verified transaction volume on the ledger. You can't fake a completed escrow. The chain doesn't lie — and neither does your score.</p>
-    </div>
+  <div class="fee-callout reveal">
+    <strong>At $5,000/month in ticket sales</strong> — MintSeat saves you $1,175 vs StubHub. Every single month. That's $14,100 a year you're giving away for no reason.
   </div>
+</div>
 
-  <div class="mintscore-note reveal">
-    <div class="mintscore-note-inner">
-      <div>
-        <div style="font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.04em; margin-bottom:6px;">SCORES ARE RECENCY-WEIGHTED</div>
-        <p style="font-size:13px; color:var(--text-dim); line-height:1.65; max-width:560px;">The last 90 days count 50%. The prior year counts 35%. Everything older counts 15%. Bad history fades. Consistent good behavior rebuilds. New sellers start at 500 — every transaction is an opportunity to earn.</p>
+<!-- CHICAGO SPORTS -->
+<div class="section-band">
+  <div class="section-wrap">
+    <div class="eyebrow">Any Event, Anywhere</div>
+    <h2 class="h2 reveal">ANY TICKET.<br><em>ANY EVENT.</em></h2>
+    <p class="lead reveal">Works with tickets from any team, any artist, any platform. If you have tickets you can't use — this is built for you.</p>
+
+    <div class="sports-grid reveal">
+      <div class="sport-card">
+        <div class="sport-emoji">⚾</div>
+        <div class="sport-name">Baseball</div>
+        <div class="sport-sub">MLB · Minor League</div>
       </div>
-      <div class="mintscore-moat">
-        <div style="font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; color:var(--mint); margin-bottom:8px; text-transform:uppercase;">Why it can't be gamed</div>
-        <p style="font-size:13px; color:var(--text-dim); line-height:1.65;">StubHub has star ratings. Anyone can earn 5 stars with a burner account. MintSeat's score is anchored to on-chain escrow transactions that are public, immutable, and verifiable. You can't fake a completed delivery. You can't buy a good score. You earn it.</p>
+      <div class="sport-card">
+        <div class="sport-emoji">🏈</div>
+        <div class="sport-name">Football</div>
+        <div class="sport-sub">NFL · College</div>
+      </div>
+      <div class="sport-card">
+        <div class="sport-emoji">🏀</div>
+        <div class="sport-name">Basketball</div>
+        <div class="sport-sub">NBA · WNBA · NCAA</div>
+      </div>
+      <div class="sport-card">
+        <div class="sport-emoji">🎵</div>
+        <div class="sport-name">Concerts</div>
+        <div class="sport-sub">Any Artist · Any Venue</div>
+      </div>
+      <div class="sport-card">
+        <div class="sport-emoji">🎭</div>
+        <div class="sport-name">Theater</div>
+        <div class="sport-sub">Broadway · Local Shows</div>
       </div>
     </div>
+
+    <p style="text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:24px;letter-spacing:0.05em;">
+      Hockey · Soccer · Comedy · Festivals · Motorsports · MMA · Any ticket you own
+    </p>
   </div>
+</div>
 
-  <!-- Three listing tiers -->
-  <div style="margin-top:64px;">
-    <div class="section-label">Listing Verification Tiers</div>
-    <h3 style="font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:0.03em; margin-bottom:12px;">EVERY LISTING SHOWS ITS TRUST LEVEL</h3>
-    <p class="section-desc">MintScore covers the seller. The listing tier covers the ticket itself. Buyers see both before they pay.</p>
-  </div>
+<!-- RESELLERS -->
+<div class="section-wrap" id="resellers">
+  <div class="eyebrow">For Resellers</div>
+  <h2 class="h2 reveal">IF YOU FLIP TICKETS<br><em>FOR PROFIT</em></h2>
 
-  <div class="trust-grid reveal">
-    <div class="trust-card">
-      <div class="trust-tier">Partner Verified</div>
-      <span class="trust-badge badge-p1">✓ HIGHEST TRUST</span>
-      <p class="trust-desc">Ticket purchased through a MintSeat-integrated venue. Authenticity confirmed at point of sale. Resale rules and royalties auto-populated. Strongest buyer protection available.</p>
-      <ul class="trust-features">
-        <li>Registered at original purchase</li>
-        <li>Venue resale rules auto-enforce</li>
-        <li>Artist / rights holder royalty auto-routes</li>
-        <li>Instant seller recognition on listing</li>
-      </ul>
-    </div>
-    <div class="trust-card">
-      <div class="trust-tier">Transfer Verified</div>
-      <span class="trust-badge badge-p2">✓ VERIFIED</span>
-      <p class="trust-desc">Seller connected their Ticketmaster or team app account. MintSeat confirmed the ticket exists and belongs to this seller. Works for any ticket from any source.</p>
-      <ul class="trust-features">
-        <li>Ticket confirmed in seller's account</li>
-        <li>Identity verified at listing</li>
-        <li>Escrow protection on purchase</li>
-        <li>Event rules applied if venue is a partner</li>
-      </ul>
-    </div>
-    <div class="trust-card">
-      <div class="trust-tier">Seller Declared</div>
-      <span class="trust-badge badge-p3">DECLARED</span>
-      <p class="trust-desc">Seller uploaded proof of ticket. MintSeat cross-references against known event data. Escrow still protects the money. Trust level shown clearly before purchase.</p>
-      <ul class="trust-features">
-        <li>Proof of ticket reviewed</li>
-        <li>Escrow holds funds until delivery</li>
-        <li>Automatic refund on non-delivery</li>
-        <li>Buyer assumes ownership verification risk</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- PAYMENT SECTION -->
-<div class="payment-section">
-  <div class="payment-inner">
-    <div class="payment-grid">
-      <div>
-        <div class="section-label">How Fans Pay</div>
-        <h2 class="section-title">CARD OR CRYPTO.<br>BUYER'S CHOICE.</h2>
-        <p class="section-desc">Most fans pay with their Visa. Crypto-native buyers can pay with their USDC wallet. Both settle the same way. Both get the same escrow protection.</p>
-
-        <div class="payment-paths">
-          <div class="payment-path featured">
-            <div class="path-icon">💳</div>
-            <div>
-              <div class="path-title">Credit or Debit Card</div>
-              <p class="path-desc">Default checkout. Fan enters their card like any other purchase. Processed by Stripe. Funds settle in escrow automatically.</p>
-              <span class="path-fee">Most buyers • Standard processing</span>
-            </div>
-          </div>
-          <div class="payment-path">
-            <div class="path-icon">🔗</div>
-            <div>
-              <div class="path-title">USDC Wallet</div>
-              <p class="path-desc">Connect any USDC-compatible wallet. Pay directly from your balance. Lower effective fee — no card processing cost. Earns more MINT rewards.</p>
-              <span class="path-fee">Crypto-native • Lower fee path</span>
-            </div>
-          </div>
+  <div class="reseller-grid reveal">
+    <div class="points">
+      <p style="font-size:15px;color:var(--text-dim);line-height:1.7;margin-bottom:8px;">The math on StubHub is brutal at volume. MintSeat was built for sellers who treat this seriously.</p>
+      <div class="point">
+        <div class="point-num">1</div>
+        <div>
+          <div class="point-title">1.5% fee. Not 15–25%.</div>
+          <p class="point-body">Every dollar saved on fees is a dollar more profit. At volume this is not a rounding error — it's your entire margin.</p>
         </div>
       </div>
+      <div class="point">
+        <div class="point-num">2</div>
+        <div>
+          <div class="point-title">Payment protection works both ways.</div>
+          <p class="point-body">Buyer funds lock before you transfer. No chargebacks after delivery is confirmed. Your payout is protected by design.</p>
+        </div>
+      </div>
+      <div class="point">
+        <div class="point-num">3</div>
+        <div>
+          <div class="point-title">MintScore makes your listings convert better.</div>
+          <p class="point-body">Your trust rating is built on verified on-chain transaction history. Delivery rate, speed, peer ratings. High MintScore means buyers choose you first.</p>
+        </div>
+      </div>
+    </div>
 
-      <div class="payment-logos">
-        <div class="powered-by">Payments powered by</div>
-        <div class="logo-badge" style="font-size:24px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z" fill="#635BFF"/>
-          </svg>
-          <span>Stripe</span> Connect
-        </div>
-        <div class="logo-badge">
-          <span style="color:var(--blue);">⬡</span> XRPL Escrow Settlement
-        </div>
-        <p style="font-family:'DM Mono',monospace; font-size:11px; color:var(--text-muted); text-align:center; line-height:1.65; margin-top:8px;">MintSeat never holds your money.<br>Escrow releases only on confirmed delivery.</p>
+    <div class="math-card">
+      <div class="math-header">$500 ticket · what you actually keep</div>
+      <div class="math-row">
+        <div class="math-label">Your asking price</div>
+        <div class="math-val v-dim">$500</div>
+      </div>
+      <div class="math-row" style="background:rgba(255,87,87,0.04);">
+        <div class="math-label">StubHub keeps (25%)</div>
+        <div class="math-val v-red">−$125</div>
+      </div>
+      <div class="math-row" style="background:var(--mint-glow);">
+        <div class="math-label">MintSeat keeps (1.5%)</div>
+        <div class="math-val v-mint">−$7.50</div>
+      </div>
+      <div class="math-row" style="border-top:2px solid var(--border-b);">
+        <div class="math-label" style="font-weight:600;color:var(--text);">You keep on StubHub</div>
+        <div class="math-val v-red">$375</div>
+      </div>
+      <div class="math-row">
+        <div class="math-label" style="font-weight:600;color:var(--text);">You keep on MintSeat</div>
+        <div class="math-val v-mint">$492.50</div>
+      </div>
+      <div class="math-footer">
+        <strong>$117.50 more per ticket.</strong><br>
+        At 20 tickets/month that's $2,350 extra — every month.
       </div>
     </div>
   </div>
 </div>
 
-<!-- PRICING -->
-<section id="pricing">
-  <div class="section-label">Transparent Pricing</div>
-  <h2 class="section-title">YOU ONLY PAY<br><em style="color:var(--mint); font-style:normal;">WHAT MAKES SENSE.</em></h2>
-  <p class="section-desc">Venues pay a monthly SaaS fee. Season ticket holders and fans never pay a subscription — ever. You only pay a small transaction fee when a ticket actually sells.</p>
+<!-- ARTIST ROYALTY -->
+<div class="royalty-band" id="royalty">
+  <div class="royalty-inner">
+    <div class="eyebrow">What Makes MintSeat Different</div>
+    <h2 class="h2 reveal">THE ARTIST GETS PAID<br><em>EVERY TIME.</em></h2>
 
-  <!-- Who pays what — quick summary -->
-  <div class="pricing-who reveal">
-    <div class="who-card">
-      <div class="who-icon">🏛️</div>
-      <div class="who-role">Venues & Sports Teams</div>
-      <div class="who-fee">$49–$299 <span>/mo</span></div>
-      <div class="who-note">Monthly SaaS subscription. Unlimited ticket registrations, resale rules, royalty routing, and dashboard access. No per-ticket fee on primary sales beyond the 2.5% transaction fee.</div>
-    </div>
-    <div class="who-card who-card-free">
-      <div class="who-icon">🎟️</div>
-      <div class="who-role">Season Ticket Holders</div>
-      <div class="who-fee free-fee">$0 <span>/mo</span></div>
-      <div class="who-note">No subscription. No monthly fee. You pay <strong>1.5%</strong> only when a ticket sells and the buyer receives it. If nothing sells, you pay nothing.</div>
-    </div>
-    <div class="who-card who-card-free">
-      <div class="who-icon">🙋</div>
-      <div class="who-role">Fans & Buyers</div>
-      <div class="who-fee free-fee">$0 <span>/mo</span></div>
-      <div class="who-note">No subscription. No hidden fees. You see the full price — ticket + <strong>1.5% platform fee</strong> — before you click buy. That's it. No surprise charges at checkout.</div>
-    </div>
-  </div>
+    <div class="royalty-grid reveal">
+      <div>
+        <p style="font-size:15px;color:var(--text-dim);line-height:1.75;margin-bottom:32px;">
+          On StubHub, when you resell a $200 ticket that you paid $75 for, you keep the markup and StubHub keeps 25%. The artist — the person whose name is on the ticket, whose music fills the arena — gets exactly zero.<br><br>
+          MintSeat fixes this. A small percentage of every resale automatically routes to the artist or rights holder. You set it. We enforce it. It happens on-chain — no one can skip it, forget it, or redirect it.
+        </p>
 
-  <!-- Venue SaaS tiers -->
-  <div style="margin-top:64px;">
-    <div class="section-label">Venue Subscription Tiers</div>
-    <h3 style="font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:0.03em; margin-bottom:12px;">FOR VENUES & SPORTS TEAMS</h3>
-    <p style="font-size:15px; color:var(--text-dim); max-width:520px; line-height:1.7; margin-bottom:40px;">Everything below applies to the venue or team — not to fans or sellers. Pick the tier that fits your event volume.</p>
-  </div>
+        <div class="royalty-flow">
+          <div class="royalty-step">
+            <div class="royalty-icon">🎟️</div>
+            <div>
+              <div class="royalty-step-title">You list your ticket</div>
+              <p class="royalty-step-body">Set your price and royalty percentage. Default is 7% — you can adjust it. The artist's cut is shown transparently to the buyer before they purchase.</p>
+            </div>
+          </div>
+          <div class="royalty-step">
+            <div class="royalty-icon">🔒</div>
+            <div>
+              <div class="royalty-step-title">Buyer payment is secured</div>
+              <p class="royalty-step-body">The full purchase amount is held securely. Nothing moves until the ticket is confirmed delivered. Your funds and the royalty are both protected.</p>
+            </div>
+          </div>
+          <div class="royalty-step">
+            <div class="royalty-icon">⚡</div>
+            <div>
+              <div class="royalty-step-title">Automatic split on delivery</div>
+              <p class="royalty-step-body">Ticket confirmed delivered. Royalty routes to the artist's wallet instantly. You get paid your share automatically. MintSeat takes 1.5%. Done.</p>
+            </div>
+          </div>
+          <div class="royalty-step">
+            <div class="royalty-icon">🎵</div>
+            <div>
+              <div class="royalty-step-title">Artist receives it directly</div>
+              <p class="royalty-step-body">No middleman. No manager getting in between. The royalty goes to a verified wallet address — the artist controls it and can claim it on their own timeline.</p>
+            </div>
+          </div>
+        </div>
 
-  <div class="pricing-grid reveal">
-    <div class="price-card">
-      <div class="price-tier">Starter</div>
-      <div class="price-num"><sup>$</sup>49</div>
-      <div class="price-period">per venue / month</div>
-      <ul class="price-features">
-        <li>Up to 5 events per month</li>
-        <li>Escrow protection on all ticket sales</li>
-        <li>Basic venue dashboard</li>
-        <li>Transparent fee display at checkout</li>
-        <li>Fan email support</li>
-        <li>Stripe-hosted seller onboarding</li>
-      </ul>
-      <button class="btn-outline" onclick="scrollToWaitlist()">Join Waitlist</button>
-    </div>
-
-    <div class="price-card featured">
-      <div class="price-tier">Pro</div>
-      <div class="price-num"><sup>$</sup>149</div>
-      <div class="price-period">per venue / month</div>
-      <div class="price-pilot">★ Chicago Pilot — Free Until Launch</div>
-      <ul class="price-features">
-        <li>Unlimited events</li>
-        <li>Artist / rights holder royalty routing</li>
-        <li>Resale price cap controls per event</li>
-        <li>Real-time escrow status dashboard</li>
-        <li>Season ticket holder bulk listing</li>
-        <li>Card + USDC wallet checkout</li>
-        <li>MintScore trust system</li>
-        <li>Priority support</li>
-      </ul>
-      <button class="btn-mint-block" onclick="scrollToWaitlist()">Get Early Access</button>
-    </div>
-
-    <div class="price-card">
-      <div class="price-tier">Enterprise</div>
-      <div class="price-num"><sup>$</sup>299</div>
-      <div class="price-period">per venue / month</div>
-      <ul class="price-features">
-        <li>Everything in Pro</li>
-        <li>Multi-venue management</li>
-        <li>Custom royalty splits per event</li>
-        <li>White-label checkout option</li>
-        <li>Dedicated account manager</li>
-        <li>Sports team rights holder setup</li>
-        <li>Custom integrations</li>
-      </ul>
-      <button class="btn-outline" onclick="scrollToWaitlist()">Talk To Us</button>
-    </div>
-  </div>
-
-  <!-- Transaction fee reminder -->
-  <div class="fee-reminder reveal">
-    <div class="fee-reminder-inner">
-      <div class="fee-item">
-        <div class="fee-label">Primary Sale</div>
-        <div class="fee-amount">2.5%</div>
-        <div class="fee-note">Charged to venue at time of sale</div>
+        <div class="royalty-tagline">You still keep more<br>than you would on <em>StubHub.</em></div>
       </div>
-      <div class="fee-divider"></div>
-      <div class="fee-item">
-        <div class="fee-label">Resale — Seller Pays</div>
-        <div class="fee-amount">1.5%</div>
-        <div class="fee-note">Only charged when ticket actually sells</div>
-      </div>
-      <div class="fee-divider"></div>
-      <div class="fee-item">
-        <div class="fee-label">Resale — Buyer Pays</div>
-        <div class="fee-amount">1.5%</div>
-        <div class="fee-note">Shown upfront before checkout. No surprises.</div>
-      </div>
-      <div class="fee-divider"></div>
-      <div class="fee-item">
-        <div class="fee-label">Monthly Fee — STH</div>
-        <div class="fee-amount" style="color:var(--mint);">$0</div>
-        <div class="fee-note">Never. Not now. Not ever.</div>
-      </div>
-      <div class="fee-divider"></div>
-      <div class="fee-item">
-        <div class="fee-label">Monthly Fee — Fan</div>
-        <div class="fee-amount" style="color:var(--mint);">$0</div>
-        <div class="fee-note">Never. Not now. Not ever.</div>
+
+      <div>
+        <div class="royalty-card">
+          <div class="royalty-card-header">$200 resale ticket — where every dollar goes</div>
+          <div class="royalty-split-row">
+            <div class="royalty-split-label"><span class="royalty-split-emoji">🎵</span> Artist royalty (7%)</div>
+            <div class="royalty-split-val rs-gold">$14.00</div>
+          </div>
+          <div class="royalty-split-row">
+            <div class="royalty-split-label"><span class="royalty-split-emoji">💳</span> MintSeat fee (1.5%)</div>
+            <div class="royalty-split-val rs-dim">$3.00</div>
+          </div>
+          <div class="royalty-split-row" style="background:var(--mint-glow);">
+            <div class="royalty-split-label" style="color:var(--text);font-weight:600;"><span class="royalty-split-emoji">💰</span> You receive</div>
+            <div class="royalty-split-val rs-mint">$183.00</div>
+          </div>
+          <div class="royalty-split-row" style="opacity:0.5;">
+            <div class="royalty-split-label"><span class="royalty-split-emoji">👀</span> Buyer pays total</div>
+            <div class="royalty-split-val rs-dim">$203.00</div>
+          </div>
+          <div class="royalty-card-footer">
+            Compare: StubHub seller keeps $150 on the same $200 ticket.<br>
+            <strong>MintSeat seller keeps $183 — and the artist got paid.</strong>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;background:var(--ink-light);border:1px solid var(--border);border-radius:10px;padding:20px 24px;">
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;margin-bottom:12px;">No artist registered? No problem.</div>
+          <p style="font-size:13px;color:var(--text-dim);line-height:1.65;">If no artist or rights holder is registered for your event, the royalty percentage stays in your pocket. You keep 98.5% of the sale. Registering an artist takes 5 minutes — or we can do it for you when a venue signs up.</p>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-</section>
+<!-- BUYER TRUST -->
+<div class="section-band" id="trust">
+  <div class="section-wrap">
+    <div class="eyebrow">For Buyers</div>
+    <h2 class="h2 reveal">BUYING IS<br><em>SAFE TOO</em></h2>
+    <p class="lead reveal">Every ticket on MintSeat has payment protection built in. Your money never moves until your ticket does.</p>
+
+    <div class="trust-grid reveal">
+      <div class="trust-card">
+        <div class="trust-icon">🔒</div>
+        <div class="trust-title">Payment Protection on Every Purchase</div>
+        <p class="trust-body">Your payment is held securely the moment you buy. The seller gets nothing until the ticket is confirmed delivered. If it never arrives — automatic full refund. No questions, no disputes.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">💰</div>
+        <div class="trust-title">Real Price Shown Upfront</div>
+        <p class="trust-body">The total — including the 1.5% MintSeat buyer fee — is shown before you click buy. No fee reveal at the last screen. No surprise charges after you've already mentally committed. What you see is exactly what you pay.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">⬡</div>
+        <div class="trust-title">MintScore on Every Listing</div>
+        <p class="trust-body">Every seller has a MintScore built on verified on-chain transaction history. Delivery rate, speed, peer ratings. You see it before you buy. You cannot fake a completed delivery on the blockchain.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- FOOTER CTA -->
 <div class="footer-cta" id="waitlist">
-  <h2>MINT YOUR<br><span>SEAT.</span></h2>
-  <div style="font-family:'Bebas Neue',sans-serif; font-size:clamp(28px,4vw,52px); letter-spacing:0.06em; color:var(--text-dim); margin-bottom:28px;">OWN THE <span style="color:var(--mint);">CHAIN.</span></div>
-  <p>We're launching with Chicago venues first — The Riv, Metro, Schubas. If you're a venue, sports team, season ticket holder, or fan who's done with 30% fees and empty promises, get on the list.</p>
+  <div class="big">STOP LEAVING<br><span>MONEY</span> BEHIND.</div>
+  <p class="sub">List your tickets in two minutes. Keep 98.5% of every sale. Get paid automatically the moment your ticket delivers.</p>
 
-  <div class="footer-form">
-    <input type="email" id="footer-email" placeholder="your@email.com" autocomplete="email">
-    <button class="btn-mint" onclick="submitWaitlist('footer')">Get Early Access</button>
+  <div class="footer-row">
+    <input class="footer-input" type="email" id="footer-email" placeholder="your@email.com" autocomplete="email">
+    <button class="btn-mint" onclick="joinWaitlist('footer')">Join the Pilot</button>
   </div>
-  <div class="success-msg" id="footer-success">✓ You're on the list. We'll be in touch soon.</div>
+  <div class="footer-success" id="footer-success">✓ You're in. We'll reach out within 24 hours.</div>
 </div>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-brand"><span>Mint</span>Seat</div>
-  <span class="footer-copy">© 2026 Solmare Group LLC · Chicago, IL · mintseat.co</span>
-  <ul class="footer-links">
+  <div class="f-brand"><span>Mint</span>Seat</div>
+  <span class="f-copy">© 2026 Solmare Group LLC · Chicago, IL · mintseat.co</span>
+  <ul class="f-links">
     <li><a href="#">Privacy</a></li>
     <li><a href="#">Terms</a></li>
+    <li><a href="/venues">For Venues</a></li>
     <li><a href="mailto:hello@mintseat.co">Contact</a></li>
-    <li><a href="#">Venue Docs</a></li>
   </ul>
 </footer>
 
 <script>
-// ── AUDIENCE TABS ──────────────────────────────────────────────────────────
-function switchAud(id, scroll) {
-  document.querySelectorAll('.aud-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.aud-content').forEach(c => c.classList.remove('active'));
-  // Match the tab
-  document.querySelectorAll('.aud-tab').forEach(t => {
-    if ((id === 'venue' && t.textContent.includes('Venue')) ||
-        (id === 'holder' && t.textContent.includes('Season')) ||
-        (id === 'fan' && t.textContent.includes('Fan'))) {
-      t.classList.add('active');
-    }
-  });
-  const content = document.getElementById('aud-' + id);
-  if (content) content.classList.add('active');
-  // Scroll to hero on nav click
-  if (scroll !== false) {
-    document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' });
-  }
-}
-
-// ── CALENDAR MOCKUP ────────────────────────────────────────────────────────
-const games = [
-  {d:3,s:'listed'},{d:6,s:'keeping'},{d:7,s:'listed'},{d:9,s:'listed'},
-  {d:11,s:'keeping'},{d:13,s:'listed'},{d:14,s:'listed'},{d:16,s:'empty'},
-  {d:17,s:'listed'},{d:19,s:'keeping'},{d:20,s:'listed'},{d:21,s:'listed'},
-  {d:23,s:'listed'},{d:24,s:'keeping'},{d:25,s:'listed'},{d:26,s:'listed'},
-  {d:28,s:'keeping'},{d:29,s:'listed'},{d:30,s:'listed'},{d:31,s:'listed'},
-  {d:2,s:'listed',m:'Jul'},{d:4,s:'keeping',m:'Jul'},{d:5,s:'listed',m:'Jul'},
-  {d:6,s:'listed',m:'Jul'},{d:8,s:'listed',m:'Jul'},{d:9,s:'listed',m:'Jul'},
-  {d:10,s:'listed',m:'Jul'},{d:12,s:'keeping',m:'Jul'},
-];
-
-function buildCal() {
-  const grid = document.getElementById('cal-grid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  ['S','M','T','W','T','F','S'].forEach(d => {
-    const h = document.createElement('div');
-    h.style.cssText = 'text-align:center; font-family:"DM Mono",monospace; font-size:9px; color:var(--text-muted); padding:4px 0; letter-spacing:0.06em;';
-    h.textContent = d;
-    grid.appendChild(h);
-  });
-  games.forEach((g, i) => {
-    const cell = document.createElement('div');
-    cell.className = 'cal-cell ' + g.s;
-    cell.innerHTML = `<div class="cal-cell-day">${g.d}</div><div class="cal-cell-label">${g.m || 'Jun'}</div>`;
-    cell.onclick = () => toggleGame(i, cell);
-    grid.appendChild(cell);
-  });
-}
-
-function toggleGame(i, cell) {
-  if (games[i].s === 'listed') {
-    games[i].s = 'keeping';
-    cell.className = 'cal-cell keeping';
-  } else if (games[i].s === 'keeping') {
-    games[i].s = 'listed';
-    cell.className = 'cal-cell listed';
-  }
-  updateCalFooter();
-}
-
-function updateCalFooter() {
-  const listed  = games.filter(g => g.s === 'listed').length;
-  const keeping = games.filter(g => g.s === 'keeping').length;
-  document.querySelectorAll('.cal-legend')[0].innerHTML = `<div class="cal-dot listed"></div> Listed (${listed})`;
-  document.querySelectorAll('.cal-legend')[1].innerHTML = `<div class="cal-dot keeping"></div> Keeping (${keeping})`;
-}
-
-function publishAll() {
-  const btn = document.querySelector('.cal-publish-btn');
-  btn.textContent = 'Publishing...';
-  setTimeout(() => {
-    btn.textContent = '✓ All Listed!';
-    btn.style.background = 'var(--mint-dim)';
-    setTimeout(() => {
-      btn.textContent = 'Publish All →';
-      btn.style.background = '';
-    }, 2000);
-  }, 800);
-}
-
-buildCal();
-
-// ── WAITLIST ───────────────────────────────────────────────────────────────
-let waitlistCount = 0;
-
-async function loadCount() {
-  try {
-    const r = await fetch('/api/waitlist/count');
-    if (r.ok) { const d = await r.json(); waitlistCount = d.count || 0; }
-  } catch(e) { waitlistCount = 63; }
-  document.getElementById('count-num').textContent = waitlistCount.toLocaleString();
-}
-
-async function submitWaitlist(source) {
-  const emailEl = document.getElementById(source === 'hero' ? 'hero-email' : 'footer-email');
-  const email   = emailEl.value.trim();
-  const success = document.getElementById(source + '-success');
+async function joinWaitlist(src) {
+  const id  = src === 'hero' ? 'hero-email' : 'footer-email';
+  const el  = document.getElementById(id);
+  const ok  = document.getElementById(src === 'hero' ? 'hero-success' : 'footer-success');
+  const email = el.value.trim();
 
   if (!email || !email.includes('@')) {
-    emailEl.style.borderColor = '#ff5757';
-    emailEl.focus();
-    setTimeout(() => { emailEl.style.borderColor = ''; }, 2000);
+    el.style.borderColor = '#FF5757';
+    el.focus();
+    setTimeout(() => { el.style.borderColor = ''; }, 2000);
     return;
   }
 
   const btn = event.target;
-  const orig = btn.textContent;
   btn.textContent = 'Adding...';
   btn.disabled = true;
 
@@ -1530,30 +695,20 @@ async function submitWaitlist(source) {
     await fetch('/api/waitlist/join', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, source, ts: Date.now() })
+      body: JSON.stringify({ email, source: src, ts: Date.now() })
     });
   } catch(e) {}
 
-  success.style.display = 'flex';
-  emailEl.value = '';
-  waitlistCount++;
-  document.getElementById('count-num').textContent = waitlistCount.toLocaleString();
-  btn.textContent = orig;
+  el.value = '';
+  ok.style.display = 'block';
+  btn.textContent = src === 'hero' ? 'Start Selling Free' : 'Join the Pilot';
   btn.disabled = false;
 }
 
-function scrollToWaitlist() {
-  document.getElementById('waitlist').scrollIntoView({ behavior: 'smooth' });
-}
-
-loadCount();
-
-// ── SCROLL REVEAL ──────────────────────────────────────────────────────────
-const observer = new IntersectionObserver(entries => {
+const obs = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.08 });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 </script>
 </body>
 </html>
