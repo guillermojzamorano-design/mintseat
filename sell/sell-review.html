@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Review Your Tickets — MintSeat</title>
+<meta name="description" content="Review the tickets we found in your email, set your prices, and list them on MintSeat.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#060E09;--bg-card:#0C1810;--bg-input:#080F0A;--bg-hover:#112016;
+  --gold:#C9A84C;--gold-light:#E2C46E;--gold-dim:#7A5F28;
+  --gold-glow:rgba(201,168,76,0.10);--gold-glow2:rgba(201,168,76,0.22);
+  --mint:#00E5A0;--mint-dim:#00A370;--mint-glow:rgba(0,229,160,0.08);--mint-glow2:rgba(0,229,160,0.18);
+  --red:#E05252;--red-glow:rgba(224,82,82,0.12);
+  --text:#E8F2EB;--text-dim:#7FA890;--text-muted:#3D6050;
+  --border:rgba(255,255,255,0.05);--border-gold:rgba(201,168,76,0.18);--border-mint:rgba(0,229,160,0.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
+
+/* ── NAV ── */
+.nav{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-gold);background:rgba(6,14,9,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-gem{width:26px;height:26px;background:linear-gradient(135deg,var(--gold-dim),var(--gold));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.nav-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);}
+
+/* ── LOADING ── */
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
+.loading-rings{width:52px;height:52px;position:relative;}
+.lr1{position:absolute;inset:0;border-radius:50%;border:2px solid var(--border-gold);border-top-color:var(--gold);animation:spin .9s linear infinite;}
+.lr2{position:absolute;inset:8px;border-radius:50%;border:2px solid var(--border-gold);border-bottom-color:var(--mint);animation:spin 1.4s linear infinite reverse;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;}
+.loading-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);letter-spacing:0.08em;}
+
+/* ── ERROR SCREEN ── */
+.error-screen{display:none;max-width:500px;margin:80px auto;padding:0 20px;text-align:center;}
+.error-icon{width:56px;height:56px;background:var(--red-glow);border:1px solid rgba(224,82,82,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.error-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin-bottom:8px;}
+.error-msg{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.8;margin-bottom:20px;}
+
+/* ── MAIN CONTENT ── */
+.main{max-width:800px;margin:0 auto;padding:32px 16px 80px;display:none;}
+
+/* ── PAGE HEADER ── */
+.page-hero{text-align:center;margin-bottom:32px;}
+.hero-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--mint);margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.hero-tag::before,.hero-tag::after{content:'';width:20px;height:1px;background:var(--border-mint);}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,5vw,42px);font-weight:700;line-height:1.1;margin-bottom:8px;}
+.hero-title em{font-style:italic;color:var(--gold-light);}
+.hero-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.8;letter-spacing:0.04em;}
+
+/* ── SUMMARY BAR ── */
+.summary-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border-gold);border:1px solid var(--border-gold);border-radius:8px;overflow:hidden;margin-bottom:24px;}
+.sb-cell{background:var(--bg-card);padding:14px 16px;text-align:center;}
+.sb-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;}
+.sb-val{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:var(--gold-light);}
+.sb-val.mint{color:var(--mint);}
+.sb-val.white{color:var(--text);}
+
+/* ── BULK CONTROLS ── */
+.bulk-controls{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.bc-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);white-space:nowrap;}
+.bc-input{background:var(--bg-input);border:1px solid var(--border-gold);border-radius:4px;padding:7px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;width:90px;outline:none;}
+.bc-input:focus{border-color:var(--gold);}
+.bc-select{background:var(--bg-input);border:1px solid var(--border-gold);border-radius:4px;padding:7px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:9px;outline:none;cursor:pointer;}
+.bc-divider{width:1px;height:20px;background:var(--border-gold);flex-shrink:0;}
+.bc-actions{display:flex;gap:6px;margin-left:auto;}
+
+/* ── TICKET CARDS ── */
+.tickets-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.ticket-card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:8px;overflow:hidden;transition:border-color .2s;}
+.ticket-card.selected{border-color:var(--gold);}
+.ticket-card.deselected{opacity:.45;border-color:var(--border);}
+.tc-header{padding:13px 16px;background:linear-gradient(135deg,rgba(201,168,76,0.05),transparent);display:flex;align-items:center;gap:12px;cursor:pointer;}
+.tc-check{width:18px;height:18px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;}
+.tc-sport{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);background:var(--gold-glow);border:1px solid var(--border-gold);padding:2px 8px;border-radius:100px;flex-shrink:0;}
+.tc-game{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tc-date{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);flex-shrink:0;}
+.tc-body{padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;border-top:1px solid var(--border);}
+.tc-field{padding-top:12px;}
+.tc-field-label{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;}
+.tc-field-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--mint);font-weight:500;}
+.tc-field-input{width:100%;background:var(--bg-input);border:1px solid var(--border-gold);border-radius:4px;padding:7px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;outline:none;transition:border-color .15s;}
+.tc-field-input:focus{border-color:var(--gold);}
+.tc-field-select{width:100%;background:var(--bg-input);border:1px solid var(--border-gold);border-radius:4px;padding:7px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:9px;outline:none;cursor:pointer;}
+.tc-payout{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:4px;}
+.tc-payout span{color:var(--mint);}
+
+/* ── CONNECT SECTION ── */
+.connect-card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:8px;overflow:hidden;margin-bottom:16px;}
+.connect-header{padding:14px 18px;border-bottom:1px solid var(--border-gold);background:rgba(201,168,76,0.04);display:flex;align-items:center;gap:10px;}
+.connect-icon{width:30px;height:30px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.connect-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;}
+.connect-body{padding:16px 18px;}
+.connect-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.connect-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border-gold);border-radius:6px;cursor:pointer;transition:all .2s;}
+.connect-opt:hover,.connect-opt.sel{background:var(--gold-glow);border-color:var(--gold);}
+.co-icon{font-size:18px;flex-shrink:0;}
+.co-title{font-size:14px;font-weight:500;}
+.co-desc{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:2px;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:5px;}
+.field input{width:100%;background:var(--bg-input);border:1px solid var(--border-gold);border-radius:5px;padding:10px 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .15s;}
+.field input:focus{border-color:var(--gold);}
+.field input::placeholder{color:var(--text-muted);}
+
+/* ── LISTING SUMMARY ── */
+.listing-summary{background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:14px;}
+.ls-title{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;}
+.ls-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);}
+.ls-row:last-child{border-bottom:none;}
+.ls-key{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.ls-val{font-family:'DM Mono',monospace;font-size:9px;color:var(--text);}
+.ls-val.gold{color:var(--gold-light);}
+.ls-val.mint{color:var(--mint);}
+
+/* ── SUCCESS ── */
+.success-screen{display:none;text-align:center;padding:60px 20px;}
+.ss-icon{width:64px;height:64px;background:var(--mint-glow);border:1px solid var(--border-mint);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.ss-title{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;margin-bottom:8px;}
+.ss-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-bottom:28px;line-height:1.8;letter-spacing:0.04em;}
+.ss-stats{display:flex;justify-content:center;gap:32px;margin-bottom:28px;flex-wrap:wrap;}
+.ss-stat-val{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--mint);}
+.ss-stat-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-top:2px;}
+.ss-listing-ids{background:var(--bg-input);border:1px solid var(--border-mint);border-radius:6px;padding:14px;margin-bottom:20px;text-align:left;max-width:500px;margin-left:auto;margin-right:auto;}
+.ss-ids-title{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
+.ss-id{font-family:'DM Mono',monospace;font-size:9px;color:var(--mint);padding:4px 0;border-bottom:1px solid var(--border);}
+.ss-id:last-child{border-bottom:none;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:10px 18px;border-radius:5px;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;font-weight:500;}
+.btn-gold{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--bg);font-weight:600;}
+.btn-gold:hover{box-shadow:0 5px 20px var(--gold-glow2);}
+.btn-gold:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+.btn-mint{background:var(--mint-glow);border:1px solid var(--border-mint);color:var(--mint);}
+.btn-mint:hover{background:var(--mint-glow2);}
+.btn-ghost{background:transparent;border:1px solid var(--border-gold);color:var(--text-dim);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-full{width:100%;}
+.btn-sm{padding:6px 12px;font-size:8px;}
+.btn-lg{padding:13px 24px;font-size:10px;}
+.spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+
+/* ── EXPIRED ── */
+.expired-screen{display:none;max-width:480px;margin:80px auto;padding:0 20px;text-align:center;}
+.exp-icon{font-size:40px;margin-bottom:12px;}
+.exp-title{font-family:'Cormorant Garamond',serif;font-size:26px;margin-bottom:8px;}
+.exp-msg{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.8;margin-bottom:20px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);z-index:1000;background:var(--bg-card);border:1px solid var(--border-mint);border-radius:8px;padding:11px 18px;display:flex;align-items:center;gap:8px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto;}
+.toast.error{border-color:rgba(224,82,82,.4);}
+.toast-dot{width:6px;height:6px;border-radius:50%;background:var(--mint);flex-shrink:0;}
+.toast.error .toast-dot{background:var(--red);}
+.toast-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);}
+
+/* ── EXPIRY TIMER ── */
+.expiry-bar{background:var(--bg-input);border:1px solid var(--border-gold);border-radius:6px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.eb-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.eb-timer{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);font-weight:500;}
+.eb-timer.urgent{color:var(--red);}
+
+@media(max-width:600px){
+  .summary-bar{grid-template-columns:1fr 1fr;}
+  .tc-body{grid-template-columns:1fr 1fr;}
+  .bulk-controls{flex-direction:column;align-items:flex-start;}
+  .bc-actions{margin-left:0;}
+  .ss-stats{gap:20px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="/">
+    <div class="nav-gem"></div>
+    <span class="nav-name">MintSeat</span>
+  </a>
+</nav>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loading-screen">
+  <div class="loading-rings"><div class="lr1"></div><div class="lr2"></div></div>
+  <div class="loading-title">Loading your tickets</div>
+  <div class="loading-sub">Fetching your listing details...</div>
+</div>
+
+<!-- ERROR -->
+<div class="error-screen" id="error-screen">
+  <div class="error-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E05252" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  </div>
+  <div class="error-title">Link Not Found</div>
+  <div class="error-msg" id="error-msg">This review link may have expired or already been used. Review links are valid for 48 hours after receiving your confirmation email.</div>
+  <a href="/sell/bulk"><button class="btn btn-gold btn-lg">Start a New Listing</button></a>
+</div>
+
+<!-- EXPIRED -->
+<div class="expired-screen" id="expired-screen">
+  <div class="exp-icon">⏰</div>
+  <div class="exp-title">Review Link Expired</div>
+  <div class="exp-msg">This review link was valid for 48 hours and has expired. Forward your ticket email again to get a fresh link.</div>
+  <a href="/sell/bulk"><button class="btn btn-gold btn-lg">Forward Email Again</button></a>
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="success-screen">
+  <div class="ss-icon">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00E5A0" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <div class="ss-title">Tickets Listed!</div>
+  <div class="ss-sub">Your tickets are live on the MintSeat marketplace.<br>You'll receive an email the moment each one sells.</div>
+  <div class="ss-stats">
+    <div><div class="ss-stat-val" id="ss-count">0</div><div class="ss-stat-label">Tickets Listed</div></div>
+    <div><div class="ss-stat-val" id="ss-value">$0</div><div class="ss-stat-label">Total Value</div></div>
+    <div><div class="ss-stat-val">2%</div><div class="ss-stat-label">Platform Fee</div></div>
+  </div>
+  <div class="ss-listing-ids" id="ss-listing-ids">
+    <div class="ss-ids-title">Listing IDs</div>
+    <div id="ss-ids-list"></div>
+  </div>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+    <a href="/market"><button class="btn btn-mint btn-lg">Browse Marketplace</button></a>
+    <a href="/sell/bulk"><button class="btn btn-ghost btn-lg">List More Tickets</button></a>
+  </div>
+</div>
+
+<!-- MAIN REVIEW UI -->
+<div class="main" id="main">
+
+  <div class="page-hero">
+    <div class="hero-tag">Step 2 of 3 — Review</div>
+    <h1 class="hero-title">Your tickets,<br><em>ready to list</em></h1>
+    <p class="hero-sub" id="hero-sub">We found your tickets. Set your prices and confirm to go live.</p>
+  </div>
+
+  <!-- Expiry timer -->
+  <div class="expiry-bar" id="expiry-bar">
+    <span class="eb-label">Review link expires in</span>
+    <span class="eb-timer" id="expiry-timer">—</span>
+  </div>
+
+  <!-- Summary bar -->
+  <div class="summary-bar">
+    <div class="sb-cell"><div class="sb-label">Tickets Found</div><div class="sb-val white" id="sum-total">—</div></div>
+    <div class="sb-cell"><div class="sb-label">Selected</div><div class="sb-val" id="sum-selected">—</div></div>
+    <div class="sb-cell"><div class="sb-label">Total Value</div><div class="sb-val" id="sum-value">—</div></div>
+    <div class="sb-cell"><div class="sb-label">You Receive</div><div class="sb-val mint" id="sum-receive">—</div></div>
+  </div>
+
+  <!-- Bulk controls -->
+  <div class="bulk-controls">
+    <span class="bc-label">Set price for all:</span>
+    <input class="bc-input" type="number" id="bulk-price" placeholder="$0.00" min="1" step="0.01" oninput="applyBulkPrice()">
+    <span class="bc-label">Type:</span>
+    <select class="bc-select" id="bulk-type" onchange="applyBulkType()">
+      <option value="whole">Whole Ticket</option>
+      <option value="fractional">Fractional</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" onclick="applyBulkPrice();applyBulkType();">Apply to All</button>
+    <div class="bc-divider"></div>
+    <div class="bc-actions">
+      <button class="btn btn-ghost btn-sm" onclick="selectAll(true)">Select All</button>
+      <button class="btn btn-ghost btn-sm" onclick="selectAll(false)">Deselect All</button>
+    </div>
+  </div>
+
+  <!-- Ticket cards -->
+  <div class="tickets-list" id="tickets-list"></div>
+
+  <!-- Connect section -->
+  <div class="connect-card">
+    <div class="connect-header">
+      <div class="connect-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="connect-title">How to receive payment</div>
+    </div>
+    <div class="connect-body">
+      <div class="connect-opts">
+        <div class="connect-opt sel" id="co-email" onclick="selectConnect('email')">
+          <div class="co-icon">✉️</div>
+          <div><div class="co-title">Email &amp; Bank Transfer</div><div class="co-desc">Receive payment via Stripe. No crypto required.</div></div>
+        </div>
+        <div class="connect-opt" id="co-wallet" onclick="selectConnect('wallet')">
+          <div class="co-icon">🔗</div>
+          <div><div class="co-title">XRPL Wallet</div><div class="co-desc">Receive XRP directly. Earn 7% royalties on every resale.</div></div>
+        </div>
+      </div>
+
+      <div id="email-fields">
+        <div class="field"><label>Your Email</label><input type="email" id="seller-email" placeholder="you@example.com"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:4px;">We'll notify you when tickets sell and send payout instructions.</div></div>
+        <div class="field"><label>Full Name</label><input type="text" id="seller-name" placeholder="Your full name"></div>
+      </div>
+
+      <div id="wallet-fields" style="display:none;">
+        <div class="field"><label>XRPL Wallet Address</label><input type="text" id="seller-wallet" placeholder="r... (starts with r)"></div>
+        <div class="field"><label>Email for Notifications</label><input type="email" id="seller-wallet-email" placeholder="you@example.com"></div>
+      </div>
+
+      <!-- Listing summary -->
+      <div class="listing-summary">
+        <div class="ls-title">Listing Summary</div>
+        <div class="ls-row"><span class="ls-key">Tickets selected</span><span class="ls-val" id="ls-count">—</span></div>
+        <div class="ls-row"><span class="ls-key">Total asking value</span><span class="ls-val gold" id="ls-value">—</span></div>
+        <div class="ls-row"><span class="ls-key">Platform fee (2%)</span><span class="ls-val" id="ls-fee">—</span></div>
+        <div class="ls-row"><span class="ls-key">You receive</span><span class="ls-val mint" id="ls-receive">—</span></div>
+        <div class="ls-row" style="margin-top:4px;"><span class="ls-key" style="font-size:8px;color:var(--text-muted);">By confirming you agree to our <a href="/terms" style="color:var(--gold);text-decoration:none;">Terms</a> and <a href="/privacy" style="color:var(--gold);text-decoration:none;">Privacy Policy</a></span></div>
+      </div>
+
+      <button class="btn btn-gold btn-full btn-lg" id="confirm-btn" onclick="confirmListings()">
+        <span id="confirm-text">Confirm &amp; List All Tickets</span>
+        <div class="spinner" id="confirm-spinner"></div>
+      </button>
+
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-dot"></div><span class="toast-text" id="toast-text"></span></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const PARSER_URL = 'https://mintseat-email-parser.guillermojzamorano.workers.dev';
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let reviewToken  = null;
+let batchData    = null;
+let tickets      = [];
+let connectMethod = 'email';
+let expiryTimer  = null;
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  reviewToken  = params.get('token');
+
+  if (!reviewToken) {
+    showError('No review token found in the URL. Make sure you followed the link from your confirmation email exactly.');
+    return;
+  }
+
+  await loadBatch();
+});
+
+async function loadBatch() {
+  try {
+    const response = await fetch(`${PARSER_URL}/api/listings/review?token=${encodeURIComponent(reviewToken)}`);
+    const data     = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        showExpired();
+      } else {
+        showError(data.error || 'Could not load your ticket details. The link may have expired.');
+      }
+      return;
+    }
+
+    batchData = data;
+    tickets   = (data.tickets || []).map(t => ({
+      ...t,
+      selected:     true,
+      asking_price: t.face_value || null,
+      listing_type: 'whole',
+    }));
+
+    renderUI();
+
+  } catch (err) {
+    showError('Could not connect to the server. Please try again in a moment.');
+    console.error('[Review]', err);
+  }
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderUI() {
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('main').style.display           = 'block';
+
+  const count = tickets.length;
+  const source = batchData.tickets?.[0]?.source || 'Email';
+
+  document.getElementById('hero-sub').textContent =
+    `We found ${count} ticket${count !== 1 ? 's' : ''} in your forwarded email. Review the details, set your prices, and confirm to go live instantly.`;
+
+  document.getElementById('sum-total').textContent = count;
+
+  // Start expiry countdown
+  if (batchData.expires_at) {
+    startExpiryCountdown(new Date(batchData.expires_at));
+  }
+
+  renderTickets();
+  updateSummary();
+}
+
+function renderTickets() {
+  const list = document.getElementById('tickets-list');
+  list.innerHTML = tickets.map((t, i) => `
+    <div class="ticket-card ${t.selected ? 'selected' : 'deselected'}" id="card-${i}">
+      <div class="tc-header" onclick="toggleTicket(${i})">
+        <input type="checkbox" class="tc-check" ${t.selected ? 'checked' : ''} onchange="toggleTicket(${i})" onclick="event.stopPropagation()">
+        <span class="tc-sport">${t.sport || 'Ticket'}</span>
+        <span class="tc-game">${t.game || 'Unknown Game'}</span>
+        <span class="tc-date">${t.date || ''}</span>
+      </div>
+      <div class="tc-body">
+        <div class="tc-field">
+          <div class="tc-field-label">Venue &amp; Seat</div>
+          <div class="tc-field-val">${t.section ? `Sec ${t.section} · Row ${t.row || '?'} · Seat ${t.seat || '?'}` : t.venue || '—'}</div>
+          ${t.venue && t.section ? `<div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:2px;">${t.venue}</div>` : ''}
+        </div>
+        <div class="tc-field">
+          <div class="tc-field-label">Asking Price (USD)</div>
+          <input class="tc-field-input" type="number" value="${t.asking_price || ''}" placeholder="${t.face_value ? `Face: $${t.face_value}` : 'Set price'}" min="1" step="0.01" onchange="updateTicketPrice(${i}, this.value)" onclick="event.stopPropagation()">
+          ${t.asking_price ? `<div class="tc-payout">You receive: <span>$${(t.asking_price * 0.98).toFixed(2)}</span></div>` : ''}
+        </div>
+        <div class="tc-field">
+          <div class="tc-field-label">Listing Type</div>
+          <select class="tc-field-select" onchange="updateTicketType(${i}, this.value)" onclick="event.stopPropagation()">
+            <option value="whole" ${t.listing_type === 'whole' ? 'selected' : ''}>Whole Ticket</option>
+            <option value="fractional" ${t.listing_type === 'fractional' ? 'selected' : ''}>Fractional Shares</option>
+          </select>
+          <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:4px;">${t.listing_type === 'fractional' ? '7% royalty on resales' : 'Single buyer gets full seat'}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleTicket(i) {
+  tickets[i].selected = !tickets[i].selected;
+  const card = document.getElementById(`card-${i}`);
+  card.className = `ticket-card ${tickets[i].selected ? 'selected' : 'deselected'}`;
+  card.querySelector('.tc-check').checked = tickets[i].selected;
+  updateSummary();
+}
+
+function updateTicketPrice(i, val) {
+  tickets[i].asking_price = parseFloat(val) || null;
+  // Update payout display
+  const card   = document.getElementById(`card-${i}`);
+  const payout = card.querySelector('.tc-payout');
+  if (payout && tickets[i].asking_price) {
+    payout.innerHTML = `You receive: <span>$${(tickets[i].asking_price * 0.98).toFixed(2)}</span>`;
+  }
+  updateSummary();
+}
+
+function updateTicketType(i, val) {
+  tickets[i].listing_type = val;
+  renderTickets(); // re-render to update description
+  updateSummary();
+}
+
+function selectAll(sel) {
+  tickets.forEach((t, i) => {
+    t.selected = sel;
+    const card = document.getElementById(`card-${i}`);
+    if (card) {
+      card.className = `ticket-card ${sel ? 'selected' : 'deselected'}`;
+      card.querySelector('.tc-check').checked = sel;
+    }
+  });
+  updateSummary();
+}
+
+function applyBulkPrice() {
+  const price = parseFloat(document.getElementById('bulk-price').value);
+  if (!price) return;
+  tickets.forEach((t, i) => {
+    if (t.selected) t.asking_price = price;
+  });
+  renderTickets();
+  updateSummary();
+}
+
+function applyBulkType() {
+  const type = document.getElementById('bulk-type').value;
+  tickets.forEach(t => { if (t.selected) t.listing_type = type; });
+  renderTickets();
+  updateSummary();
+}
+
+function updateSummary() {
+  const selected = tickets.filter(t => t.selected);
+  const total    = selected.reduce((s, t) => s + (t.asking_price || 0), 0);
+  const fee      = total * 0.02;
+  const receive  = total - fee;
+
+  document.getElementById('sum-selected').textContent = selected.length;
+  document.getElementById('sum-value').textContent    = total ? `$${total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}` : '—';
+  document.getElementById('sum-receive').textContent  = receive ? `$${receive.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}` : '—';
+  document.getElementById('ls-count').textContent     = selected.length;
+  document.getElementById('ls-value').textContent     = total   ? `$${total.toFixed(2)}` : '—';
+  document.getElementById('ls-fee').textContent       = fee     ? `-$${fee.toFixed(2)}`  : '—';
+  document.getElementById('ls-receive').textContent   = receive ? `$${receive.toFixed(2)}` : '—';
+}
+
+// ─── CONNECT ──────────────────────────────────────────────────────────────────
+function selectConnect(method) {
+  connectMethod = method;
+  document.getElementById('co-email').classList.toggle('sel', method === 'email');
+  document.getElementById('co-wallet').classList.toggle('sel', method === 'wallet');
+  document.getElementById('email-fields').style.display  = method === 'email'  ? 'block' : 'none';
+  document.getElementById('wallet-fields').style.display = method === 'wallet' ? 'block' : 'none';
+}
+
+// ─── CONFIRM ──────────────────────────────────────────────────────────────────
+async function confirmListings() {
+  const selected = tickets.filter(t => t.selected);
+
+  if (!selected.length) {
+    showToast('Select at least one ticket to list.', true);
+    return;
+  }
+
+  const missingPrice = selected.filter(t => !t.asking_price || t.asking_price < 1);
+  if (missingPrice.length) {
+    showToast(`Set a price for all ${missingPrice.length} selected ticket${missingPrice.length > 1 ? 's' : ''} first.`, true);
+    return;
+  }
+
+  let sellerEmail = '', sellerName = '', walletAddress = '';
+
+  if (connectMethod === 'email') {
+    sellerEmail = document.getElementById('seller-email').value.trim();
+    sellerName  = document.getElementById('seller-name').value.trim();
+    if (!sellerEmail || !sellerEmail.includes('@')) { showToast('Enter a valid email address.', true); return; }
+    if (!sellerName) { showToast('Enter your full name.', true); return; }
+  } else {
+    walletAddress = document.getElementById('seller-wallet').value.trim();
+    sellerEmail   = document.getElementById('seller-wallet-email').value.trim();
+    if (!walletAddress || !walletAddress.startsWith('r')) { showToast('Enter a valid XRPL wallet address.', true); return; }
+    if (!sellerEmail) { showToast('Enter your email for notifications.', true); return; }
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await fetch(`${PARSER_URL}/api/listings/confirm`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token:          reviewToken,
+        tickets:        selected.map(t => ({ ...t, selected: true })),
+        seller_email:   sellerEmail,
+        seller_name:    sellerName,
+        payment_method: connectMethod,
+        wallet_address: walletAddress || null,
+      }),
+    });
+
+    const data = await response.json();
+    setLoading(false);
+
+    if (!response.ok || !data.success) {
+      if (response.status === 401) {
+        showExpired();
+      } else {
+        showToast(data.message || data.error || 'Could not confirm listings. Please try again.', true);
+      }
+      return;
+    }
+
+    // Show success
+    showSuccess(data);
+
+  } catch (err) {
+    setLoading(false);
+    showToast('Connection error. Please try again.', true);
+    console.error('[Confirm]', err);
+  }
+}
+
+function setLoading(on) {
+  document.getElementById('confirm-text').style.display    = on ? 'none'  : 'inline';
+  document.getElementById('confirm-spinner').style.display = on ? 'block' : 'none';
+  document.getElementById('confirm-btn').disabled = on;
+}
+
+// ─── SUCCESS ──────────────────────────────────────────────────────────────────
+function showSuccess(data) {
+  document.getElementById('main').style.display           = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+
+  const count = data.listings_created || 0;
+  const ids   = data.listing_ids || [];
+  const selected = tickets.filter(t => t.selected);
+  const total = selected.reduce((s, t) => s + (t.asking_price || 0), 0);
+
+  document.getElementById('ss-count').textContent = count;
+  document.getElementById('ss-value').textContent = `$${total.toLocaleString()}`;
+
+  const idsList = document.getElementById('ss-ids-list');
+  idsList.innerHTML = ids.map(id => `<div class="ss-id">${id}</div>`).join('');
+
+  if (expiryTimer) clearInterval(expiryTimer);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast(`${count} ticket${count !== 1 ? 's' : ''} listed successfully!`);
+}
+
+// ─── EXPIRY COUNTDOWN ─────────────────────────────────────────────────────────
+function startExpiryCountdown(expiresAt) {
+  function update() {
+    const diff = expiresAt - Date.now();
+    if (diff <= 0) {
+      clearInterval(expiryTimer);
+      showExpired();
+      return;
+    }
+    const h   = Math.floor(diff / 3600000);
+    const m   = Math.floor((diff % 3600000) / 60000);
+    const s   = Math.floor((diff % 60000) / 1000);
+    const str = h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m ${s}s` : `${s}s`;
+    const el  = document.getElementById('expiry-timer');
+    el.textContent = str;
+    el.className   = `eb-timer${diff < 600000 ? ' urgent' : ''}`;
+  }
+  update();
+  expiryTimer = setInterval(update, 1000);
+}
+
+// ─── STATE SCREENS ────────────────────────────────────────────────────────────
+function showError(msg) {
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('error-screen').style.display   = 'block';
+  document.getElementById('error-msg').textContent        = msg;
+}
+
+function showExpired() {
+  document.getElementById('loading-screen').style.display  = 'none';
+  document.getElementById('main').style.display            = 'none';
+  document.getElementById('expired-screen').style.display  = 'block';
+  if (expiryTimer) clearInterval(expiryTimer);
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>

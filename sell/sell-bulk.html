@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>List All Your Tickets — MintSeat</title>
+<meta name="description" content="Forward your ticket email or upload photos of all your tickets at once. List your entire season in 60 seconds.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#060E09;--bg-card:#0C1810;--bg-input:#080F0A;--bg-hover:#112016;
+  --gold:#C9A84C;--gold-light:#E2C46E;--gold-dim:#7A5F28;
+  --gold-glow:rgba(201,168,76,0.10);--gold-glow2:rgba(201,168,76,0.22);
+  --mint:#00E5A0;--mint-dim:#00A370;--mint-glow:rgba(0,229,160,0.08);--mint-glow2:rgba(0,229,160,0.18);
+  --red:#E05252;--red-glow:rgba(224,82,82,0.12);
+  --text:#E8F2EB;--text-dim:#7FA890;--text-muted:#3D6050;
+  --border:rgba(255,255,255,0.05);--border-gold:rgba(201,168,76,0.18);--border-mint:rgba(0,229,160,0.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
+
+/* ── NAV ── */
+.nav{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-gold);background:rgba(6,14,9,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-gem{width:26px;height:26px;background:linear-gradient(135deg,var(--gold-dim),var(--gold));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.nav-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-back{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color .2s;}
+.nav-back:hover{color:var(--gold);}
+
+/* ── PAGE HEADER ── */
+.page-header{padding:40px 24px 32px;max-width:720px;margin:0 auto;text-align:center;}
+.page-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.page-tag::before,.page-tag::after{content:'';width:20px;height:1px;background:var(--border-gold);}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,6vw,46px);font-weight:700;line-height:1.1;margin-bottom:10px;}
+.page-title em{font-style:italic;color:var(--gold-light);}
+.page-sub{font-size:15px;color:var(--text-dim);line-height:1.7;max-width:500px;margin:0 auto;}
+
+/* ── METHOD SELECTOR ── */
+.method-wrap{max-width:720px;margin:0 auto;padding:0 16px 60px;}
+.method-tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+.method-tab{border:2px solid var(--border-gold);border-radius:10px;padding:20px;cursor:pointer;transition:all .2s;background:transparent;text-align:left;}
+.method-tab:hover{border-color:var(--gold);background:var(--gold-glow);}
+.method-tab.active{border-color:var(--gold);background:var(--gold-glow);}
+.mt-icon{font-size:28px;margin-bottom:10px;}
+.mt-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;margin-bottom:4px;}
+.mt-desc{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);line-height:1.7;letter-spacing:0.04em;}
+.mt-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 7px;border-radius:100px;margin-top:6px;background:var(--mint-glow);border:1px solid var(--border-mint);color:var(--mint);}
+
+/* ── CARD ── */
+.card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:10px;overflow:hidden;margin-bottom:14px;}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border-gold);background:linear-gradient(135deg,rgba(201,168,76,0.06),transparent);display:flex;align-items:center;gap:12px;}
+.card-icon{width:34px;height:34px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;}
+.card-sub{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:2px;letter-spacing:0.04em;}
+.card-body{padding:20px;}
+
+/* ── EMAIL METHOD ── */
+.email-address-box{background:var(--bg-input);border:2px solid var(--gold);border-radius:8px;padding:16px 20px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;}
+.email-address-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-dim),var(--gold),var(--gold-dim));}
+.ea-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.ea-address{font-family:'DM Mono',monospace;font-size:20px;color:var(--gold-light);font-weight:500;letter-spacing:0.04em;margin-bottom:6px;}
+.ea-copy{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mint);cursor:pointer;transition:opacity .2s;}
+.ea-copy:hover{opacity:.7;}
+
+.steps-list{list-style:none;display:flex;flex-direction:column;gap:0;}
+.step-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+.step-item:last-child{border-bottom:none;}
+.step-circle{width:28px;height:28px;border-radius:50%;background:var(--gold-glow);border:1px solid var(--border-gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);font-weight:500;}
+.step-content{}
+.step-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.step-desc{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.6;letter-spacing:0.02em;}
+
+.supported-platforms{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;}
+.platform-badge{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.06em;text-transform:uppercase;padding:4px 10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:100px;color:var(--text-muted);}
+
+/* ── EMAIL INPUT (optional — for tracking) ── */
+.field{margin-bottom:14px;}
+.field label{display:block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;}
+.field input{width:100%;background:var(--bg-input);border:1px solid var(--border-gold);border-radius:6px;padding:11px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;outline:none;transition:border-color .15s;}
+.field input:focus{border-color:var(--gold);}
+.field input::placeholder{color:var(--text-muted);}
+.field-hint{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:4px;line-height:1.5;}
+
+/* ── PHOTO METHOD ── */
+.bulk-drop{border:2px dashed var(--border-gold);border-radius:8px;padding:36px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:rgba(201,168,76,0.02);}
+.bulk-drop:hover,.bulk-drop.drag-over{border-color:var(--gold);background:var(--gold-glow);}
+.bulk-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.bd-icon{width:52px;height:52px;margin:0 auto 14px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.bd-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:6px;}
+.bd-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.8;}
+.bd-or{display:flex;align-items:center;gap:10px;margin:12px 0;font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
+.bd-or::before,.bd-or::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── PHOTO GRID ── */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:16px;}
+.photo-thumb{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid var(--border-gold);}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;}
+.photo-thumb-status{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);}
+.photo-thumb-status.scanning{background:rgba(201,168,76,0.2);}
+.photo-thumb-status.done{background:rgba(0,229,160,0.2);}
+.photo-thumb-status.error{background:rgba(224,82,82,0.3);}
+.thumb-icon{font-size:20px;}
+.photo-remove{position:absolute;top:4px;right:4px;width:18px;height:18px;background:rgba(0,0,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:var(--text-muted);border:none;}
+.photo-remove:hover{background:var(--red);color:white;}
+.photo-count{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:center;margin-bottom:12px;}
+
+/* ── SCAN PROGRESS ── */
+.scan-progress{display:none;background:var(--bg-input);border:1px solid var(--border-gold);border-radius:8px;padding:16px;margin-bottom:14px;}
+.sp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sp-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);}
+.sp-count{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.sp-bar-wrap{height:4px;background:var(--border);border-radius:100px;overflow:hidden;}
+.sp-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:100px;transition:width .4s ease;width:0%;}
+.sp-current{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:6px;}
+
+/* ── REVIEW TABLE ── */
+.review-section{display:none;}
+.review-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.review-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;}
+.review-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;letter-spacing:0.04em;}
+.review-actions{display:flex;gap:8px;}
+
+.ticket-table{width:100%;border-collapse:collapse;margin-bottom:14px;}
+.ticket-table th{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);text-align:left;padding:9px 12px;border-bottom:1px solid var(--border-gold);background:rgba(201,168,76,0.03);white-space:nowrap;}
+.ticket-table td{padding:12px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.ticket-table tr:last-child td{border-bottom:none;}
+.ticket-table tr:hover td{background:var(--bg-hover);}
+.ticket-table tr.deselected td{opacity:.4;}
+
+.tt-check{width:20px;height:20px;accent-color:var(--gold);cursor:pointer;}
+.tt-game{font-size:13px;color:var(--text);font-weight:500;margin-bottom:2px;}
+.tt-detail{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);}
+.tt-seat{font-family:'DM Mono',monospace;font-size:10px;color:var(--mint);}
+.tt-price-input{background:var(--bg-input);border:1px solid var(--border-gold);border-radius:4px;padding:6px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;width:80px;outline:none;}
+.tt-price-input:focus{border-color:var(--gold);}
+.tt-type-select{background:var(--bg-input);border:1px solid var(--border-gold);border-radius:4px;padding:6px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:9px;outline:none;cursor:pointer;}
+.tt-status{font-family:'DM Mono',monospace;font-size:8px;padding:2px 7px;border-radius:100px;}
+.tt-status.ok{background:var(--mint-glow);border:1px solid var(--border-mint);color:var(--mint);}
+.tt-status.warn{background:var(--gold-glow);border:1px solid var(--border-gold);color:var(--gold);}
+.tt-status.err{background:var(--red-glow);border:1px solid rgba(224,82,82,.2);color:var(--red);}
+
+/* ── BULK PRICING ── */
+.bulk-pricing{background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px;}
+.bp-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.bp-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.bp-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);white-space:nowrap;}
+.bp-input{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:4px;padding:7px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;width:90px;outline:none;}
+.bp-input:focus{border-color:var(--gold);}
+
+/* ── CONNECT STEP ── */
+.connect-section{display:none;}
+.connect-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.connect-opt{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--border-gold);border-radius:8px;cursor:pointer;transition:all .2s;background:transparent;}
+.connect-opt:hover,.connect-opt.sel{background:var(--gold-glow);border-color:var(--gold);}
+.co-icon{font-size:20px;flex-shrink:0;}
+.co-body{flex:1;}
+.co-title{font-size:14px;font-weight:500;color:var(--text);}
+.co-desc{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;}
+
+/* ── SUCCESS ── */
+.success-section{display:none;text-align:center;padding:48px 24px;}
+.ss-icon{width:64px;height:64px;background:var(--mint-glow);border:1px solid var(--border-mint);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.ss-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;margin-bottom:8px;}
+.ss-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);margin-bottom:24px;line-height:1.7;}
+.ss-stats{display:flex;justify-content:center;gap:32px;margin-bottom:24px;}
+.ss-stat{text-align:center;}
+.ss-stat-val{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--mint);}
+.ss-stat-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-top:2px;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:12px 22px;border-radius:6px;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;font-weight:500;}
+.btn-gold{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--bg);font-weight:600;}
+.btn-gold:hover{box-shadow:0 6px 24px var(--gold-glow2);}
+.btn-gold:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+.btn-mint{background:var(--mint-glow);border:1px solid var(--border-mint);color:var(--mint);}
+.btn-mint:hover{background:var(--mint-glow2);}
+.btn-ghost{background:transparent;border:1px solid var(--border-gold);color:var(--text-dim);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-full{width:100%;}
+.btn-sm{padding:7px 12px;font-size:9px;}
+.spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);z-index:1000;background:var(--bg-card);border:1px solid var(--border-mint);border-radius:8px;padding:11px 18px;display:flex;align-items:center;gap:8px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto;}
+.toast.error{border-color:rgba(224,82,82,.4);}
+.toast-dot{width:6px;height:6px;border-radius:50%;background:var(--mint);flex-shrink:0;}
+.toast.error .toast-dot{background:var(--red);}
+.toast-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);}
+
+@media(max-width:600px){
+  .method-tabs{grid-template-columns:1fr;}
+  .ticket-table th:nth-child(4),.ticket-table td:nth-child(4),
+  .ticket-table th:nth-child(5),.ticket-table td:nth-child(5){display:none;}
+  .ss-stats{gap:20px;}
+}
+
+/* ── CONSENT BLOCK ── */
+.consent-block{background:rgba(201,168,76,0.04);border:1px solid var(--border-gold);border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;}
+.consent-icon{font-size:16px;flex-shrink:0;margin-top:2px;}
+.consent-title{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+.consent-body{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.7;}
+.consent-body a{color:var(--gold);text-decoration:none;}
+.consent-body a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="/">
+    <div class="nav-gem"></div>
+    <span class="nav-name">MintSeat</span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-back" href="/sell">← Single Ticket</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-tag">Season Ticket Holders</div>
+  <h1 class="page-title">List <em>all</em> your tickets<br>at once</h1>
+  <p class="page-sub">Forward your ticket confirmation email or upload photos of all your tickets. We extract every game automatically — no manual entry.</p>
+</div>
+
+<div class="method-wrap">
+
+  <!-- METHOD SELECTOR -->
+  <div class="method-tabs">
+    <div class="method-tab active" id="tab-email" onclick="selectMethod('email',this)">
+      <div class="mt-icon">✉️</div>
+      <div class="mt-title">Forward Your Email</div>
+      <div class="mt-desc">Forward your season ticket confirmation email. We extract every game automatically. No upload needed.</div>
+      <div class="mt-badge">Easiest — Recommended</div>
+    </div>
+    <div class="method-tab" id="tab-photos" onclick="selectMethod('photos',this)">
+      <div class="mt-icon">📸</div>
+      <div class="mt-title">Upload Ticket Photos</div>
+      <div class="mt-desc">Select all your ticket screenshots or photos at once. AI scans each one and extracts the details.</div>
+      <div class="mt-badge">Works with any ticket format</div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════
+       EMAIL METHOD
+  ══════════════════════════════════ -->
+  <div id="method-email">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div>
+          <div class="card-title">Forward to list@tickets.mintseat.co</div>
+          <div class="card-sub">We read your email and extract every ticket automatically</div>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <div class="consent-block">
+          <div class="consent-icon">🔒</div>
+          <div>
+            <div class="consent-title">What happens with your email</div>
+            <div class="consent-body">
+              Our AI reads your forwarded email and extracts game details, dates, and seat information only —
+              no barcodes, no account access, no credentials stored. Draft data auto-deletes in 48 hours
+              if you don't confirm. By forwarding you agree to our
+              <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+            </div>
+          </div>
+        </div>
+
+                <div class="email-address-box">
+          <div class="ea-label">Forward your ticket email to</div>
+          <div class="ea-address">list@tickets.mintseat.co</div>
+          <div class="ea-copy" onclick="copyEmail()">📋 Copy address</div>
+        </div>
+
+        <ol class="steps-list">
+          <li class="step-item">
+            <div class="step-circle">1</div>
+            <div class="step-content">
+              <div class="step-title">Open your ticket confirmation email</div>
+              <div class="step-desc">Find the original email from your team, Tickets.com, Ticketmaster, AXS, or any ticketing platform. Season package confirmation emails work best — they list every game at once.</div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-circle">2</div>
+            <div class="step-content">
+              <div class="step-title">Forward it to list@tickets.mintseat.co</div>
+              <div class="step-desc">Hit forward in your email app. Send the whole email as-is — no need to edit anything. Subject line doesn't matter.</div>
+            </div>
+          </li>
+          <li class="step-item">
+            <div class="step-circle">3</div>
+            <div class="step-content">
+              <div class="step-title">Check your inbox in 60 seconds</div>
+              <div class="step-desc">We'll email you back with every ticket we found, a review link, and space to set your prices. One click to publish all of them live.</div>
+            </div>
+          </li>
+        </ol>
+
+        <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px;">
+          <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Works with these platforms</div>
+          <div class="supported-platforms">
+            <span class="platform-badge">Tickets.com</span>
+            <span class="platform-badge">Ticketmaster</span>
+            <span class="platform-badge">AXS</span>
+            <span class="platform-badge">SeatGeek</span>
+            <span class="platform-badge">MLB Ballpark</span>
+            <span class="platform-badge">StubHub</span>
+            <span class="platform-badge">Vivid Seats</span>
+            <span class="platform-badge">Any ticket email</span>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding:14px;background:var(--bg-input);border-radius:6px;">
+          <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Optional — Get notified on this device</div>
+          <div class="field" style="margin-bottom:0;">
+            <input type="email" id="notify-email" placeholder="your@email.com — we'll send the review link here too">
+          </div>
+        </div>
+
+        <button class="btn btn-gold btn-full" style="margin-top:14px;" onclick="copyEmailAndShowConfirm()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Copy Email &amp; Open My Email App
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════
+       PHOTO METHOD
+  ══════════════════════════════════ -->
+  <div id="method-photos" style="display:none;">
+
+    <!-- Upload zone -->
+    <div id="upload-section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Upload All Ticket Photos</div>
+            <div class="card-sub">Select multiple photos at once — screenshots, photos, anything</div>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <div class="bulk-drop" id="bulk-drop"
+               ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+            <input type="file" accept="image/*" multiple onchange="onFilesSelect(event)">
+            <div class="bd-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="bd-title">Drop all your ticket photos here</div>
+            <div class="bd-sub">
+              Select multiple files at once from your camera roll or downloads<br>
+              Screenshots from MLB Ballpark app, digital tickets, photos of physical stubs
+            </div>
+            <div class="bd-or">or</div>
+            <button class="btn btn-gold" style="width:auto;padding:10px 24px;" onclick="event.stopPropagation()">Select Photos</button>
+          </div>
+
+          <!-- Photo thumbnails -->
+          <div id="photo-grid" class="photo-grid" style="display:none;margin-top:14px;"></div>
+          <div id="photo-count" class="photo-count" style="display:none;"></div>
+
+          <!-- Scan progress -->
+          <div class="scan-progress" id="scan-progress">
+            <div class="sp-header">
+              <span class="sp-title">Scanning tickets</span>
+              <span class="sp-count" id="sp-count">0 / 0</span>
+            </div>
+            <div class="sp-bar-wrap"><div class="sp-bar-fill" id="sp-bar"></div></div>
+            <div class="sp-current" id="sp-current">Starting...</div>
+          </div>
+
+          <div id="scan-btn-wrap" style="display:none;margin-top:14px;">
+            <button class="btn btn-gold btn-full" onclick="scanAllPhotos()" id="scan-all-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span id="scan-all-text">Scan All Tickets</span>
+              <div class="spinner" id="scan-all-spinner"></div>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Review section -->
+    <div class="review-section" id="review-section">
+      <div class="review-header">
+        <div>
+          <div class="review-title">Review Your Tickets</div>
+          <div class="review-sub" id="review-sub-text">0 tickets found — set prices and select which to list</div>
+        </div>
+        <div class="review-actions">
+          <button class="btn btn-ghost btn-sm" onclick="selectAll(true)">Select All</button>
+          <button class="btn btn-ghost btn-sm" onclick="selectAll(false)">Deselect All</button>
+        </div>
+      </div>
+
+      <!-- Bulk pricing -->
+      <div class="bulk-pricing">
+        <div class="bp-title">Set price for all selected tickets</div>
+        <div class="bp-row">
+          <span class="bp-label">Asking price:</span>
+          <input class="bp-input" type="number" id="bulk-price" placeholder="$0.00" min="1" step="0.01" oninput="applyBulkPrice()">
+          <span class="bp-label" style="margin-left:8px;">Listing type:</span>
+          <select class="tt-type-select" id="bulk-type" onchange="applyBulkType()">
+            <option value="whole">Whole Ticket</option>
+            <option value="fractional">Fractional</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="applyBulkPrice();applyBulkType();">Apply to All</button>
+        </div>
+      </div>
+
+      <!-- Tickets table -->
+      <div class="card" style="overflow-x:auto;">
+        <table class="ticket-table" id="ticket-table">
+          <thead>
+            <tr>
+              <th style="width:32px;"></th>
+              <th>Game / Event</th>
+              <th>Seat</th>
+              <th>Price</th>
+              <th>Type</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="ticket-tbody"></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="btn btn-ghost" onclick="resetScanner()">← Upload More</button>
+        <button class="btn btn-gold" style="flex:2;" onclick="proceedToConnect()" id="proceed-btn">
+          Continue to List →
+        </button>
+      </div>
+    </div>
+
+    <!-- Connect section -->
+    <div class="connect-section" id="connect-section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div class="card-title">How to receive payment</div>
+            <div class="card-sub" id="connect-sub">Listing <span id="selected-count">0</span> tickets</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="connect-opts">
+            <div class="connect-opt sel" id="co-email" onclick="selectConnect('email')">
+              <div class="co-icon">✉️</div>
+              <div class="co-body"><div class="co-title">Email &amp; Bank Transfer</div><div class="co-desc">Receive payment via Stripe. No crypto needed.</div></div>
+            </div>
+            <div class="connect-opt" id="co-wallet" onclick="selectConnect('wallet')">
+              <div class="co-icon">🔗</div>
+              <div class="co-body"><div class="co-title">XRPL Wallet</div><div class="co-desc">Receive XRP directly. Earn 7% royalties on resales.</div></div>
+            </div>
+          </div>
+
+          <div id="email-fields">
+            <div class="field"><label>Your Email</label><input type="email" id="seller-email" placeholder="you@example.com"><div class="field-hint">We'll confirm your listing and notify you when tickets sell.</div></div>
+            <div class="field"><label>Full Name</label><input type="text" id="seller-name" placeholder="Your full name"></div>
+          </div>
+
+          <div id="wallet-fields" style="display:none;">
+            <div class="field"><label>XRPL Wallet Address</label><input type="text" id="seller-wallet" placeholder="r... (starts with r)"><div class="field-hint">Royalties route here automatically on every resale.</div></div>
+            <div class="field"><label>Email for Notifications</label><input type="email" id="seller-wallet-email" placeholder="you@example.com"></div>
+          </div>
+
+          <div style="background:var(--bg-input);border-radius:6px;padding:12px;margin-bottom:14px;">
+            <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">By listing you confirm</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.8;">✓ You own these tickets and have the right to sell them<br>✓ MintSeat Terms of Service apply · 2% platform fee on each sale</div>
+          </div>
+
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-ghost" onclick="backToReview()">← Back</button>
+            <button class="btn btn-gold" style="flex:2;" onclick="submitAllListings()" id="submit-btn">
+              <span id="submit-text">List All Tickets</span>
+              <div class="spinner" id="submit-spinner"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="success-section" id="success-section">
+      <div class="card">
+        <div class="success-section" style="display:block;padding:48px 24px;text-align:center;">
+          <div class="ss-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00E5A0" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="ss-title">All Tickets Listed!</div>
+          <div class="ss-sub">Your tickets are live on the MintSeat marketplace.<br>You'll be notified the moment each one sells.</div>
+          <div class="ss-stats">
+            <div class="ss-stat"><div class="ss-stat-val" id="ss-count">0</div><div class="ss-stat-label">Tickets Listed</div></div>
+            <div class="ss-stat"><div class="ss-stat-val" id="ss-value">$0</div><div class="ss-stat-label">Total Value</div></div>
+            <div class="ss-stat"><div class="ss-stat-val">7%</div><div class="ss-stat-label">Royalty on Resales</div></div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn btn-mint" onclick="location.reload()">List More Tickets</button>
+            <a href="/market" style="text-decoration:none;"><button class="btn btn-ghost">Browse Market</button></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /method-photos -->
+
+</div><!-- /method-wrap -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-dot"></div><span class="toast-text" id="toast-text"></span></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const WORKER_URL    = 'https://mintseat-registry-worker.guillermojzamorano.workers.dev';
+const STORE_API_KEY = 'ms_live_b9k23BmUEXcNtUt6ecBlzSkHgiB4kRbm';
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let photos         = []; // { file, base64, type, status, ticket }
+let scannedTickets = [];
+let connectMethod  = 'email';
+
+// ─── METHOD SELECTION ─────────────────────────────────────────────────────────
+function selectMethod(method, el) {
+  document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('method-email').style.display  = method === 'email'  ? 'block' : 'none';
+  document.getElementById('method-photos').style.display = method === 'photos' ? 'block' : 'none';
+}
+
+// ─── EMAIL METHOD ─────────────────────────────────────────────────────────────
+function copyEmail() {
+  navigator.clipboard.writeText('list@tickets.mintseat.co').then(() => showToast('Email address copied!'));
+}
+
+function copyEmailAndShowConfirm() {
+  navigator.clipboard.writeText('list@tickets.mintseat.co').then(() => {
+    showToast('Copied! Now open your email app and forward your ticket email.');
+    // Try to open default email app
+    const notifyEmail = document.getElementById('notify-email').value.trim();
+    const subject = encodeURIComponent('My season tickets');
+    window.location.href = `mailto:list@tickets.mintseat.co?subject=${subject}`;
+  });
+}
+
+// ─── FILE HANDLING ────────────────────────────────────────────────────────────
+function onDragOver(e) { e.preventDefault(); document.getElementById('bulk-drop').classList.add('drag-over'); }
+function onDragLeave() { document.getElementById('bulk-drop').classList.remove('drag-over'); }
+function onDrop(e) { e.preventDefault(); document.getElementById('bulk-drop').classList.remove('drag-over'); if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); }
+function onFilesSelect(e) { if (e.target.files.length) addFiles(e.target.files); }
+
+function addFiles(fileList) {
+  const newFiles = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+  if (!newFiles.length) { showToast('Please select image files only.', true); return; }
+
+  let loaded = 0;
+  newFiles.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const base64 = e.target.result.split(',')[1];
+      photos.push({ file, base64, type: file.type, status: 'pending', ticket: null });
+      loaded++;
+      if (loaded === newFiles.length) renderPhotoGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPhotoGrid() {
+  const grid      = document.getElementById('photo-grid');
+  const countEl   = document.getElementById('photo-count');
+  const btnWrap   = document.getElementById('scan-btn-wrap');
+  const dropZone  = document.getElementById('bulk-drop');
+
+  grid.style.display    = 'grid';
+  countEl.style.display = 'block';
+  btnWrap.style.display = 'block';
+  dropZone.style.display = photos.length ? 'none' : 'block';
+
+  grid.innerHTML = photos.map((p, i) => {
+    const url = URL.createObjectURL(p.file);
+    const statusClass = p.status === 'done' ? 'done' : p.status === 'error' ? 'error' : p.status === 'scanning' ? 'scanning' : '';
+    const statusIcon  = p.status === 'done' ? '✅' : p.status === 'error' ? '❌' : p.status === 'scanning' ? '⏳' : '';
+    return `
+      <div class="photo-thumb">
+        <img src="${url}" alt="Ticket ${i+1}">
+        ${statusClass ? `<div class="photo-thumb-status ${statusClass}"><span class="thumb-icon">${statusIcon}</span></div>` : ''}
+        ${p.status === 'pending' ? `<button class="photo-remove" onclick="removePhoto(${i})">✕</button>` : ''}
+      </div>`;
+  }).join('');
+
+  countEl.textContent = `${photos.length} photo${photos.length !== 1 ? 's' : ''} selected${photos.some(p=>p.status==='done') ? ` · ${photos.filter(p=>p.status==='done').length} scanned` : ''}`;
+
+  document.getElementById('scan-all-text').textContent = `Scan All ${photos.length} Ticket${photos.length !== 1 ? 's' : ''}`;
+}
+
+function removePhoto(i) {
+  photos.splice(i, 1);
+  if (!photos.length) {
+    document.getElementById('photo-grid').style.display  = 'none';
+    document.getElementById('photo-count').style.display = 'none';
+    document.getElementById('scan-btn-wrap').style.display = 'none';
+    document.getElementById('bulk-drop').style.display   = 'block';
+  } else {
+    renderPhotoGrid();
+  }
+}
+
+// ─── SCAN ALL PHOTOS ──────────────────────────────────────────────────────────
+async function scanAllPhotos() {
+  if (!photos.length) return;
+
+  const pendingPhotos = photos.filter(p => p.status === 'pending');
+  if (!pendingPhotos.length) { showToast('All photos already scanned.'); return; }
+
+  document.getElementById('scan-all-text').style.display   = 'none';
+  document.getElementById('scan-all-spinner').style.display = 'block';
+
+  const progress = document.getElementById('scan-progress');
+  progress.style.display = 'block';
+
+  let done = 0;
+  const total = pendingPhotos.length;
+
+  for (let i = 0; i < photos.length; i++) {
+    if (photos[i].status !== 'pending') continue;
+
+    photos[i].status = 'scanning';
+    renderPhotoGrid();
+
+    document.getElementById('sp-count').textContent   = `${done} / ${total}`;
+    document.getElementById('sp-bar').style.width     = `${(done / total) * 100}%`;
+    document.getElementById('sp-current').textContent = `Scanning: ${photos[i].file.name}`;
+
+    try {
+      const ticket = await scanSinglePhoto(photos[i].base64, photos[i].type);
+      photos[i].status = ticket ? 'done' : 'error';
+      photos[i].ticket = ticket;
+    } catch {
+      photos[i].status = 'error';
+    }
+
+    done++;
+    renderPhotoGrid();
+  }
+
+  document.getElementById('sp-count').textContent   = `${done} / ${total}`;
+  document.getElementById('sp-bar').style.width     = '100%';
+  document.getElementById('sp-current').textContent = 'Scan complete';
+
+  document.getElementById('scan-all-text').style.display    = 'inline';
+  document.getElementById('scan-all-spinner').style.display = 'none';
+
+  // Build ticket list from successful scans
+  scannedTickets = photos
+    .filter(p => p.status === 'done' && p.ticket)
+    .map((p, i) => ({ ...p.ticket, index: i, selected: true, asking_price: p.ticket.face_value || null, listing_type: 'whole' }));
+
+  const errorCount = photos.filter(p => p.status === 'error').length;
+
+  showToast(`${scannedTickets.length} ticket${scannedTickets.length !== 1 ? 's' : ''} found${errorCount ? ` · ${errorCount} could not be read` : ''}`);
+
+  if (scannedTickets.length > 0) {
+    showReviewSection();
+  } else {
+    showToast('No tickets could be read. Try clearer photos or use the email method.', true);
+  }
+}
+
+async function scanSinglePhoto(base64, type) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 600,
+      messages: [{
+        role: 'user',
+        content: [
+          { type:'image', source:{ type:'base64', media_type: type||'image/jpeg', data: base64 } },
+          { type:'text', text:`Extract ticket information from this image.
+
+Return ONLY valid JSON with these fields:
+{"game":"Team A vs Team B","sport":"MLB","date":"May 6 2025","time":"7:05 PM CT","venue":"Wrigley Field Chicago IL","section":"204","row":"C","seat":"14","quantity":1,"face_value":85.00,"confidence":90}
+
+If not a ticket or unreadable, return: {"confidence":0,"game":null}
+No markdown, no explanation.` }
+        ]
+      }]
+    })
+  });
+
+  if (!response.ok) throw new Error(`API error ${response.status}`);
+  const data = await response.json();
+  const raw  = data.content?.[0]?.text || '';
+
+  let parsed;
+  try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+  catch { return null; }
+
+  if (!parsed.game || parsed.confidence < 25) return null;
+  return parsed;
+}
+
+// ─── REVIEW SECTION ───────────────────────────────────────────────────────────
+function showReviewSection() {
+  document.getElementById('upload-section').style.display  = 'none';
+  document.getElementById('review-section').style.display  = 'block';
+  document.getElementById('connect-section').style.display = 'none';
+  document.getElementById('success-section').style.display = 'none';
+
+  document.getElementById('review-sub-text').textContent =
+    `${scannedTickets.length} ticket${scannedTickets.length !== 1 ? 's' : ''} found — set prices and select which to list`;
+
+  renderTicketTable();
+}
+
+function renderTicketTable() {
+  const tbody = document.getElementById('ticket-tbody');
+  tbody.innerHTML = scannedTickets.map((t, i) => `
+    <tr id="tr-${i}" class="${t.selected ? '' : 'deselected'}">
+      <td><input type="checkbox" class="tt-check" ${t.selected ? 'checked' : ''} onchange="toggleTicket(${i},this.checked)"></td>
+      <td>
+        <div class="tt-game">${t.game || 'Unknown Game'}</div>
+        <div class="tt-detail">${[t.date, t.time, t.venue].filter(Boolean).join(' · ')}</div>
+      </td>
+      <td><span class="tt-seat">Sec ${t.section||'?'} · R${t.row||'?'} · S${t.seat||'?'}</span></td>
+      <td><input class="tt-price-input" type="number" value="${t.asking_price||''}" placeholder="${t.face_value||'Price'}" min="1" step="0.01" onchange="updateTicketPrice(${i},this.value)"></td>
+      <td>
+        <select class="tt-type-select" onchange="updateTicketType(${i},this.value)">
+          <option value="whole" ${t.listing_type==='whole'?'selected':''}>Whole</option>
+          <option value="fractional" ${t.listing_type==='fractional'?'selected':''}>Fractional</option>
+        </select>
+      </td>
+      <td><span class="tt-status ok">Ready</span></td>
+    </tr>
+  `).join('');
+}
+
+function toggleTicket(i, checked) {
+  scannedTickets[i].selected = checked;
+  document.getElementById(`tr-${i}`).className = checked ? '' : 'deselected';
+}
+
+function updateTicketPrice(i, val) { scannedTickets[i].asking_price = parseFloat(val) || null; }
+function updateTicketType(i, val)  { scannedTickets[i].listing_type = val; }
+
+function applyBulkPrice() {
+  const price = parseFloat(document.getElementById('bulk-price').value);
+  if (!price) return;
+  scannedTickets.forEach((t, i) => { if (t.selected) { t.asking_price = price; } });
+  renderTicketTable();
+}
+
+function applyBulkType() {
+  const type = document.getElementById('bulk-type').value;
+  scannedTickets.forEach((t, i) => { if (t.selected) { t.listing_type = type; } });
+  renderTicketTable();
+}
+
+function selectAll(sel) {
+  scannedTickets.forEach((t, i) => { t.selected = sel; });
+  renderTicketTable();
+}
+
+function resetScanner() {
+  photos = []; scannedTickets = [];
+  document.getElementById('upload-section').style.display  = 'block';
+  document.getElementById('review-section').style.display  = 'none';
+  document.getElementById('photo-grid').style.display      = 'none';
+  document.getElementById('photo-count').style.display     = 'none';
+  document.getElementById('scan-btn-wrap').style.display   = 'none';
+  document.getElementById('scan-progress').style.display   = 'none';
+  document.getElementById('bulk-drop').style.display       = 'block';
+}
+
+// ─── CONNECT SECTION ──────────────────────────────────────────────────────────
+function proceedToConnect() {
+  const selected = scannedTickets.filter(t => t.selected);
+  if (!selected.length) { showToast('Select at least one ticket to list.', true); return; }
+
+  const missingPrice = selected.filter(t => !t.asking_price);
+  if (missingPrice.length) { showToast(`Set a price for all selected tickets first.`, true); return; }
+
+  document.getElementById('review-section').style.display  = 'none';
+  document.getElementById('connect-section').style.display = 'block';
+  document.getElementById('selected-count').textContent    = selected.length;
+}
+
+function backToReview() {
+  document.getElementById('connect-section').style.display = 'none';
+  document.getElementById('review-section').style.display  = 'block';
+}
+
+function selectConnect(method) {
+  connectMethod = method;
+  document.getElementById('co-email').classList.toggle('sel', method === 'email');
+  document.getElementById('co-wallet').classList.toggle('sel', method === 'wallet');
+  document.getElementById('email-fields').style.display  = method === 'email'  ? 'block' : 'none';
+  document.getElementById('wallet-fields').style.display = method === 'wallet' ? 'block' : 'none';
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────────────────────────
+async function submitAllListings() {
+  const email = document.getElementById('seller-email').value.trim();
+  const name  = document.getElementById('seller-name').value.trim();
+  if (!email || !email.includes('@')) { showToast('Enter a valid email address.', true); return; }
+  if (!name)  { showToast('Enter your full name.', true); return; }
+
+  document.getElementById('submit-text').style.display    = 'none';
+  document.getElementById('submit-spinner').style.display = 'block';
+
+  const selected = scannedTickets.filter(t => t.selected);
+
+  // Simulate API call — wire to listing worker when ready
+  await new Promise(r => setTimeout(r, 2000));
+
+  document.getElementById('submit-text').style.display    = 'inline';
+  document.getElementById('submit-spinner').style.display = 'none';
+
+  const totalValue = selected.reduce((sum, t) => sum + (t.asking_price || 0), 0);
+
+  document.getElementById('connect-section').style.display = 'none';
+  document.getElementById('success-section').style.display = 'block';
+  document.getElementById('ss-count').textContent = selected.length;
+  document.getElementById('ss-value').textContent = `$${totalValue.toLocaleString()}`;
+
+  showToast(`${selected.length} tickets listed successfully!`);
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>
