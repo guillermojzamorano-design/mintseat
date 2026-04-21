@@ -199,6 +199,14 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font
   .ticket-table th:nth-child(5),.ticket-table td:nth-child(5){display:none;}
   .ss-stats{gap:20px;}
 }
+
+/* ── CONSENT BLOCK ── */
+.consent-block{background:rgba(201,168,76,0.04);border:1px solid var(--border-gold);border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;}
+.consent-icon{font-size:16px;flex-shrink:0;margin-top:2px;}
+.consent-title{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+.consent-body{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.7;}
+.consent-body a{color:var(--gold);text-decoration:none;}
+.consent-body a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
@@ -254,7 +262,20 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font
       </div>
       <div class="card-body">
 
-        <div class="email-address-box">
+        <div class="consent-block">
+          <div class="consent-icon">🔒</div>
+          <div>
+            <div class="consent-title">What happens with your email</div>
+            <div class="consent-body">
+              Our AI reads your forwarded email and extracts game details, dates, and seat information only —
+              no barcodes, no account access, no credentials stored. Draft data auto-deletes in 48 hours
+              if you don't confirm. By forwarding you agree to our
+              <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+            </div>
+          </div>
+        </div>
+
+                <div class="email-address-box">
           <div class="ea-label">Forward your ticket email to</div>
           <div class="ea-address">list@tickets.mintseat.co</div>
           <div class="ea-copy" onclick="copyEmail()">📋 Copy address</div>
