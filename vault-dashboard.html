@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MintVault — Store Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#09100D;--bg-card:#0D1A14;--bg-panel:#071009;--bg-hover:#122018;--bg-input:#0A150F;
+  --gold:#C9A84C;--gold-light:#E2C46E;--gold-dim:#7A5F28;
+  --gold-glow:rgba(201,168,76,0.10);--gold-glow2:rgba(201,168,76,0.25);
+  --mint:#00E5A0;--mint-dim:#00A370;--mint-glow:rgba(0,229,160,0.08);--mint-glow2:rgba(0,229,160,0.18);
+  --red:#E05252;--red-glow:rgba(224,82,82,0.12);
+  --text:#E8F2EB;--text-dim:#7FA890;--text-muted:#3D6050;
+  --border:rgba(255,255,255,0.05);--border-gold:rgba(201,168,76,0.18);--border-mint:rgba(0,229,160,0.15);
+  --sidebar-w:256px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;line-height:1.6;}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;width:100vw;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);flex-shrink:0;background:var(--bg-panel);border-right:1px solid var(--border-gold);display:flex;flex-direction:column;height:100vh;overflow-y:auto;}
+.sidebar-brand{padding:22px 20px 18px;border-bottom:1px solid var(--border-gold);display:flex;align-items:center;gap:10px;}
+.brand-gem{width:34px;height:34px;flex-shrink:0;background:linear-gradient(135deg,var(--gold-dim),var(--gold));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);}
+.brand-sub{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.16em;color:var(--gold);text-transform:uppercase;display:block;margin-top:1px;}
+.store-block{padding:14px 20px;border-bottom:1px solid var(--border-gold);background:rgba(201,168,76,0.03);}
+.store-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;margin-bottom:5px;}
+.store-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.store-tier{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);background:var(--gold-glow);border:1px solid var(--border-gold);padding:2px 7px;border-radius:100px;}
+.store-dot{width:5px;height:5px;background:var(--mint);border-radius:50%;box-shadow:0 0 5px var(--mint);}
+.sidebar-nav{padding:14px 0;flex:1;}
+.nav-group{padding:0 16px;margin-bottom:4px;}
+.nav-group-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.16em;color:var(--text-muted);text-transform:uppercase;padding:8px 4px 5px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:5px;cursor:pointer;transition:all 0.15s;color:var(--text-dim);font-size:13px;margin-bottom:1px;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--bg-hover);color:var(--text);}
+.nav-item.active{background:var(--gold-glow);color:var(--gold-light);border-left-color:var(--gold);}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:0.7;}
+.nav-item.active svg{opacity:1;}
+.nav-pill{margin-left:auto;background:var(--mint);color:var(--bg);font-family:'DM Mono',monospace;font-size:8px;font-weight:500;padding:1px 6px;border-radius:100px;}
+.nav-pill.gold{background:var(--gold);}
+.sidebar-footer{padding:14px 20px;border-top:1px solid var(--border-gold);display:flex;flex-direction:column;gap:7px;}
+.sf-row{display:flex;justify-content:space-between;align-items:center;}
+.sf-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;}
+.sf-val{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;color:var(--gold-light);}
+.sf-val.mint{color:var(--mint);}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.topbar{flex-shrink:0;background:rgba(7,16,9,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-gold);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:56px;gap:16px;}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;white-space:nowrap;}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 14px;border-radius:4px;cursor:pointer;border:none;transition:all 0.2s;white-space:nowrap;font-weight:500;}
+.btn-ghost{background:transparent;border:1px solid var(--border-gold);color:var(--text-dim);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-gold{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--bg);font-weight:600;}
+.btn-gold:hover{box-shadow:0 4px 20px var(--gold-glow2);}
+.btn-mint{background:var(--mint-glow);border:1px solid var(--border-mint);color:var(--mint);}
+.btn-mint:hover{background:var(--mint-glow2);}
+.btn-lg{padding:11px 24px;font-size:10px;}
+.btn-full{width:100%;justify-content:center;}
+
+/* ── SCROLL + PAGES ── */
+.scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:var(--border-gold);border-radius:2px;}
+.page{padding:28px;display:none;}
+.page.active{display:block;}
+
+/* ── STEP TRACKER ── */
+.mint-steps{display:flex;align-items:center;gap:0;margin-bottom:24px;flex-wrap:wrap;gap:6px;}
+.mint-step{display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:8px 14px;border:1px solid var(--border);border-radius:4px;transition:all 0.2s;}
+.mint-step.active{color:var(--gold);border-color:var(--border-gold);background:var(--gold-glow);}
+.mint-step.done{color:var(--mint);border-color:var(--border-mint);background:var(--mint-glow);}
+.step-num{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;background:var(--border);color:var(--text-muted);}
+.mint-step.active .step-num{background:var(--gold);color:var(--bg);}
+.mint-step.done .step-num{background:var(--mint);color:var(--bg);}
+.step-connector{flex:1;height:1px;background:var(--border);min-width:12px;}
+.step-connector.done{background:var(--mint-dim);}
+
+/* ── MINT LAYOUT ── */
+.mint-flow{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start;}
+
+/* ── SCANNER HERO ── */
+.scanner-hero{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:6px;overflow:hidden;margin-bottom:16px;}
+.scanner-hero-header{padding:16px 20px;border-bottom:1px solid var(--border-gold);background:linear-gradient(135deg,rgba(201,168,76,0.07),transparent);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.scanner-hero-left{display:flex;align-items:center;gap:12px;}
+.scanner-icon-wrap{width:40px;height:40px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.scanner-hero-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;}
+.scanner-hero-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;letter-spacing:0.04em;}
+.input-mode-tabs{display:flex;gap:4px;}
+.mode-tab{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-muted);transition:all 0.15s;}
+.mode-tab:hover{border-color:var(--border-gold);color:var(--text-dim);}
+.mode-tab.active{border-color:var(--border-gold);color:var(--gold);background:var(--gold-glow);}
+.scanner-hero-body{padding:20px;}
+
+/* ── DROP ZONE ── */
+.drop-zone{border:2px dashed var(--border-gold);border-radius:6px;padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;background:rgba(201,168,76,0.02);}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--gold);background:var(--gold-glow);}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dz-icon{width:52px;height:52px;margin:0 auto 14px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.dz-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:6px;}
+.dz-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);letter-spacing:0.04em;line-height:1.8;}
+.dz-formats{display:flex;justify-content:center;gap:6px;margin:12px 0;}
+.dz-fmt{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:2px 8px;border-radius:100px;}
+.dz-or{display:flex;align-items:center;gap:10px;margin:12px 0;font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
+.dz-or::before,.dz-or::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── IMAGE PREVIEW ── */
+.image-preview{display:none;border-radius:6px;overflow:hidden;position:relative;}
+.image-preview img{width:100%;max-height:260px;object-fit:contain;background:#000;display:block;}
+.preview-bar{display:flex;gap:8px;margin-top:10px;}
+
+/* ── CAMERA ── */
+.camera-view{display:none;border-radius:6px;overflow:hidden;background:#000;position:relative;aspect-ratio:16/9;}
+.camera-view video{width:100%;height:100%;object-fit:cover;display:block;}
+.camera-frame-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.cam-frame{width:65%;max-width:300px;aspect-ratio:2.5/1;border:2px solid var(--gold);border-radius:4px;box-shadow:0 0 0 9999px rgba(0,0,0,0.5);position:relative;}
+.cam-corner{position:absolute;width:12px;height:12px;border-color:var(--gold);border-style:solid;}
+.cam-corner.tl{top:-1px;left:-1px;border-width:2px 0 0 2px;}
+.cam-corner.tr{top:-1px;right:-1px;border-width:2px 2px 0 0;}
+.cam-corner.bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
+.cam-corner.br{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+.cam-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;color:var(--gold);text-transform:uppercase;background:rgba(0,0,0,0.7);padding:3px 10px;border-radius:100px;white-space:nowrap;}
+.cam-scan-line{position:absolute;left:2px;right:2px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:scanline 2s ease-in-out infinite;top:0;}
+@keyframes scanline{0%,100%{top:5%;opacity:.8;}50%{top:92%;opacity:1;}}
+.camera-controls{display:flex;gap:8px;margin-top:10px;}
+canvas#capture-canvas{display:none;}
+
+/* ── SCANNING STATE ── */
+.scanning-state{display:none;padding:36px;text-align:center;border:1px solid var(--border-gold);border-radius:6px;background:rgba(201,168,76,0.02);}
+.scan-rings{width:56px;height:56px;margin:0 auto 16px;position:relative;}
+.scan-ring{position:absolute;border-radius:50%;border-style:solid;}
+.scan-ring-1{inset:0;border-width:2px;border-color:var(--border-gold);border-top-color:var(--gold);animation:spin .9s linear infinite;}
+.scan-ring-2{inset:8px;border-width:2px;border-color:var(--border-gold);border-bottom-color:var(--mint);animation:spin 1.4s linear infinite reverse;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.scan-label{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:4px;}
+.scan-sublabel{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-bottom:14px;}
+.scan-steps-list{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.scan-step-li{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);display:flex;align-items:center;gap:8px;justify-content:center;transition:color .3s;padding:3px 0;}
+.scan-step-li.active{color:var(--gold);}
+.scan-step-li.done{color:var(--mint);}
+.scan-step-li::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+/* ── SCAN RESULT ── */
+.scan-result{display:none;border:1px solid var(--border-mint);border-radius:6px;overflow:hidden;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.sr-header{padding:10px 14px;background:var(--mint-glow);border-bottom:1px solid var(--border-mint);display:flex;align-items:center;justify-content:space-between;}
+.sr-header-left{display:flex;align-items:center;gap:8px;}
+.sr-live-dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint);}
+.sr-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--mint);text-transform:uppercase;}
+.sr-confidence{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);}
+.sr-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);}
+.sr-cell{background:var(--bg-card);padding:10px 14px;}
+.sr-cell.full{grid-column:1/-1;}
+.sr-label{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px;}
+.sr-value{font-family:'DM Mono',monospace;font-size:11px;color:var(--text);}
+.sr-value.cert{color:var(--mint);font-size:15px;font-weight:500;letter-spacing:0.04em;}
+.sr-value.gold{color:var(--gold-light);font-size:13px;}
+.sr-actions{padding:12px 14px;border-top:1px solid var(--border-mint);display:flex;gap:8px;background:rgba(0,229,160,0.02);}
+.conf-bar{height:3px;background:var(--border);border-radius:100px;overflow:hidden;margin-top:4px;}
+.conf-fill{height:100%;border-radius:100px;transition:width .6s ease;}
+.conf-high{background:linear-gradient(90deg,var(--mint-dim),var(--mint));}
+.conf-med{background:linear-gradient(90deg,var(--gold-dim),var(--gold));}
+.conf-low{background:linear-gradient(90deg,#E05252,#FF6B6B);}
+
+/* ── SCAN WARNING ── */
+.scan-warning{display:none;border:1px solid rgba(224,82,82,0.3);border-radius:6px;padding:14px;background:var(--red-glow);margin-top:12px;}
+.sw-title{font-family:'DM Mono',monospace;font-size:9px;color:var(--red);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;}
+.sw-msg{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);line-height:1.6;}
+.sw-actions{display:flex;gap:8px;margin-top:10px;}
+
+/* ── MANUAL MODE ── */
+.manual-mode{display:none;}
+.field{margin-bottom:14px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field label{display:block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:var(--bg-input);border:1px solid var(--border-gold);border-radius:4px;padding:10px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;outline:none;transition:border-color .15s;resize:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-muted);}
+.field select option{background:var(--bg-card);}
+.field-hint{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:4px;line-height:1.5;}
+
+/* ── DETAILS FORM (step 1b after scan) ── */
+.details-form{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:6px;overflow:hidden;margin-top:14px;}
+.details-form-header{padding:13px 18px;border-bottom:1px solid var(--border-gold);background:rgba(201,168,76,0.04);display:flex;align-items:center;gap:10px;}
+.details-form-icon{width:26px;height:26px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.details-form-title{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;}
+.details-form-body{padding:18px;}
+
+/* ── RAISE CALCULATOR ── */
+.raise-calc{background:var(--bg-input);border:1px solid var(--border);border-radius:4px;padding:14px;margin:14px 0;}
+.rc-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;}
+.rc-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);}
+.rc-val{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--text);}
+.rc-divider{height:1px;background:var(--border);margin:8px 0;}
+.rc-total-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);font-weight:500;}
+.rc-total-val{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold-light);}
+
+/* ── VALUATION RESULT ── */
+.val-result{border-radius:4px;overflow:hidden;margin-bottom:14px;display:none;}
+.val-result.show{display:block;}
+.vr-head{padding:10px 14px;display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;}
+.vr-head.ok{background:var(--mint-glow);border-bottom:1px solid var(--border-mint);color:var(--mint);}
+.vr-head.fail{background:var(--red-glow);border-bottom:1px solid rgba(224,82,82,0.2);color:var(--red);}
+.vr-dot{width:7px;height:7px;border-radius:50%;}
+.vr-dot.g{background:var(--mint);box-shadow:0 0 6px var(--mint);}
+.vr-dot.r{background:var(--red);box-shadow:0 0 6px var(--red);}
+.vr-body{background:var(--bg-input);}
+.vr-row{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border);}
+.vr-row:last-child{border-bottom:none;}
+.vr-key{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.vr-val{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);}
+.vr-val.mint{color:var(--mint);}
+.vr-val.gold{color:var(--gold-light);}
+.vr-val.red{color:var(--red);}
+.vr-suggestion{padding:10px 14px;background:var(--red-glow);border-top:1px solid rgba(224,82,82,0.15);}
+.vr-sug-label{font-family:'DM Mono',monospace;font-size:8px;color:var(--red);margin-bottom:3px;letter-spacing:0.08em;text-transform:uppercase;}
+.vr-sug-text{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);line-height:1.6;}
+
+/* ── SUMMARY CARD (right column) ── */
+.summary-card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:6px;overflow:hidden;position:sticky;top:0;margin-bottom:14px;}
+.sc-header{padding:13px 18px;border-bottom:1px solid var(--border-gold);background:rgba(201,168,76,0.04);}
+.sc-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase;}
+.sc-body{padding:16px;}
+.sc-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.sc-row:last-child{border-bottom:none;}
+.sc-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.sc-val{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;color:var(--text);}
+.sc-val.gold{color:var(--gold-light);}
+.sc-val.mint{color:var(--mint);}
+.sc-val.red{color:var(--red);}
+.cap-bar-wrap{margin:10px 0;}
+.cap-bar-labels{display:flex;justify-content:space-between;margin-bottom:4px;}
+.cap-bar-labels span{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);}
+.cap-bar{height:4px;background:var(--border);border-radius:100px;overflow:hidden;}
+.cap-fill{height:100%;background:linear-gradient(90deg,var(--mint-dim),var(--mint));border-radius:100px;transition:width .4s ease;}
+.cap-fill.warn{background:linear-gradient(90deg,var(--gold-dim),var(--gold));}
+.cap-fill.over{background:linear-gradient(90deg,#E05252,#FF6B6B);}
+.sc-info{margin-top:10px;padding:10px 12px;background:var(--bg-input);border-radius:4px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.7;}
+
+/* ── CONFIRM STEP ── */
+.confirm-checklist{background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:4px;padding:12px 14px;margin:14px 0;}
+.confirm-checklist-title{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase;}
+.confirm-checklist-body{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);line-height:2;}
+
+/* ── SUCCESS ── */
+.success-wrap{text-align:center;padding:40px 28px;}
+.success-icon{width:56px;height:56px;background:var(--mint-glow);border:1px solid var(--border-mint);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-bottom:6px;}
+.success-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-bottom:20px;letter-spacing:0.04em;}
+.success-data{background:var(--bg-input);border:1px solid var(--border-mint);border-radius:4px;padding:14px;margin-bottom:20px;text-align:left;}
+.success-data-title{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;}
+.success-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);}
+.success-row:last-child{border-bottom:none;}
+.success-key{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.success-val{font-family:'DM Mono',monospace;font-size:9px;color:var(--mint);}
+
+/* ── LISTINGS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--bg-card);border:1px solid var(--border-gold);padding:18px 20px;border-radius:6px;}
+.stat-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--gold-light);line-height:1;}
+.stat-value.mint{color:var(--mint);}
+.stat-value.white{color:var(--text);}
+.stat-delta{font-family:'DM Mono',monospace;font-size:9px;margin-top:5px;color:var(--text-muted);}
+.stat-delta.up{color:var(--mint);}
+.section-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;}
+.section-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);letter-spacing:0.06em;margin-top:2px;}
+.panel{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:6px;overflow:hidden;margin-bottom:20px;}
+.panel-header{padding:13px 18px;border-bottom:1px solid var(--border-gold);display:flex;align-items:center;justify-content:space-between;background:rgba(201,168,76,0.03);}
+.panel-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase;}
+.listing-table{width:100%;border-collapse:collapse;}
+.listing-table th{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--border-gold);background:rgba(201,168,76,0.03);}
+.listing-table td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-dim);vertical-align:middle;}
+.listing-table tr:last-child td{border-bottom:none;}
+.listing-table tr:hover td{background:var(--bg-hover);}
+.listing-name{font-size:13px;color:var(--text);margin-bottom:2px;font-weight:500;}
+.listing-cert{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.badge{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:100px;}
+.badge-vault{background:rgba(201,168,76,0.1);border:1px solid var(--border-gold);color:var(--gold);}
+.badge-legacy{background:var(--mint-glow);border:1px solid var(--border-mint);color:var(--mint);}
+.prog-wrap{display:flex;align-items:center;gap:8px;}
+.mini-bar{flex:1;height:3px;background:var(--border);border-radius:100px;overflow:hidden;}
+.mini-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:100px;}
+.prog-pct{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);white-space:nowrap;}
+
+/* ── ROYALTIES ── */
+.roy-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.roy-cell{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:6px;padding:18px 20px;text-align:center;}
+.roy-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;}
+.roy-val{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--mint);}
+.roy-val.dim{color:var(--text-dim);}
+.roy-feed{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:6px;overflow:hidden;}
+.roy-row{display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:1px solid var(--border);transition:background .15s;}
+.roy-row:last-child{border-bottom:none;}
+.roy-row:hover{background:var(--bg-hover);}
+.roy-icon{width:30px;height:30px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;}
+.roy-desc{flex:1;min-width:0;}
+.roy-item{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.roy-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.roy-amount{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--gold-light);white-space:nowrap;}
+.roy-date{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);text-align:right;min-width:50px;}
+
+/* ── SETTINGS ── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.settings-section{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:6px;overflow:hidden;}
+.ss-header{padding:13px 18px;border-bottom:1px solid var(--border-gold);background:rgba(201,168,76,0.04);}
+.ss-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase;}
+.ss-body{padding:16px;}
+.ss-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.ss-row:last-child{border-bottom:none;}
+.ss-label{font-size:13px;color:var(--text);}
+.ss-desc{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;}
+.ss-val{font-family:'DM Mono',monospace;font-size:10px;color:var(--mint);}
+.toggle{width:34px;height:18px;background:var(--mint-dim);border-radius:9px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;}
+.toggle::after{content:'';position:absolute;width:12px;height:12px;background:white;border-radius:50%;top:3px;right:3px;transition:transform .2s;}
+.toggle.off{background:var(--text-muted);}
+.toggle.off::after{transform:translateX(-16px);}
+
+/* ── SPINNER ── */
+.spinner{width:14px;height:14px;border:2px solid var(--border-gold);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:none;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;z-index:1000;background:var(--bg-card);border:1px solid var(--border-mint);border-radius:6px;padding:12px 16px;min-width:280px;max-width:360px;display:flex;align-items:flex-start;gap:10px;transform:translateY(20px);opacity:0;transition:all .3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;pointer-events:auto;}
+.toast.error{border-color:rgba(224,82,82,0.4);}
+.toast-dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint);flex-shrink:0;margin-top:4px;}
+.toast.error .toast-dot{background:var(--red);box-shadow:0 0 6px var(--red);}
+.toast-title{font-size:13px;color:var(--text);margin-bottom:2px;font-weight:500;}
+.toast-msg{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);line-height:1.5;}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
+.empty-icon{font-size:40px;opacity:.3;margin-bottom:12px;}
+.empty-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--text-dim);margin-bottom:6px;}
+.empty-sub{font-size:12px;max-width:320px;margin:0 auto 20px;line-height:1.6;}
+
+@media(max-width:1100px){.mint-flow{grid-template-columns:1fr;}.stats-row{grid-template-columns:repeat(2,1fr);}.settings-grid{grid-template-columns:1fr;}}
+@media(max-width:768px){.sidebar{display:none;}.stats-row{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-gem"></div>
+    <div>
+      <div class="brand-name">MintVault</div>
+      <span class="brand-sub">Store Dashboard</span>
+    </div>
+  </div>
+  <div class="store-block">
+    <div class="store-label">Active Store</div>
+    <div class="store-name" id="sb-store-name">Chicago Collectibles Co.</div>
+    <div class="store-tier"><span class="store-dot"></span>Pro Plan</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Catalog</div>
+      <div class="nav-item active" onclick="showPage('mint',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Mint New Token
+        <span class="nav-pill gold">New</span>
+      </div>
+      <div class="nav-item" onclick="showPage('listings',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Active Listings
+        <span class="nav-pill">4</span>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Revenue</div>
+      <div class="nav-item" onclick="showPage('royalties',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Royalties
+        <span class="nav-pill">$312</span>
+      </div>
+      <div class="nav-item" onclick="showPage('payouts',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Payouts
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Account</div>
+      <div class="nav-item" onclick="showPage('settings',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </div>
+      <div class="nav-item" onclick="alert('Signing out...')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sf-row"><span class="sf-label">Total Minted</span><span class="sf-val">4</span></div>
+    <div class="sf-row"><span class="sf-label">Volume</span><span class="sf-val">$18,400</span></div>
+    <div class="sf-row"><span class="sf-label">Royalties</span><span class="sf-val mint">$312.40</span></div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Mint New Token</div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost" onclick="showPage('listings',null)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        View Listings
+      </button>
+      <button class="btn btn-gold" onclick="showPage('mint',null);resetMint();">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Mint
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll-area">
+
+    <!-- ══════════════════════════════════
+         PAGE: MINT
+    ══════════════════════════════════ -->
+    <div id="page-mint" class="page active">
+
+      <!-- Step tracker -->
+      <div class="mint-steps">
+        <div class="mint-step active" id="step-1"><span class="step-num">1</span>Scan or Enter Item</div>
+        <div class="step-connector" id="conn-1"></div>
+        <div class="mint-step" id="step-2"><span class="step-num">2</span>Valuation Check</div>
+        <div class="step-connector" id="conn-2"></div>
+        <div class="mint-step" id="step-3"><span class="step-num">3</span>Confirm &amp; Mint</div>
+      </div>
+
+      <div class="mint-flow">
+        <!-- LEFT -->
+        <div>
+
+          <!-- ── STEP 1: SCANNER HERO ── -->
+          <div id="form-step-1">
+
+            <div class="scanner-hero">
+              <div class="scanner-hero-header">
+                <div class="scanner-hero-left">
+                  <div class="scanner-icon-wrap">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  </div>
+                  <div>
+                    <div class="scanner-hero-title">Scan PSA Slab</div>
+                    <div class="scanner-hero-sub">Take a photo or upload an image — AI reads the cert number, grade, and item details automatically</div>
+                  </div>
+                </div>
+                <div class="input-mode-tabs">
+                  <button class="mode-tab active" onclick="setMode('upload',this)">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Upload
+                  </button>
+                  <button class="mode-tab" onclick="setMode('camera',this)">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px;"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    Camera
+                  </button>
+                  <button class="mode-tab" onclick="setMode('manual',this)">✎ Manual</button>
+                </div>
+              </div>
+
+              <div class="scanner-hero-body">
+
+                <!-- UPLOAD MODE -->
+                <div id="mode-upload">
+                  <div class="drop-zone" id="drop-zone"
+                       ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+                    <input type="file" accept="image/*" onchange="onFileSelect(event)">
+                    <div class="dz-icon">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    </div>
+                    <div class="dz-title">Drop your PSA slab photo here</div>
+                    <div class="dz-sub">Place the slab label face-up in good lighting<br>Works best when the entire label is clearly visible</div>
+                    <div class="dz-formats">
+                      <span class="dz-fmt">JPG</span><span class="dz-fmt">PNG</span>
+                      <span class="dz-fmt">HEIC</span><span class="dz-fmt">WEBP</span>
+                      <span class="dz-fmt">Max 10MB</span>
+                    </div>
+                    <div class="dz-or">or</div>
+                    <button class="btn btn-gold" style="pointer-events:none;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      Choose File
+                    </button>
+                  </div>
+
+                  <!-- Preview -->
+                  <div class="image-preview" id="image-preview">
+                    <img id="preview-img" src="" alt="PSA slab">
+                    <div class="preview-bar">
+                      <button class="btn btn-mint btn-lg" style="flex:2" onclick="scanImage()">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <span id="scan-btn-text">Scan This Photo</span>
+                        <div class="spinner" id="scan-spinner"></div>
+                      </button>
+                      <button class="btn btn-ghost" onclick="clearImage()">Clear</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CAMERA MODE -->
+                <div id="mode-camera" style="display:none;">
+                  <div class="camera-view" id="camera-view">
+                    <video id="camera-feed" autoplay playsinline muted></video>
+                    <div class="camera-frame-overlay">
+                      <div class="cam-frame">
+                        <div class="cam-corner tl"></div><div class="cam-corner tr"></div>
+                        <div class="cam-corner bl"></div><div class="cam-corner br"></div>
+                        <div class="cam-scan-line"></div>
+                      </div>
+                    </div>
+                    <div class="cam-hint">Align PSA label within frame</div>
+                  </div>
+                  <canvas id="capture-canvas"></canvas>
+                  <div class="camera-controls">
+                    <button class="btn btn-gold btn-full btn-lg" onclick="capturePhoto()">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                      Capture &amp; Scan
+                    </button>
+                    <button class="btn btn-ghost" onclick="stopCamera();setMode('upload',document.querySelectorAll('.mode-tab')[0])">Cancel</button>
+                  </div>
+                </div>
+
+                <!-- MANUAL MODE -->
+                <div id="mode-manual" class="manual-mode">
+                  <div class="field" style="margin-bottom:12px;">
+                    <label>PSA Cert Number</label>
+                    <input type="text" id="manual-cert" placeholder="e.g. 08765432" maxlength="12">
+                  </div>
+                  <div class="field" style="margin-bottom:12px;">
+                    <label>Item Name</label>
+                    <input type="text" id="manual-name" placeholder="e.g. 1986 Fleer Michael Jordan Rookie Card">
+                  </div>
+                  <div class="field-row" style="margin-bottom:12px;">
+                    <div class="field" style="margin-bottom:0;">
+                      <label>PSA Grade</label>
+                      <input type="text" id="manual-grade" placeholder="e.g. NM-MT 8">
+                    </div>
+                    <div class="field" style="margin-bottom:0;">
+                      <label>Year</label>
+                      <input type="text" id="manual-year" placeholder="e.g. 1986">
+                    </div>
+                  </div>
+                  <button class="btn btn-gold btn-full btn-lg" onclick="applyManualInput()">Apply to Form</button>
+                </div>
+
+                <!-- SCANNING STATE -->
+                <div class="scanning-state" id="scanning-state">
+                  <div class="scan-rings"><div class="scan-ring scan-ring-1"></div><div class="scan-ring scan-ring-2"></div></div>
+                  <div class="scan-label">Reading PSA Slab</div>
+                  <div class="scan-sublabel">Claude AI is analyzing your image</div>
+                  <ul class="scan-steps-list">
+                    <li class="scan-step-li" id="ss-a">Locating PSA label</li>
+                    <li class="scan-step-li" id="ss-b">Reading cert number</li>
+                    <li class="scan-step-li" id="ss-c">Extracting grade and subject</li>
+                    <li class="scan-step-li" id="ss-d">Preparing form data</li>
+                  </ul>
+                </div>
+
+                <!-- SCAN RESULT -->
+                <div class="scan-result" id="scan-result">
+                  <div class="sr-header">
+                    <div class="sr-header-left"><div class="sr-live-dot"></div><div class="sr-title">Scan Complete</div></div>
+                    <div class="sr-confidence" id="sr-conf-label">—</div>
+                  </div>
+                  <div class="sr-grid">
+                    <div class="sr-cell full">
+                      <div class="sr-label">PSA Cert Number</div>
+                      <div class="sr-value cert" id="sr-cert">—</div>
+                      <div class="conf-bar"><div id="sr-conf-bar" class="conf-fill conf-high" style="width:0%"></div></div>
+                    </div>
+                    <div class="sr-cell full">
+                      <div class="sr-label">Item</div>
+                      <div class="sr-value gold" id="sr-name">—</div>
+                    </div>
+                    <div class="sr-cell"><div class="sr-label">Grade</div><div class="sr-value gold" id="sr-grade">—</div></div>
+                    <div class="sr-cell"><div class="sr-label">Year</div><div class="sr-value" id="sr-year">—</div></div>
+                    <div class="sr-cell"><div class="sr-label">Brand / Set</div><div class="sr-value" id="sr-brand">—</div></div>
+                    <div class="sr-cell"><div class="sr-label">Item Type</div><div class="sr-value" id="sr-type">—</div></div>
+                    <div class="sr-cell full" id="sr-notes-cell" style="display:none;">
+                      <div class="sr-label">Scanner Notes</div>
+                      <div class="sr-value" id="sr-notes" style="font-size:9px;color:var(--text-muted);line-height:1.6;"></div>
+                    </div>
+                  </div>
+                  <div class="sr-actions">
+                    <button class="btn btn-mint" style="flex:2" onclick="applyScannedData()">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                      Use These Details
+                    </button>
+                    <button class="btn btn-ghost" onclick="rescan()">Rescan</button>
+                    <button class="btn btn-ghost" onclick="editScanResult()">Edit</button>
+                  </div>
+                </div>
+
+                <!-- SCAN WARNING -->
+                <div class="scan-warning" id="scan-warning">
+                  <div class="sw-title" id="sw-title">Scan Issue</div>
+                  <div class="sw-msg" id="sw-msg">—</div>
+                  <div class="sw-actions">
+                    <button class="btn btn-ghost" style="font-size:8px;padding:5px 10px;" onclick="rescan()">Try Again</button>
+                    <button class="btn btn-ghost" style="font-size:8px;padding:5px 10px;" onclick="setMode('manual',document.querySelectorAll('.mode-tab')[2])">Enter Manually</button>
+                  </div>
+                </div>
+
+              </div><!-- /scanner-hero-body -->
+            </div><!-- /scanner-hero -->
+
+            <!-- Details form — appears after scan data is applied -->
+            <div class="details-form" id="details-form" style="display:none;">
+              <div class="details-form-header">
+                <div class="details-form-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                </div>
+                <div class="details-form-title">Item &amp; Share Details</div>
+              </div>
+              <div class="details-form-body">
+
+                <div class="field">
+                  <label>PSA Cert Number</label>
+                  <input type="text" id="psa-cert" placeholder="e.g. 08765432" maxlength="12" oninput="updateSummary()">
+                  <div class="field-hint">Verify this matches the number on the PSA label exactly.</div>
+                </div>
+
+                <div class="field">
+                  <label>Display Name <span style="color:var(--text-muted);font-weight:400;">(shown to buyers)</span></label>
+                  <input type="text" id="item-name" placeholder="e.g. 1986 Fleer Michael Jordan Rookie Card" oninput="updateSummary()">
+                </div>
+
+                <div class="field-row">
+                  <div class="field" style="margin-bottom:0;">
+                    <label>Item Type</label>
+                    <select id="item-type" onchange="updateSummary()">
+                      <option value="psa_graded">PSA Graded Card / Collectible</option>
+                      <option value="legacy">Legacy Ticket Stub (pre-2015)</option>
+                    </select>
+                  </div>
+                  <div class="field" style="margin-bottom:0;">
+                    <label>PSA Grade <span style="color:var(--text-muted);font-weight:400;">(display only)</span></label>
+                    <input type="text" id="item-grade" placeholder="e.g. NM-MT 8" readonly style="opacity:0.7;cursor:default;">
+                  </div>
+                </div>
+
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+                  <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase;margin-bottom:14px;">Share Structure</div>
+                  <div class="field-row">
+                    <div class="field" style="margin-bottom:0;">
+                      <label>Number of Shares</label>
+                      <input type="number" id="shares" placeholder="e.g. 100" min="1" max="10000" oninput="updateSummary()">
+                      <div class="field-hint">1 – 10,000 shares per item.</div>
+                    </div>
+                    <div class="field" style="margin-bottom:0;">
+                      <label>Price per Share (USD)</label>
+                      <input type="number" id="price" placeholder="e.g. 25.00" min="1" step="0.01" oninput="updateSummary()">
+                      <div class="field-hint">Minimum $1.00.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="raise-calc">
+                  <div class="rc-row"><span class="rc-label">Shares</span><span class="rc-val" id="calc-shares">—</span></div>
+                  <div class="rc-row"><span class="rc-label">Price per share</span><span class="rc-val" id="calc-price">—</span></div>
+                  <div class="rc-divider"></div>
+                  <div class="rc-row"><span class="rc-total-label">Total Raise</span><span class="rc-total-val" id="calc-total">$0</span></div>
+                </div>
+
+                <button class="btn btn-gold btn-lg btn-full" onclick="runValuationCheck()">
+                  <span id="check-btn-text">Run Valuation Check</span>
+                  <div class="spinner" id="check-spinner"></div>
+                </button>
+
+              </div>
+            </div><!-- /details-form -->
+          </div><!-- /form-step-1 -->
+
+          <!-- ── STEP 2: VALUATION ── -->
+          <div id="form-step-2" style="display:none;">
+            <div class="details-form">
+              <div class="details-form-header">
+                <div class="details-form-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div class="details-form-title">Valuation Result</div>
+              </div>
+              <div class="details-form-body">
+
+                <div class="val-result show" id="val-approved" style="display:none;">
+                  <div class="vr-head ok"><div class="vr-dot g"></div>Approved — Raise within market cap</div>
+                  <div class="vr-body">
+                    <div class="vr-row"><span class="vr-key">FMV Low</span><span class="vr-val gold" id="vr-fmv-low">—</span></div>
+                    <div class="vr-row"><span class="vr-key">FMV High</span><span class="vr-val gold" id="vr-fmv-high">—</span></div>
+                    <div class="vr-row"><span class="vr-key">Comps Used</span><span class="vr-val mint" id="vr-comps">—</span></div>
+                    <div class="vr-row"><span class="vr-key">Last Sale Date</span><span class="vr-val" id="vr-last-sale">—</span></div>
+                    <div class="vr-row"><span class="vr-key">Your Total Raise</span><span class="vr-val mint" id="vr-raise">—</span></div>
+                    <div class="vr-row"><span class="vr-key">Max Allowed Raise</span><span class="vr-val" id="vr-max">—</span></div>
+                    <div class="vr-row"><span class="vr-key">Approval Expires</span><span class="vr-val">30 minutes</span></div>
+                  </div>
+                </div>
+
+                <div class="val-result show" id="val-rejected" style="display:none;">
+                  <div class="vr-head fail"><div class="vr-dot r"></div>Raise Exceeds Valuation Cap</div>
+                  <div class="vr-body">
+                    <div class="vr-row"><span class="vr-key">FMV Low</span><span class="vr-val gold" id="vr-rej-fmv">—</span></div>
+                    <div class="vr-row"><span class="vr-key">Max Allowed Raise</span><span class="vr-val" id="vr-rej-max">—</span></div>
+                    <div class="vr-row"><span class="vr-key">Your Raise</span><span class="vr-val red" id="vr-rej-raise">—</span></div>
+                  </div>
+                  <div class="vr-suggestion">
+                    <div class="vr-sug-label">How to Fix</div>
+                    <div class="vr-sug-text" id="vr-suggestion">—</div>
+                  </div>
+                </div>
+
+                <div style="display:flex;gap:10px;margin-top:16px;">
+                  <button class="btn btn-ghost" style="flex:1" onclick="goToStep(1)">← Back</button>
+                  <button class="btn btn-gold btn-lg" style="flex:2" id="confirm-btn" onclick="goToStep(3)" disabled>Review &amp; Mint →</button>
+                </div>
+              </div>
+            </div>
+          </div><!-- /form-step-2 -->
+
+          <!-- ── STEP 3: CONFIRM ── -->
+          <div id="form-step-3" style="display:none;">
+            <div class="details-form">
+              <div class="details-form-header">
+                <div class="details-form-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00E5A0" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="details-form-title">Review &amp; Execute Mint</div>
+              </div>
+              <div class="details-form-body">
+                <div class="raise-calc">
+                  <div class="rc-row"><span class="rc-label">Item</span><span class="rc-val" id="conf-name" style="font-size:13px;font-family:'Outfit',sans-serif;">—</span></div>
+                  <div class="rc-row"><span class="rc-label">PSA Cert</span><span class="rc-val" id="conf-cert" style="font-family:'DM Mono',monospace;font-size:11px;">—</span></div>
+                  <div class="rc-row"><span class="rc-label">Shares</span><span class="rc-val" id="conf-shares">—</span></div>
+                  <div class="rc-row"><span class="rc-label">Price / Share</span><span class="rc-val" id="conf-price">—</span></div>
+                  <div class="rc-divider"></div>
+                  <div class="rc-row"><span class="rc-total-label">Total Raise</span><span class="rc-total-val" id="conf-total">—</span></div>
+                  <div class="rc-row"><span class="rc-label" style="color:var(--mint);">FMV at Mint</span><span class="rc-val mint" id="conf-fmv">—</span></div>
+                </div>
+
+                <div class="confirm-checklist">
+                  <div class="confirm-checklist-title">By minting you confirm</div>
+                  <div class="confirm-checklist-body">
+                    ✓ You own this item and have the right to tokenize it<br>
+                    ✓ Authentication information is accurate and verifiable<br>
+                    ✓ You accept MintVault licensing terms and royalty structure<br>
+                    ✓ Token issuance is permanent and cannot be reversed
+                  </div>
+                </div>
+
+                <div style="display:flex;gap:10px;">
+                  <button class="btn btn-ghost" style="flex:1" onclick="goToStep(2)">← Back</button>
+                  <button class="btn btn-lg btn-full" style="flex:2;background:linear-gradient(135deg,#00A370,#00E5A0);color:#09100D;border:none;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;" onclick="executeMint()">
+                    <span id="mint-btn-text">Execute Mint on XRPL</span>
+                    <div class="spinner" id="mint-spinner"></div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div><!-- /form-step-3 -->
+
+          <!-- ── STEP 4: SUCCESS ── -->
+          <div id="form-step-4" style="display:none;">
+            <div class="details-form">
+              <div class="success-wrap">
+                <div class="success-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5A0" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="success-title">Token Minted</div>
+                <div class="success-sub">Permanently recorded on the XRPL ledger</div>
+                <div class="success-data">
+                  <div class="success-data-title">Mint Details</div>
+                  <div class="success-row"><span class="success-key">Token ID</span><span class="success-val" id="success-token">—</span></div>
+                  <div class="success-row"><span class="success-key">XRPL TX</span><span class="success-val" id="success-tx">—</span></div>
+                  <div class="success-row"><span class="success-key">Verify URL</span><span class="success-val" id="success-url" style="color:var(--gold-light);font-size:9px;">—</span></div>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:center;">
+                  <button class="btn btn-mint btn-lg" onclick="resetMint()">Mint Another</button>
+                  <button class="btn btn-ghost btn-lg" onclick="showPage('listings',null)">View Listings</button>
+                </div>
+              </div>
+            </div>
+          </div><!-- /form-step-4 -->
+
+        </div><!-- /LEFT -->
+
+        <!-- RIGHT: Summary -->
+        <div>
+          <div class="summary-card">
+            <div class="sc-header"><div class="sc-title">Mint Summary</div></div>
+            <div class="sc-body">
+              <div class="sc-row"><span class="sc-label">Shares</span><span class="sc-val" id="sum-shares">—</span></div>
+              <div class="sc-row"><span class="sc-label">Price / Share</span><span class="sc-val gold" id="sum-price">—</span></div>
+              <div class="sc-row"><span class="sc-label">Total Raise</span><span class="sc-val gold" id="sum-total">—</span></div>
+              <div class="sc-row"><span class="sc-label">FMV Low</span><span class="sc-val" id="sum-fmv">Not checked</span></div>
+              <div class="sc-row"><span class="sc-label">Royalty Rate</span><span class="sc-val mint">7%</span></div>
+              <div class="sc-row"><span class="sc-label">Platform Fee</span><span class="sc-val">2%</span></div>
+              <div class="cap-bar-wrap" id="cap-bar-wrap" style="display:none;">
+                <div class="cap-bar-labels"><span>Raise vs Cap</span><span id="cap-pct">0%</span></div>
+                <div class="cap-bar"><div class="cap-fill" id="cap-fill" style="width:0%"></div></div>
+              </div>
+              <div class="sc-info">Raise capped at 90% of FMV low based on live eBay sold listings. Protects buyers from overpaying relative to authenticated market value.</div>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="sc-header"><div class="sc-title">Store Limits — Pro</div></div>
+            <div class="sc-body">
+              <div class="sc-row"><span class="sc-label">Active Listings</span><span class="sc-val">4 / 50</span></div>
+              <div class="sc-row"><span class="sc-label">Primary Fee</span><span class="sc-val">1.5%</span></div>
+              <div class="sc-row"><span class="sc-label">Secondary Fee</span><span class="sc-val">1%</span></div>
+              <div class="sc-row"><span class="sc-label">Ticket Services</span><span class="sc-val mint">✓ Enabled</span></div>
+            </div>
+          </div>
+        </div><!-- /RIGHT -->
+      </div><!-- /mint-flow -->
+    </div><!-- /page-mint -->
+
+
+    <!-- ══════════════════════════════════
+         PAGE: LISTINGS
+    ══════════════════════════════════ -->
+    <div id="page-listings" class="page">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Active Listings</div><div class="stat-value white">4</div><div class="stat-delta">of 50 allowed</div></div>
+        <div class="stat-card"><div class="stat-label">Total Volume</div><div class="stat-value">$18,400</div><div class="stat-delta up">↑ +$2,200 this month</div></div>
+        <div class="stat-card"><div class="stat-label">Shares Sold</div><div class="stat-value white">287</div><div class="stat-delta up">↑ +34 this month</div></div>
+        <div class="stat-card"><div class="stat-label">Royalties Earned</div><div class="stat-value mint">$312</div><div class="stat-delta up">↑ +$48 this month</div></div>
+      </div>
+      <div class="section-hdr">
+        <div><div class="section-title">Active Listings</div><div class="section-sub">All tokens minted under your store</div></div>
+        <button class="btn btn-gold" onclick="showPage('mint',null);resetMint();">+ Mint New Token</button>
+      </div>
+      <div class="panel">
+        <table class="listing-table">
+          <thead><tr><th>Item</th><th>Type</th><th>Shares Sold</th><th>FMV at Mint</th><th>Royalties</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><div class="listing-name">1986 Michael Jordan Rookie Card</div><div class="listing-cert">PSA NM-MT 8 · Cert #08765432</div></td><td><span class="badge badge-vault">Vault</span></td><td><div class="prog-wrap"><div class="mini-bar"><div class="mini-fill" style="width:82%"></div></div><span class="prog-pct">82%</span></div></td><td style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-light);">$950</td><td style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--mint);">$148.20</td><td><span class="badge badge-vault">Live</span></td><td><button class="btn btn-ghost" style="padding:5px 10px;font-size:8px;">View</button></td></tr>
+            <tr><td><div class="listing-name">2016 World Series Game 7 Ticket</div><div class="listing-cert">PSA EX-MT 6 · Cert #03421987</div></td><td><span class="badge badge-legacy">Legacy</span></td><td><div class="prog-wrap"><div class="mini-bar"><div class="mini-fill" style="width:44%"></div></div><span class="prog-pct">44%</span></div></td><td style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-light);">$800</td><td style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--mint);">$62.40</td><td><span class="badge badge-vault">Live</span></td><td><button class="btn btn-ghost" style="padding:5px 10px;font-size:8px;">View</button></td></tr>
+            <tr><td><div class="listing-name">Scottie Pippen Signed Jersey</div><div class="listing-cert">JSA Certified · Upper Deck</div></td><td><span class="badge badge-vault">Vault</span></td><td><div class="prog-wrap"><div class="mini-bar"><div class="mini-fill" style="width:70%"></div></div><span class="prog-pct">70%</span></div></td><td style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-light);">$1,200</td><td style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--mint);">$71.40</td><td><span class="badge badge-vault">Live</span></td><td><button class="btn btn-ghost" style="padding:5px 10px;font-size:8px;">View</button></td></tr>
+            <tr><td><div class="listing-name">1998 NBA Finals Game 6 Ticket</div><div class="listing-cert">PSA NM-MT 8 · Cert #12345678</div></td><td><span class="badge badge-legacy">Legacy</span></td><td><div class="prog-wrap"><div class="mini-bar"><div class="mini-fill" style="width:91%"></div></div><span class="prog-pct">91%</span></div></td><td style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-light);">$2,100</td><td style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--mint);">$30.40</td><td><span class="badge badge-vault">Live</span></td><td><button class="btn btn-ghost" style="padding:5px 10px;font-size:8px;">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════
+         PAGE: ROYALTIES
+    ══════════════════════════════════ -->
+    <div id="page-royalties" class="page">
+      <div class="roy-summary">
+        <div class="roy-cell"><div class="roy-label">Total Earned</div><div class="roy-val">$312.40</div></div>
+        <div class="roy-cell"><div class="roy-label">This Month</div><div class="roy-val">$48.20</div></div>
+        <div class="roy-cell"><div class="roy-label">Pending Payout</div><div class="roy-val dim">$0.00</div></div>
+      </div>
+      <div class="section-hdr"><div><div class="section-title">Royalty History</div><div class="section-sub">3% auto-paid on every secondary trade</div></div></div>
+      <div class="roy-feed">
+        <div class="panel-header"><span class="panel-title">On-Chain Royalty Feed</span></div>
+        <div class="roy-row"><div class="roy-icon">✦</div><div class="roy-desc"><div class="roy-item">Jordan Rookie — Secondary Trade</div><div class="roy-meta">Share 23 · $220 trade · 3% = $6.60</div></div><div class="roy-amount">+$6.60</div><div class="roy-date">Apr 18</div></div>
+        <div class="roy-row"><div class="roy-icon">✦</div><div class="roy-desc"><div class="roy-item">2016 WS Ticket — Secondary Trade</div><div class="roy-meta">Share 7 · $113 trade · 3% = $3.40</div></div><div class="roy-amount">+$3.40</div><div class="roy-date">Apr 15</div></div>
+        <div class="roy-row"><div class="roy-icon">✦</div><div class="roy-desc"><div class="roy-item">Jordan Rookie — Secondary Trade</div><div class="roy-meta">Share 14 · $210 trade · 3% = $6.30</div></div><div class="roy-amount">+$6.30</div><div class="roy-date">Apr 11</div></div>
+        <div class="roy-row"><div class="roy-icon">✦</div><div class="roy-desc"><div class="roy-item">NBA Finals Ticket — Secondary Trade</div><div class="roy-meta">Share 3 · $380 trade · 3% = $11.40</div></div><div class="roy-amount">+$11.40</div><div class="roy-date">Apr 8</div></div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════
+         PAGE: PAYOUTS
+    ══════════════════════════════════ -->
+    <div id="page-payouts" class="page">
+      <div class="section-hdr"><div><div class="section-title">Payouts</div><div class="section-sub">Stripe Connect payout management</div></div><button class="btn btn-gold" onclick="alert('Opening Stripe portal...')">Manage in Stripe →</button></div>
+      <div class="empty-state">
+        <div class="empty-icon">💳</div>
+        <div class="empty-title">Payout management via Stripe</div>
+        <p class="empty-sub">All primary sale proceeds and royalties route through your connected Stripe account. Manage payouts, bank accounts, and tax documents directly in the Stripe dashboard.</p>
+        <button class="btn btn-gold btn-lg" onclick="alert('Opening Stripe portal...')">Open Stripe Dashboard →</button>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════
+         PAGE: SETTINGS
+    ══════════════════════════════════ -->
+    <div id="page-settings" class="page">
+      <div class="section-hdr"><div><div class="section-title">Settings</div><div class="section-sub">Store configuration and preferences</div></div></div>
+      <div class="settings-grid">
+        <div class="settings-section">
+          <div class="ss-header"><div class="ss-title">Store Info</div></div>
+          <div class="ss-body">
+            <div class="ss-row"><div><div class="ss-label">Store Name</div><div class="ss-desc">Shown to buyers on all listings</div></div><div class="ss-val">Chicago Collectibles Co.</div></div>
+            <div class="ss-row"><div><div class="ss-label">Plan</div><div class="ss-desc">50 listings, ticket services enabled</div></div><div class="ss-val">Pro — $299/mo</div></div>
+            <div class="ss-row"><div><div class="ss-label">Status</div></div><div style="display:flex;align-items:center;gap:6px;"><div style="width:7px;height:7px;background:var(--mint);border-radius:50%;box-shadow:0 0 5px var(--mint);"></div><span class="ss-val">Active</span></div></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="ss-header"><div class="ss-title">Royalty Configuration</div></div>
+          <div class="ss-body">
+            <div class="ss-row"><div><div class="ss-label">Secondary Royalty Rate</div><div class="ss-desc">Your cut of every secondary trade</div></div><div class="ss-val">3%</div></div>
+            <div class="ss-row"><div><div class="ss-label">MintSeat Platform Fee</div></div><div class="ss-val">2%</div></div>
+            <div class="ss-row"><div><div class="ss-label">Auto-Payout</div><div class="ss-desc">Route royalties to wallet automatically</div></div><div class="toggle" onclick="this.classList.toggle('off')"></div></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="ss-header"><div class="ss-title">Notifications</div></div>
+          <div class="ss-body">
+            <div class="ss-row"><div><div class="ss-label">New share purchases</div></div><div class="toggle" onclick="this.classList.toggle('off')"></div></div>
+            <div class="ss-row"><div><div class="ss-label">Royalty payments received</div></div><div class="toggle" onclick="this.classList.toggle('off')"></div></div>
+            <div class="ss-row"><div><div class="ss-label">Secondary trades on your items</div></div><div class="toggle off" onclick="this.classList.toggle('off')"></div></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="ss-header"><div class="ss-title">API &amp; Integration</div></div>
+          <div class="ss-body">
+            <div class="ss-row"><div><div class="ss-label">API Key</div><div class="ss-desc">For webhook integrations</div></div><button class="btn btn-ghost" style="font-size:8px;padding:5px 10px;">Rotate Key</button></div>
+            <div class="ss-row"><div><div class="ss-label">XRPL Wallet</div><div class="ss-desc">Royalty destination</div></div><div class="ss-val" style="font-size:9px;">rXKp...9F3m</div></div>
+            <div class="ss-row"><div><div class="ss-label">Stripe Account</div></div><button class="btn btn-ghost" style="font-size:8px;padding:5px 10px;">Open Stripe →</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /scroll-area -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-dot"></div><div><div class="toast-title" id="toast-title"></div><div class="toast-msg" id="toast-msg"></div></div></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const WORKER_URL    = 'https://mintseat-registry-worker.guillermojzamorano.workers.dev';
+const STORE_ID      = 'venue_1776716919462_dbe4a69c';
+const DEALER_WALLET = 'rLMtdzcmRZKDAtJhhkKnSy4VLFdC7xri61';
+const STORE_API_KEY = 'ms_live_b9k23BmUEXcNtUt6ecBlzSkHgiB4kRbm';
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let currentImageBase64 = null;
+let currentImageType   = null;
+let scannedData        = null;
+let cameraStream       = null;
+let approvalToken      = null;
+let valuationData      = null;
+
+// ─── PAGE NAV ─────────────────────────────────────────────────────────────────
+const PAGE_TITLES = { mint:'Mint New Token', listings:'Active Listings', royalties:'Royalties', payouts:'Payouts', settings:'Settings' };
+
+function showPage(page, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  document.getElementById('page-title').textContent = PAGE_TITLES[page] || page;
+  if (navEl) navEl.classList.add('active');
+  else document.querySelectorAll('.nav-item').forEach(n => { if (n.getAttribute('onclick')?.includes(`'${page}'`)) n.classList.add('active'); });
+  document.querySelector('.scroll-area').scrollTop = 0;
+}
+
+// ─── STEP NAV ─────────────────────────────────────────────────────────────────
+function goToStep(step) {
+  for (let i=1;i<=3;i++) {
+    const el = document.getElementById(`step-${i}`);
+    el.classList.remove('active','done');
+    if (i < step) el.classList.add('done');
+    else if (i === step) el.classList.add('active');
+  }
+  for (let i=1;i<=2;i++) document.getElementById(`conn-${i}`).classList.toggle('done', i < step);
+  ['form-step-1','form-step-2','form-step-3','form-step-4'].forEach((id,i) => {
+    document.getElementById(id).style.display = (i+1 === step) ? 'block' : 'none';
+  });
+  if (step === 3) populateConfirmStep();
+  document.querySelector('.scroll-area').scrollTop = 0;
+}
+
+// ─── INPUT MODE ───────────────────────────────────────────────────────────────
+function setMode(mode, btn) {
+  if (btn) { document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active')); btn.classList.add('active'); }
+  ['mode-upload','mode-camera','mode-manual','scanning-state','scan-result','scan-warning']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  const modeEl = document.getElementById('mode-' + mode);
+  if (modeEl) modeEl.style.display = mode === 'manual' ? 'block' : 'block';
+  if (mode === 'camera') startCamera(); else stopCamera();
+}
+
+// ─── FILE HANDLING ────────────────────────────────────────────────────────────
+function onDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
+function onDragLeave(e) { document.getElementById('drop-zone').classList.remove('drag-over'); }
+function onDrop(e) { e.preventDefault(); document.getElementById('drop-zone').classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f?.type.startsWith('image/')) loadImageFile(f); }
+function onFileSelect(e) { const f = e.target.files[0]; if (f) loadImageFile(f); }
+
+function loadImageFile(file) {
+  if (file.size > 10 * 1024 * 1024) { showToast('File Too Large', 'Use an image under 10MB.', true); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    currentImageBase64 = dataUrl.split(',')[1];
+    currentImageType   = file.type;
+    document.getElementById('preview-img').src = dataUrl;
+    document.getElementById('drop-zone').style.display       = 'none';
+    document.getElementById('image-preview').style.display   = 'block';
+    document.getElementById('scan-result').style.display     = 'none';
+    document.getElementById('scan-warning').style.display    = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage() {
+  currentImageBase64 = null; currentImageType = null;
+  document.getElementById('image-preview').style.display = 'none';
+  document.getElementById('drop-zone').style.display     = 'block';
+  document.getElementById('scan-result').style.display   = 'none';
+  document.getElementById('scan-warning').style.display  = 'none';
+}
+
+// ─── CAMERA ───────────────────────────────────────────────────────────────────
+async function startCamera() {
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'environment', width:{ideal:1280}, height:{ideal:960} } });
+    document.getElementById('camera-feed').srcObject = cameraStream;
+    document.getElementById('camera-view').style.display = 'block';
+  } catch {
+    showToast('Camera Unavailable', 'Could not access camera. Use the upload option instead.', true);
+    setMode('upload', document.querySelectorAll('.mode-tab')[0]);
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+}
+
+function capturePhoto() {
+  const video = document.getElementById('camera-feed');
+  const canvas = document.getElementById('capture-canvas');
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  currentImageBase64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+  currentImageType   = 'image/jpeg';
+  stopCamera();
+  scanImage();
+}
+
+// ─── SCAN IMAGE ───────────────────────────────────────────────────────────────
+async function scanImage() {
+  if (!currentImageBase64) { showToast('No Image', 'Upload or capture a photo first.', true); return; }
+  document.getElementById('image-preview').style.display  = 'none';
+  document.getElementById('scan-result').style.display    = 'none';
+  document.getElementById('scan-warning').style.display   = 'none';
+  document.getElementById('scanning-state').style.display = 'block';
+  setScanLoading(true);
+  animateScanSteps();
+
+  try {
+    const response = await fetch(`${WORKER_URL}/api/scanner/read-slab`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-MintSeat-Key': STORE_API_KEY },
+      body: JSON.stringify({ image_base64: currentImageBase64, media_type: currentImageType || 'image/jpeg' }),
+    });
+    const data = await response.json();
+    document.getElementById('scanning-state').style.display = 'none';
+    setScanLoading(false);
+
+    if (!response.ok || !data.success) {
+      showScanWarning('Scan Failed', data.message || data.error || 'Could not analyze image.');
+      return;
+    }
+
+    scannedData = data.scanned;
+    displayScanResult(data.scanned);
+
+  } catch (err) {
+    document.getElementById('scanning-state').style.display = 'none';
+    setScanLoading(false);
+    showScanWarning('Connection Error', 'Could not reach the scan server. Check your connection and try again.');
+    console.error('[Scanner]', err);
+  }
+}
+
+function setScanLoading(on) {
+  document.getElementById('scan-btn-text').style.display = on ? 'none' : 'inline';
+  document.getElementById('scan-spinner').style.display  = on ? 'block' : 'none';
+}
+
+function animateScanSteps() {
+  const steps = ['ss-a','ss-b','ss-c','ss-d'];
+  steps.forEach(id => { const el = document.getElementById(id); el.classList.remove('active','done'); });
+  let i = 0;
+  const iv = setInterval(() => {
+    if (i > 0) { const prev = document.getElementById(steps[i-1]); prev.classList.remove('active'); prev.classList.add('done'); }
+    if (i < steps.length) document.getElementById(steps[i]).classList.add('active');
+    i++;
+    if (i > steps.length) clearInterval(iv);
+  }, 600);
+}
+
+function displayScanResult(data) {
+  if (!data.cert_number || data.confidence < 30) {
+    showScanWarning('Could Not Read Label', data.notes || 'The PSA label was not clearly visible. Try a sharper photo with better lighting, or enter the cert number manually.');
+    return;
+  }
+  document.getElementById('sr-cert').textContent  = data.cert_number || '—';
+  document.getElementById('sr-name').textContent  = data.display_name || data.subject || '—';
+  document.getElementById('sr-grade').textContent = data.grade || '—';
+  document.getElementById('sr-year').textContent  = data.year || '—';
+  document.getElementById('sr-brand').textContent = data.brand || '—';
+  document.getElementById('sr-type').textContent  = {'trading_card':'Trading Card','ticket_stub':'Ticket Stub','memorabilia':'Memorabilia'}[data.item_type] || data.item_type || '—';
+  const conf = data.confidence || 0;
+  const bar  = document.getElementById('sr-conf-bar');
+  bar.style.width = conf + '%';
+  bar.className   = 'conf-fill ' + (conf >= 80 ? 'conf-high' : conf >= 50 ? 'conf-med' : 'conf-low');
+  document.getElementById('sr-conf-label').textContent = `Confidence: ${conf}%`;
+  const notes = data.notes || (conf < 70 ? `Low confidence (${conf}%) — verify cert number before proceeding.` : null);
+  if (notes) { document.getElementById('sr-notes').textContent = notes; document.getElementById('sr-notes-cell').style.display = 'block'; }
+  else document.getElementById('sr-notes-cell').style.display = 'none';
+  document.getElementById('scan-result').style.display  = 'block';
+  document.getElementById('scan-warning').style.display = 'none';
+}
+
+function showScanWarning(title, msg) {
+  document.getElementById('sw-title').textContent = title;
+  document.getElementById('sw-msg').textContent   = msg;
+  document.getElementById('scan-warning').style.display = 'block';
+  document.getElementById('scan-result').style.display  = 'none';
+}
+
+// ─── APPLY SCANNED DATA ───────────────────────────────────────────────────────
+function applyScannedData() {
+  if (!scannedData) return;
+  document.getElementById('psa-cert').value  = scannedData.cert_number || '';
+  document.getElementById('item-name').value = scannedData.display_name || scannedData.subject || '';
+  document.getElementById('item-grade').value = scannedData.grade || '';
+  const typeMap = { trading_card:'psa_graded', ticket_stub:'legacy', memorabilia:'psa_graded' };
+  document.getElementById('item-type').value = typeMap[scannedData.item_type] || 'psa_graded';
+  document.getElementById('details-form').style.display = 'block';
+  updateSummary();
+  document.getElementById('details-form').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  showToast('Details Applied', `Cert #${scannedData.cert_number} loaded. Set shares and price to continue.`);
+}
+
+function applyManualInput() {
+  const cert = document.getElementById('manual-cert').value.trim();
+  if (!cert) { showToast('Missing Cert Number', 'Enter the PSA cert number to continue.', true); return; }
+  scannedData = {
+    cert_number:  cert,
+    display_name: document.getElementById('manual-name').value.trim(),
+    grade:        document.getElementById('manual-grade').value.trim(),
+    year:         document.getElementById('manual-year').value.trim(),
+    confidence:   100,
+    item_type:    'trading_card',
+  };
+  applyScannedData();
+}
+
+function rescan() {
+  document.getElementById('scan-result').style.display  = 'none';
+  document.getElementById('scan-warning').style.display = 'none';
+  if (currentImageBase64) document.getElementById('image-preview').style.display = 'block';
+  else document.getElementById('drop-zone').style.display = 'block';
+}
+
+function editScanResult() {
+  if (!scannedData) return;
+  setMode('manual', document.querySelectorAll('.mode-tab')[2]);
+  document.getElementById('manual-cert').value  = scannedData.cert_number || '';
+  document.getElementById('manual-name').value  = scannedData.display_name || '';
+  document.getElementById('manual-grade').value = scannedData.grade || '';
+  document.getElementById('manual-year').value  = scannedData.year || '';
+}
+
+// ─── LIVE CALCULATOR ──────────────────────────────────────────────────────────
+function updateSummary() {
+  const shares = parseInt(document.getElementById('shares').value) || 0;
+  const price  = parseFloat(document.getElementById('price').value) || 0;
+  const total  = shares * price;
+  document.getElementById('calc-shares').textContent = shares || '—';
+  document.getElementById('calc-price').textContent  = price  ? `$${price.toFixed(2)}` : '—';
+  document.getElementById('calc-total').textContent  = total  ? `$${total.toLocaleString()}` : '$0';
+  document.getElementById('sum-shares').textContent  = shares || '—';
+  document.getElementById('sum-price').textContent   = price  ? `$${price.toFixed(2)}` : '—';
+  document.getElementById('sum-total').textContent   = total  ? `$${total.toLocaleString()}` : '—';
+  if (valuationData && total > 0) {
+    const pct = Math.min(Math.round(total / valuationData.raise_summary?.allowed_max_raise * 100), 120);
+    updateCapBar(pct);
+  }
+}
+
+function updateCapBar(pct) {
+  const wrap = document.getElementById('cap-bar-wrap');
+  const fill = document.getElementById('cap-fill');
+  wrap.style.display = 'block';
+  fill.style.width   = Math.min(pct, 100) + '%';
+  document.getElementById('cap-pct').textContent = pct + '%';
+  fill.className = 'cap-fill' + (pct > 100 ? ' over' : pct > 80 ? ' warn' : '');
+}
+
+// ─── VALUATION CHECK ──────────────────────────────────────────────────────────
+async function runValuationCheck() {
+  const cert   = document.getElementById('psa-cert').value.trim();
+  const shares = parseInt(document.getElementById('shares').value);
+  const price  = parseFloat(document.getElementById('price').value);
+  const type   = document.getElementById('item-type').value;
+  const name   = document.getElementById('item-name').value.trim();
+
+  if (!cert)   return showToast('Missing Cert Number', 'Enter your PSA cert number first.', true);
+  if (!name)   return showToast('Missing Item Name', 'Enter a display name for the listing.', true);
+  if (!shares || shares < 1) return showToast('Missing Shares', 'Enter the number of shares to issue.', true);
+  if (!price  || price < 1)  return showToast('Missing Price', 'Enter the price per share.', true);
+
+  setCheckLoading(true);
+
+  try {
+    const response = await fetch(`${WORKER_URL}/api/mint/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ psa_cert_number:cert, proposed_shares:shares, price_per_share:price, item_type:type, store_id:STORE_ID, dealer_wallet:DEALER_WALLET }),
+    });
+    const data = await response.json();
+    setCheckLoading(false);
+    valuationData = data;
+    goToStep(2);
+
+    if (data.approved) {
+      approvalToken = data.approval_token;
+      document.getElementById('val-approved').style.display = 'block';
+      document.getElementById('val-rejected').style.display = 'none';
+      const v = data.valuation, r = data.raise_summary;
+      document.getElementById('vr-fmv-low').textContent   = v ? `$${v.fmv_low?.toLocaleString()}` : 'N/A';
+      document.getElementById('vr-fmv-high').textContent  = v ? `$${v.fmv_high?.toLocaleString()}` : 'N/A';
+      document.getElementById('vr-comps').textContent     = v ? `${v.comp_count} sold listings` : 'N/A';
+      document.getElementById('vr-last-sale').textContent = v?.last_sale_date || 'N/A';
+      document.getElementById('vr-raise').textContent     = r ? `$${r.total_raise?.toLocaleString()}` : 'N/A';
+      document.getElementById('vr-max').textContent       = r ? `$${r.allowed_max_raise?.toLocaleString()}` : 'N/A';
+      document.getElementById('sum-fmv').textContent      = v?.fmv_low ? `$${v.fmv_low.toLocaleString()}` : 'N/A';
+      if (r) updateCapBar(r.cap_used_pct);
+      document.getElementById('confirm-btn').disabled = false;
+      showToast('Valuation Approved', `$${(shares*price).toLocaleString()} raise is within the allowed cap.`);
+    } else {
+      approvalToken = null;
+      document.getElementById('val-approved').style.display = 'none';
+      document.getElementById('val-rejected').style.display = 'block';
+      document.getElementById('confirm-btn').disabled = true;
+      if (data.valuation) {
+        document.getElementById('vr-rej-fmv').textContent   = `$${data.valuation.fmv_low?.toLocaleString()}`;
+        document.getElementById('vr-rej-max').textContent   = `$${data.allowed_max_raise?.toLocaleString()}`;
+        document.getElementById('vr-rej-raise').textContent = `$${data.proposed_raise?.toLocaleString()}`;
+        document.getElementById('vr-suggestion').textContent = data.suggestion || 'Reduce shares or price per share.';
+      }
+      showToast(data.error === 'PSA_CERT_NOT_FOUND' ? 'Cert Not Found' : 'Validation Failed', data.message || data.error, true);
+    }
+  } catch (err) {
+    setCheckLoading(false);
+    showToast('Connection Error', 'Could not reach the validation server.', true);
+    console.error('[Validate]', err);
+  }
+}
+
+function setCheckLoading(on) {
+  document.getElementById('check-btn-text').style.display = on ? 'none' : 'inline';
+  document.getElementById('check-spinner').style.display  = on ? 'block' : 'none';
+}
+
+// ─── CONFIRM STEP ─────────────────────────────────────────────────────────────
+function populateConfirmStep() {
+  const cert   = document.getElementById('psa-cert').value;
+  const shares = document.getElementById('shares').value;
+  const price  = parseFloat(document.getElementById('price').value);
+  const name   = document.getElementById('item-name').value;
+  const total  = parseInt(shares) * price;
+  const fmv    = valuationData?.valuation?.fmv_low;
+  document.getElementById('conf-name').textContent   = name;
+  document.getElementById('conf-cert').textContent   = cert;
+  document.getElementById('conf-shares').textContent = shares;
+  document.getElementById('conf-price').textContent  = `$${price.toFixed(2)}`;
+  document.getElementById('conf-total').textContent  = `$${total.toLocaleString()}`;
+  document.getElementById('conf-fmv').textContent    = fmv ? `$${fmv.toLocaleString()}` : 'N/A';
+}
+
+// ─── EXECUTE MINT ─────────────────────────────────────────────────────────────
+async function executeMint() {
+  if (!approvalToken) return showToast('No Approval Token', 'Run valuation check first.', true);
+  document.getElementById('mint-btn-text').style.display = 'none';
+  document.getElementById('mint-spinner').style.display  = 'block';
+
+  try {
+    const response = await fetch(`${WORKER_URL}/api/mint/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        approval_token:   approvalToken,
+        psa_cert_number:  document.getElementById('psa-cert').value.trim(),
+        shares:           parseInt(document.getElementById('shares').value),
+        price_per_share:  parseFloat(document.getElementById('price').value),
+        dealer_wallet:    DEALER_WALLET,
+        item_name:        document.getElementById('item-name').value,
+        store_id:         STORE_ID,
+      }),
+    });
+    const data = await response.json();
+    document.getElementById('mint-btn-text').style.display = 'inline';
+    document.getElementById('mint-spinner').style.display  = 'none';
+
+    if (data.minted) {
+      document.getElementById('success-token').textContent = data.token_id;
+      document.getElementById('success-tx').textContent    = (data.xrpl_tx || '').substring(0, 28) + '...';
+      document.getElementById('success-url').textContent   = data.verify_url;
+      ['step-1','step-2','step-3'].forEach(id => { const el = document.getElementById(id); el.classList.remove('active'); el.classList.add('done'); });
+      ['conn-1','conn-2'].forEach(id => document.getElementById(id).classList.add('done'));
+      goToStep(4);
+      showToast('Token Minted', document.getElementById('item-name').value + ' is now live on XRPL.');
+    } else {
+      if (data.error === 'TOKEN_EXPIRED') { showToast('Token Expired', 'Approval expired. Run valuation check again.', true); goToStep(1); }
+      else showToast('Mint Failed', data.message || data.error, true);
+    }
+  } catch (err) {
+    document.getElementById('mint-btn-text').style.display = 'inline';
+    document.getElementById('mint-spinner').style.display  = 'none';
+    showToast('Connection Error', 'Could not reach the mint server.', true);
+    console.error('[Mint]', err);
+  }
+}
+
+// ─── RESET ────────────────────────────────────────────────────────────────────
+function resetMint() {
+  currentImageBase64 = null; currentImageType = null; scannedData = null; approvalToken = null; valuationData = null;
+  ['psa-cert','item-name','item-grade','shares','price','manual-cert','manual-name','manual-grade','manual-year']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('item-type').value = 'psa_graded';
+  ['scan-result','scan-warning','image-preview','scanning-state'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('drop-zone').style.display     = 'block';
+  document.getElementById('details-form').style.display  = 'none';
+  document.getElementById('val-approved').style.display  = 'none';
+  document.getElementById('val-rejected').style.display  = 'none';
+  document.getElementById('cap-bar-wrap').style.display  = 'none';
+  document.getElementById('confirm-btn').disabled        = true;
+  ['sum-shares','sum-price','sum-total'].forEach(id => document.getElementById(id).textContent = '—');
+  document.getElementById('sum-fmv').textContent    = 'Not checked';
+  document.getElementById('calc-total').textContent = '$0';
+  setMode('upload', document.querySelectorAll('.mode-tab')[0]);
+  for (let i=1;i<=3;i++) { const el=document.getElementById(`step-${i}`); el.classList.remove('active','done'); if(i===1) el.classList.add('active'); }
+  ['conn-1','conn-2'].forEach(id => document.getElementById(id).classList.remove('done'));
+  ['form-step-1','form-step-2','form-step-3','form-step-4'].forEach((id,i) => document.getElementById(id).style.display = i===0?'block':'none');
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(title, msg, isError) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-msg').textContent   = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 4500);
+}
+</script>
+</body>
+</html>
