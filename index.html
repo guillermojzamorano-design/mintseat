@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MintSeat — Sell Your Extra Tickets. Keep Almost All of It.</title>
-<meta name="description" content="Can't make the game? List your tickets in 2 minutes. Get paid automatically. MintSeat takes 1.5% — not StubHub's 25%. Chicago sports fans, season ticket holders, resellers — this is for you.">
+<meta name="description" content="Can't make the game? List your tickets in 2 minutes. Forward your ticket email and we extract every game automatically. MintSeat takes 2% — not StubHub's 25%. Season ticket holders, resellers — this is for you.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -262,7 +262,7 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
     <li><a href="#resellers">Resellers</a></li>
     <li><a href="#trust">Buyer Protection</a></li>
     <li><a href="/venues">For Venues</a></li>
-    <li><a href="#waitlist" class="nav-cta">Start Selling</a></li>
+    <li><a href="/sell" class="nav-cta">Start Selling</a></li>
   </ul>
 </nav>
 
@@ -279,7 +279,7 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
 
   <p class="hero-sub">
     List any ticket in 2 minutes. Get paid automatically.<br>
-    We take <strong>1.5%</strong> — not StubHub's 25%.<br>
+    We take <strong>2%</strong> — not StubHub's 25%.<br>
     <span style="font-size:0.8em; color:var(--mint); display:block; margin-top:8px;">The artist gets their cut too. Automatically.</span>
   </p>
 
@@ -296,18 +296,17 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
     </div>
     <div class="fee-block">
       <div class="fee-platform">MintSeat</div>
-      <div class="fee-pct fee-mint">1.5%</div>
+      <div class="fee-pct fee-mint">2%</div>
       <div class="fee-note">that's it</div>
     </div>
   </div>
 
   <div class="waitlist-wrap">
-    <div class="waitlist-row">
-      <input class="waitlist-input" type="email" id="hero-email" placeholder="your@email.com" autocomplete="email">
-      <button class="btn-mint" onclick="joinWaitlist('hero')">Start Selling Free</button>
+    <div class="waitlist-row" style="justify-content:center;gap:12px;flex-wrap:wrap;">
+      <a href="/sell" style="text-decoration:none;"><button class="btn-mint" style="padding:14px 28px;">List a Single Ticket →</button></a>
+      <a href="/sell/bulk" style="text-decoration:none;"><button class="btn-mint" style="padding:14px 28px;background:transparent;border:1px solid rgba(0,229,160,0.35);color:var(--mint);">List Your Whole Season →</button></a>
     </div>
     <div class="waitlist-count">Season ticket holders · resellers · concert fans — <b>anyone with a ticket</b></div>
-    <div class="hero-success" id="hero-success">✓ You're on the list. We'll reach out soon.</div>
   </div>
 </div>
 
@@ -340,7 +339,7 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
     <div class="hook">
       <div class="hook-num">01</div>
       <div class="hook-title">The Fees Are Insane</div>
-      <p class="hook-body">StubHub takes up to 25% between buyer and seller. Ticketmaster takes 15%. On a $200 ticket you're handing over $30–50 for doing nothing wrong. MintSeat charges 1.5% to the seller and 1.5% to the buyer. Shown upfront. No surprises at checkout.</p>
+      <p class="hook-body">StubHub takes up to 25% between buyer and seller. Ticketmaster takes 15%. On a $200 ticket you're handing over $30–50 for doing nothing wrong. MintSeat charges 2% to the seller. Shown upfront. No surprises at checkout.</p>
       <div class="hook-proof">$200 ticket · StubHub keeps $50 · MintSeat keeps $6</div>
     </div>
     <div class="hook">
@@ -369,7 +368,7 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
       <div class="step">
         <div class="step-num">01</div>
         <div class="step-title">Connect & Import</div>
-        <p class="step-body">Connect your Ticketmaster, MLB Ballpark, or team app account. Every ticket you own appears automatically. No manual entry required.</p>
+        <p class="step-body">Forward your ticket confirmation email to <strong>list@tickets.mintseat.co</strong> or upload photos of your tickets. Our AI reads every game, date, seat, and face value automatically. No manual entry, no account linking required.</p>
       </div>
       <div class="step">
         <div class="step-num">02</div>
@@ -407,36 +406,36 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
       <div class="fc lbl">$100 ticket</div>
       <div class="fc bad">You keep $75</div>
       <div class="fc mid">You keep $85</div>
-      <div class="fc ms">You keep $98.50</div>
+      <div class="fc ms">You keep $98.00</div>
     </div>
     <div class="fee-row">
       <div class="fc lbl">$200 ticket</div>
       <div class="fc bad">You keep $150</div>
       <div class="fc mid">You keep $170</div>
-      <div class="fc ms">You keep $197</div>
+      <div class="fc ms">You keep $196.00</div>
     </div>
     <div class="fee-row">
       <div class="fc lbl">$500 ticket</div>
       <div class="fc bad">You keep $375</div>
       <div class="fc mid">You keep $425</div>
-      <div class="fc ms">You keep $492.50</div>
+      <div class="fc ms">You keep $490.00</div>
     </div>
     <div class="fee-row">
       <div class="fc lbl">$1,000 ticket</div>
       <div class="fc bad">You keep $750</div>
       <div class="fc mid">You keep $850</div>
-      <div class="fc ms">You keep $985</div>
+      <div class="fc ms">You keep $980.00</div>
     </div>
     <div class="fee-row">
       <div class="fc lbl">$5,000 / month</div>
       <div class="fc bad">StubHub keeps $1,250</div>
       <div class="fc mid">TM keeps $750</div>
-      <div class="fc ms">MintSeat keeps $75</div>
+      <div class="fc ms">MintSeat keeps $100</div>
     </div>
   </div>
 
   <div class="fee-callout reveal">
-    <strong>At $5,000/month in ticket sales</strong> — MintSeat saves you $1,175 vs StubHub. Every single month. That's $14,100 a year you're giving away for no reason.
+    <strong>At $5,000/month in ticket sales</strong> — MintSeat saves you $1,150 vs StubHub. Every single month. That's $13,800 a year you're giving away for no reason.
   </div>
 </div>
 
@@ -492,7 +491,7 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
       <div class="point">
         <div class="point-num">1</div>
         <div>
-          <div class="point-title">1.5% fee. Not 15–25%.</div>
+          <div class="point-title">2% fee. Not 15–25%.</div>
           <p class="point-body">Every dollar saved on fees is a dollar more profit. At volume this is not a rounding error — it's your entire margin.</p>
         </div>
       </div>
@@ -523,7 +522,7 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
         <div class="math-val v-red">−$125</div>
       </div>
       <div class="math-row" style="background:var(--mint-glow);">
-        <div class="math-label">MintSeat keeps (1.5%)</div>
+        <div class="math-label">MintSeat keeps (2%)</div>
         <div class="math-val v-mint">−$7.50</div>
       </div>
       <div class="math-row" style="border-top:2px solid var(--border-b);">
@@ -535,8 +534,8 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
         <div class="math-val v-mint">$492.50</div>
       </div>
       <div class="math-footer">
-        <strong>$117.50 more per ticket.</strong><br>
-        At 20 tickets/month that's $2,350 extra — every month.
+        <strong>$115.00 more per ticket.</strong><br>
+        At 20 tickets/month that's $2,300 extra — every month.
       </div>
     </div>
   </div>
@@ -574,7 +573,7 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
             <div class="royalty-icon">⚡</div>
             <div>
               <div class="royalty-step-title">Automatic split on delivery</div>
-              <p class="royalty-step-body">Ticket confirmed delivered. Royalty routes to the artist's wallet instantly. You get paid your share automatically. MintSeat takes 1.5%. Done.</p>
+              <p class="royalty-step-body">Ticket confirmed delivered. Royalty routes to the artist's wallet instantly. You get paid your share automatically. MintSeat takes 2%. Done.</p>
             </div>
           </div>
           <div class="royalty-step">
@@ -597,7 +596,7 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
             <div class="royalty-split-val rs-gold">$14.00</div>
           </div>
           <div class="royalty-split-row">
-            <div class="royalty-split-label"><span class="royalty-split-emoji">💳</span> MintSeat fee (1.5%)</div>
+            <div class="royalty-split-label"><span class="royalty-split-emoji">💳</span> MintSeat fee (2%)</div>
             <div class="royalty-split-val rs-dim">$3.00</div>
           </div>
           <div class="royalty-split-row" style="background:var(--mint-glow);">
@@ -639,7 +638,7 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
       <div class="trust-card">
         <div class="trust-icon">💰</div>
         <div class="trust-title">Real Price Shown Upfront</div>
-        <p class="trust-body">The total — including the 1.5% MintSeat buyer fee — is shown before you click buy. No fee reveal at the last screen. No surprise charges after you've already mentally committed. What you see is exactly what you pay.</p>
+        <p class="trust-body">The total — including the 2% MintSeat platform fee — is shown before you click buy. No fee reveal at the last screen. No surprise charges after you've already mentally committed. What you see is exactly what you pay.</p>
       </div>
       <div class="trust-card">
         <div class="trust-icon">⬡</div>
@@ -657,7 +656,7 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
 
   <div class="footer-row">
     <input class="footer-input" type="email" id="footer-email" placeholder="your@email.com" autocomplete="email">
-    <button class="btn-mint" onclick="joinWaitlist('footer')">Join the Pilot</button>
+    <a href="/sell" style="text-decoration:none;"><button class="btn-mint" style="padding:14px 32px;font-size:16px;">Start Selling Now →</button></a>
   </div>
   <div class="footer-success" id="footer-success">✓ You're in. We'll reach out within 24 hours.</div>
 </div>
@@ -666,8 +665,8 @@ footer{position:relative;z-index:1;padding:28px 48px;border-top:1px solid var(--
   <div class="f-brand"><span>Mint</span>Seat</div>
   <span class="f-copy">© 2026 Solmare Group LLC · Chicago, IL · mintseat.co</span>
   <ul class="f-links">
-    <li><a href="#">Privacy</a></li>
-    <li><a href="#">Terms</a></li>
+    <li><a href="/privacy">Privacy</a></li>
+    <li><a href="/terms">Terms</a></li>
     <li><a href="/venues">For Venues</a></li>
     <li><a href="mailto:hello@mintseat.co">Contact</a></li>
   </ul>
@@ -701,7 +700,7 @@ async function joinWaitlist(src) {
 
   el.value = '';
   ok.style.display = 'block';
-  btn.textContent = src === 'hero' ? 'Start Selling Free' : 'Join the Pilot';
+  btn.textContent = src === 'hero' ? 'Start Selling →' : 'Start Selling →';
   btn.disabled = false;
 }
 
