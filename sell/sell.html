@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>List Your Ticket — MintSeat</title>
+<meta name="description" content="List your season tickets in 60 seconds. Set your price, get paid instantly. No StubHub. No middleman markup.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#060E09;--bg-card:#0C1810;--bg-input:#080F0A;--bg-hover:#112016;
+  --gold:#C9A84C;--gold-light:#E2C46E;--gold-dim:#7A5F28;
+  --gold-glow:rgba(201,168,76,0.10);--gold-glow2:rgba(201,168,76,0.22);
+  --mint:#00E5A0;--mint-dim:#00A370;--mint-glow:rgba(0,229,160,0.08);--mint-glow2:rgba(0,229,160,0.18);
+  --red:#E05252;--red-glow:rgba(224,82,82,0.12);
+  --text:#E8F2EB;--text-dim:#7FA890;--text-muted:#3D6050;
+  --border:rgba(255,255,255,0.05);--border-gold:rgba(201,168,76,0.18);--border-mint:rgba(0,229,160,0.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
+
+/* ── NAV ── */
+.nav{padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-gold);background:rgba(6,14,9,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-gem{width:28px;height:28px;background:linear-gradient(135deg,var(--gold-dim),var(--gold));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.nav-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);}
+.nav-links{display:flex;align-items:center;gap:20px;}
+.nav-link{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color .2s;}
+.nav-link:hover{color:var(--gold);}
+.nav-cta{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:8px 16px;border:1px solid var(--border-gold);background:none;color:var(--gold);cursor:pointer;border-radius:4px;transition:all .2s;}
+.nav-cta:hover{background:var(--gold-glow);}
+
+/* ── HERO ── */
+.hero{padding:60px 24px 40px;text-align:center;max-width:640px;margin:0 auto;}
+.hero-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.hero-tag::before,.hero-tag::after{content:'';width:24px;height:1px;background:var(--border-gold);}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,7vw,56px);font-weight:700;line-height:1.1;margin-bottom:14px;color:var(--text);}
+.hero-title em{font-style:italic;color:var(--gold-light);}
+.hero-sub{font-size:16px;color:var(--text-dim);line-height:1.7;margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;}
+.hero-stats{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;}
+.hero-stat{text-align:center;}
+.hero-stat-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--mint);}
+.hero-stat-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-top:2px;}
+
+/* ── MAIN FORM CARD ── */
+.form-wrap{max-width:600px;margin:0 auto;padding:0 16px 80px;}
+
+/* ── STEP PROGRESS ── */
+.step-progress{display:flex;align-items:center;margin-bottom:28px;gap:0;}
+.sp-step{display:flex;align-items:center;gap:8px;flex:1;}
+.sp-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;flex-shrink:0;border:1px solid var(--border);background:transparent;color:var(--text-muted);transition:all .3s;}
+.sp-step.active .sp-num{background:var(--gold);border-color:var(--gold);color:var(--bg);}
+.sp-step.done .sp-num{background:var(--mint);border-color:var(--mint);color:var(--bg);}
+.sp-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);transition:color .3s;white-space:nowrap;}
+.sp-step.active .sp-label{color:var(--gold);}
+.sp-step.done .sp-label{color:var(--mint);}
+.sp-line{flex:1;height:1px;background:var(--border);margin:0 8px;transition:background .3s;}
+.sp-line.done{background:var(--mint-dim);}
+
+/* ── CARD ── */
+.card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:10px;overflow:hidden;margin-bottom:14px;}
+.card-header{padding:18px 22px;border-bottom:1px solid var(--border-gold);background:linear-gradient(135deg,rgba(201,168,76,0.06),transparent);display:flex;align-items:center;gap:12px;}
+.card-icon{width:36px;height:36px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;}
+.card-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;letter-spacing:0.04em;}
+.card-body{padding:22px;}
+
+/* ── SCAN ZONE ── */
+.scan-zone{border:2px dashed var(--border-gold);border-radius:8px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;background:rgba(201,168,76,0.02);}
+.scan-zone:hover,.scan-zone.drag-over{border-color:var(--gold);background:var(--gold-glow);}
+.scan-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.sz-icon{width:56px;height:56px;margin:0 auto 16px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.sz-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:6px;}
+.sz-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.8;letter-spacing:0.04em;}
+.sz-formats{display:flex;justify-content:center;gap:6px;margin:12px 0;}
+.sz-fmt{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:2px 8px;border-radius:100px;}
+.sz-or{display:flex;align-items:center;gap:10px;margin:14px 0;font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
+.sz-or::before,.sz-or::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── IMAGE PREVIEW ── */
+.img-preview{display:none;border-radius:8px;overflow:hidden;position:relative;margin-bottom:12px;}
+.img-preview img{width:100%;max-height:240px;object-fit:contain;background:#000;display:block;}
+.img-preview-bar{display:flex;gap:8px;margin-top:10px;}
+
+/* ── SCAN TABS ── */
+.scan-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.scan-tab{flex:1;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:9px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-muted);transition:all .15s;text-align:center;}
+.scan-tab:hover{border-color:var(--border-gold);color:var(--text-dim);}
+.scan-tab.active{border-color:var(--border-gold);color:var(--gold);background:var(--gold-glow);}
+
+/* ── SCANNING STATE ── */
+.scanning-state{display:none;padding:40px;text-align:center;}
+.scan-rings{width:52px;height:52px;margin:0 auto 16px;position:relative;}
+.sr1{position:absolute;inset:0;border-radius:50%;border:2px solid var(--border-gold);border-top-color:var(--gold);animation:spin .9s linear infinite;}
+.sr2{position:absolute;inset:8px;border-radius:50%;border:2px solid var(--border-gold);border-bottom-color:var(--mint);animation:spin 1.4s linear infinite reverse;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.scan-label{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:4px;}
+.scan-steps{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:10px;}
+.scan-step-item{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);display:flex;align-items:center;gap:8px;justify-content:center;transition:color .3s;}
+.scan-step-item.active{color:var(--gold);}
+.scan-step-item.done{color:var(--mint);}
+.scan-step-item::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+/* ── SCAN RESULT ── */
+.scan-result{display:none;border:1px solid var(--border-mint);border-radius:8px;overflow:hidden;animation:fadeUp .3s ease;margin-bottom:14px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.sr-head{padding:11px 16px;background:var(--mint-glow);border-bottom:1px solid var(--border-mint);display:flex;align-items:center;justify-content:space-between;}
+.sr-head-left{display:flex;align-items:center;gap:8px;}
+.sr-dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint);}
+.sr-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--mint);text-transform:uppercase;}
+.sr-conf{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);}
+.sr-body{background:var(--bg-input);}
+.sr-row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);}
+.sr-row:last-child{border-bottom:none;}
+.sr-key{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.sr-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--text);font-weight:500;}
+.sr-val.gold{color:var(--gold-light);}
+.sr-val.mint{color:var(--mint);}
+.sr-actions{padding:12px 16px;display:flex;gap:8px;border-top:1px solid var(--border-mint);background:rgba(0,229,160,0.02);}
+
+/* ── SCAN WARNING ── */
+.scan-warn{display:none;border:1px solid rgba(224,82,82,.3);border-radius:8px;padding:16px;background:var(--red-glow);margin-bottom:14px;}
+.sw-title{font-family:'DM Mono',monospace;font-size:9px;color:var(--red);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;}
+.sw-msg{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);line-height:1.6;}
+.sw-actions{display:flex;gap:8px;margin-top:10px;}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:16px;}
+.field label{display:block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:7px;}
+.field input,.field select,.field textarea{width:100%;background:var(--bg-input);border:1px solid var(--border-gold);border-radius:6px;padding:12px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;outline:none;transition:border-color .15s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-muted);}
+.field select option{background:var(--bg-card);}
+.field-hint{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:5px;line-height:1.5;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+/* ── LISTING TYPE SELECTOR ── */
+.listing-type{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.lt-option{border:2px solid var(--border-gold);border-radius:8px;padding:18px 16px;cursor:pointer;transition:all .2s;background:transparent;text-align:left;}
+.lt-option:hover{border-color:var(--gold);background:var(--gold-glow);}
+.lt-option.selected{border-color:var(--gold);background:var(--gold-glow);}
+.lt-icon{font-size:24px;margin-bottom:10px;}
+.lt-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;margin-bottom:4px;}
+.lt-desc{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);line-height:1.6;letter-spacing:0.04em;}
+.lt-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 7px;border-radius:100px;margin-top:6px;}
+.lt-badge.simple{background:var(--mint-glow);border:1px solid var(--border-mint);color:var(--mint);}
+.lt-badge.advanced{background:var(--gold-glow);border:1px solid var(--border-gold);color:var(--gold);}
+
+/* ── FRACTIONAL SETTINGS ── */
+.fractional-opts{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.fractional-opts.show{display:block;}
+
+/* ── PRICE SUMMARY ── */
+.price-summary{background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:16px;margin:16px 0;}
+.ps-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;}
+.ps-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);}
+.ps-val{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--text);}
+.ps-divider{height:1px;background:var(--border);margin:8px 0;}
+.ps-total-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);font-weight:500;}
+.ps-total-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--gold-light);}
+.ps-note{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:8px;line-height:1.6;}
+
+/* ── TICKET PREVIEW CARD ── */
+.ticket-preview{background:linear-gradient(135deg,#0D1E14,#091410);border:1px solid var(--border-gold);border-radius:8px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden;}
+.ticket-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-dim),var(--gold),var(--gold-dim));}
+.tp-sport{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.tp-game{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.2;}
+.tp-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);margin-bottom:14px;}
+.tp-details{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.tp-detail{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:4px;padding:8px 10px;}
+.tp-detail-label{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px;}
+.tp-detail-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold-light);font-weight:500;}
+.tp-edit{position:absolute;top:14px;right:14px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--border-gold);background:none;color:var(--text-muted);cursor:pointer;border-radius:3px;transition:all .2s;}
+.tp-edit:hover{color:var(--gold);}
+
+/* ── CONNECT SECTION ── */
+.connect-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.connect-opt{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--border-gold);border-radius:8px;cursor:pointer;transition:all .2s;background:transparent;}
+.connect-opt:hover{background:var(--gold-glow);border-color:var(--gold);}
+.connect-opt.selected{background:var(--gold-glow);border-color:var(--gold);}
+.co-icon{width:36px;height:36px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
+.co-title{font-size:14px;font-weight:500;color:var(--text);}
+.co-desc{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;}
+.co-arrow{margin-left:auto;color:var(--text-muted);font-size:16px;}
+
+/* ── LISTING SUCCESS ── */
+.listing-success{display:none;text-align:center;padding:48px 24px;}
+.ls-icon{width:64px;height:64px;background:var(--mint-glow);border:1px solid var(--border-mint);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.ls-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;margin-bottom:8px;}
+.ls-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);margin-bottom:24px;letter-spacing:0.04em;line-height:1.6;}
+.ls-data{background:var(--bg-input);border:1px solid var(--border-mint);border-radius:8px;padding:16px;margin-bottom:24px;text-align:left;}
+.ls-data-title{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:10px;}
+.ls-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
+.ls-row:last-child{border-bottom:none;}
+.ls-key{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.ls-val{font-family:'DM Mono',monospace;font-size:9px;color:var(--mint);}
+.ls-share{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:13px 24px;border-radius:6px;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;font-weight:500;width:100%;}
+.btn-gold{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--bg);font-weight:600;}
+.btn-gold:hover{box-shadow:0 6px 24px var(--gold-glow2);}
+.btn-gold:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+.btn-mint{background:var(--mint-glow);border:1px solid var(--border-mint);color:var(--mint);}
+.btn-mint:hover{background:var(--mint-glow2);}
+.btn-ghost{background:transparent;border:1px solid var(--border-gold);color:var(--text-dim);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-sm{width:auto;padding:8px 14px;font-size:9px;}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+
+/* ── TRUST STRIP ── */
+.trust-strip{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;padding:20px 0;border-top:1px solid var(--border);margin-top:8px;}
+.trust-item{display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);}
+.trust-dot{width:5px;height:5px;border-radius:50%;background:var(--mint);}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border-gold);padding:24px;text-align:center;}
+.footer-brand{font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--text-dim);margin-bottom:6px;}
+.footer-links{display:flex;justify-content:center;gap:20px;list-style:none;}
+.footer-links a{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color .2s;}
+.footer-links a:hover{color:var(--gold);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);z-index:1000;background:var(--bg-card);border:1px solid var(--border-mint);border-radius:8px;padding:12px 20px;display:flex;align-items:center;gap:10px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto;}
+.toast.error{border-color:rgba(224,82,82,.4);}
+.toast-dot{width:6px;height:6px;border-radius:50%;background:var(--mint);flex-shrink:0;}
+.toast.error .toast-dot{background:var(--red);}
+.toast-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);}
+
+/* ── CAMERA ── */
+.camera-wrap{display:none;border-radius:8px;overflow:hidden;position:relative;background:#000;aspect-ratio:4/3;margin-bottom:12px;}
+.camera-wrap video{width:100%;height:100%;object-fit:cover;display:block;}
+.cam-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.cam-frame{width:75%;max-width:340px;aspect-ratio:3/2;border:2px solid var(--gold);border-radius:4px;box-shadow:0 0 0 9999px rgba(0,0,0,.5);position:relative;}
+.cam-corner{position:absolute;width:14px;height:14px;border-color:var(--gold);border-style:solid;}
+.cam-corner.tl{top:-1px;left:-1px;border-width:2px 0 0 2px;}
+.cam-corner.tr{top:-1px;right:-1px;border-width:2px 2px 0 0;}
+.cam-corner.bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
+.cam-corner.br{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+.cam-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:8px;color:var(--gold);background:rgba(0,0,0,.7);padding:3px 10px;border-radius:100px;white-space:nowrap;letter-spacing:0.1em;}
+.cam-scanline{position:absolute;left:2px;right:2px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:scanline 2s ease-in-out infinite;}
+@keyframes scanline{0%,100%{top:5%;}50%{top:90%;}}
+canvas#cam-canvas{display:none;}
+
+@media(max-width:480px){
+  .field-row,.field-row-3{grid-template-columns:1fr;}
+  .listing-type{grid-template-columns:1fr;}
+  .hero-stats{gap:20px;}
+  .tp-details{grid-template-columns:1fr 1fr;}
+  .nav-links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="/">
+    <div class="nav-gem"></div>
+    <span class="nav-name">MintSeat</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="/market">Browse Tickets</a>
+    <a class="nav-link" href="/vault">For Stores</a>
+    <a class="nav-link" href="/portfolio">My Portfolio</a>
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('form-wrap-inner').scrollIntoView({behavior:'smooth'})">List a Ticket</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Season Ticket Holders</div>
+  <h1 class="hero-title">Your tickets.<br><em>Your price.</em></h1>
+  <p class="hero-sub">List any ticket in 60 seconds. Sell your seat at face value or up to 20% above. Get paid instantly — no StubHub cut, no chasing payment.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-val">0%</div><div class="hero-stat-label">Listing Fee</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">60s</div><div class="hero-stat-label">To List</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">7%</div><div class="hero-stat-label">Royalty on Resales</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">XRPL</div><div class="hero-stat-label">Blockchain Secured</div></div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap" id="form-wrap-inner">
+
+  <!-- Step progress -->
+  <div class="step-progress">
+    <div class="sp-step active" id="sp-1">
+      <div class="sp-num">1</div>
+      <div class="sp-label">Scan Ticket</div>
+    </div>
+    <div class="sp-line" id="sp-line-1"></div>
+    <div class="sp-step" id="sp-2">
+      <div class="sp-num">2</div>
+      <div class="sp-label">Set Price</div>
+    </div>
+    <div class="sp-line" id="sp-line-2"></div>
+    <div class="sp-step" id="sp-3">
+      <div class="sp-num">3</div>
+      <div class="sp-label">Connect &amp; List</div>
+    </div>
+  </div>
+
+  <!-- ══ STEP 1: SCAN ══ -->
+  <div id="step-1">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div>
+          <div class="card-title">Scan Your Ticket</div>
+          <div class="card-sub">Take a photo or upload an image — AI reads the details instantly</div>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <!-- Input mode tabs -->
+        <div class="scan-tabs">
+          <button class="scan-tab active" onclick="setScanMode('upload',this)">
+            📤 Upload Photo
+          </button>
+          <button class="scan-tab" onclick="setScanMode('camera',this)">
+            📷 Use Camera
+          </button>
+          <button class="scan-tab" onclick="setScanMode('manual',this)">
+            ✏️ Type Manually
+          </button>
+        </div>
+
+        <!-- UPLOAD MODE -->
+        <div id="scan-upload">
+          <div class="scan-zone" id="scan-zone"
+               ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+            <input type="file" accept="image/*" onchange="onFileSelect(event)">
+            <div class="sz-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="sz-title">Drop your ticket photo here</div>
+            <div class="sz-sub">
+              Physical ticket stub, digital ticket screenshot,<br>
+              or photo of your ticket on your phone screen
+            </div>
+            <div class="sz-formats">
+              <span class="sz-fmt">JPG</span><span class="sz-fmt">PNG</span>
+              <span class="sz-fmt">HEIC</span><span class="sz-fmt">Screenshot</span>
+              <span class="sz-fmt">Max 10MB</span>
+            </div>
+            <div class="sz-or">or</div>
+            <button class="btn btn-gold" style="width:auto;padding:10px 24px;" onclick="event.stopPropagation()">Choose File</button>
+          </div>
+
+          <!-- Image preview -->
+          <div class="img-preview" id="img-preview">
+            <img id="preview-img" src="" alt="Ticket">
+            <div class="img-preview-bar">
+              <button class="btn btn-mint" style="flex:2;width:auto;" onclick="scanTicket()">
+                <span id="scan-btn-text">Scan This Photo</span>
+                <div class="spinner" id="scan-spinner"></div>
+              </button>
+              <button class="btn btn-ghost btn-sm" onclick="clearImage()">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAMERA MODE -->
+        <div id="scan-camera" style="display:none;">
+          <div class="camera-wrap" id="camera-wrap">
+            <video id="cam-video" autoplay playsinline muted></video>
+            <div class="cam-overlay">
+              <div class="cam-frame">
+                <div class="cam-corner tl"></div><div class="cam-corner tr"></div>
+                <div class="cam-corner bl"></div><div class="cam-corner br"></div>
+                <div class="cam-scanline"></div>
+              </div>
+            </div>
+            <div class="cam-hint">Align ticket within frame</div>
+          </div>
+          <canvas id="cam-canvas"></canvas>
+          <button class="btn btn-gold" onclick="captureTicket()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            Capture &amp; Scan
+          </button>
+          <button class="btn btn-ghost" style="margin-top:8px;" onclick="stopCamera();setScanMode('upload',document.querySelector('.scan-tab'))">Cancel</button>
+        </div>
+
+        <!-- MANUAL MODE -->
+        <div id="scan-manual" style="display:none;">
+          <div class="field">
+            <label>Team / Event</label>
+            <input type="text" id="m-team" placeholder="e.g. Chicago Cubs vs Cardinals">
+          </div>
+          <div class="field-row">
+            <div class="field" style="margin-bottom:0;">
+              <label>Date</label>
+              <input type="date" id="m-date">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Time</label>
+              <input type="time" id="m-time">
+            </div>
+          </div>
+          <div class="field-row-3" style="margin-top:14px;">
+            <div class="field" style="margin-bottom:0;"><label>Section</label><input type="text" id="m-section" placeholder="e.g. 104"></div>
+            <div class="field" style="margin-bottom:0;"><label>Row</label><input type="text" id="m-row" placeholder="e.g. C"></div>
+            <div class="field" style="margin-bottom:0;"><label>Seat</label><input type="text" id="m-seat" placeholder="e.g. 14"></div>
+          </div>
+          <div class="field" style="margin-top:14px;">
+            <label>Venue</label>
+            <input type="text" id="m-venue" placeholder="e.g. Wrigley Field, Chicago IL">
+          </div>
+          <div class="field">
+            <label>Face Value (USD)</label>
+            <input type="number" id="m-face-value" placeholder="e.g. 85.00" min="1" step="0.01">
+          </div>
+          <button class="btn btn-gold" onclick="applyManualTicket()">Continue with These Details →</button>
+        </div>
+
+        <!-- SCANNING STATE -->
+        <div class="scanning-state" id="scanning-state">
+          <div class="scan-rings"><div class="sr1"></div><div class="sr2"></div></div>
+          <div class="scan-label">Reading Your Ticket</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-bottom:10px;">Claude AI is analyzing the image</div>
+          <ul class="scan-steps">
+            <li class="scan-step-item" id="ss-1">Locating ticket information</li>
+            <li class="scan-step-item" id="ss-2">Reading game and date</li>
+            <li class="scan-step-item" id="ss-3">Extracting section, row, seat</li>
+            <li class="scan-step-item" id="ss-4">Identifying face value</li>
+          </ul>
+        </div>
+
+        <!-- SCAN RESULT -->
+        <div class="scan-result" id="scan-result">
+          <div class="sr-head">
+            <div class="sr-head-left"><div class="sr-dot"></div><div class="sr-title">Ticket Read Successfully</div></div>
+            <div class="sr-conf" id="sr-conf">—</div>
+          </div>
+          <div class="sr-body">
+            <div class="sr-row"><span class="sr-key">Game / Event</span><span class="sr-val gold" id="sr-game">—</span></div>
+            <div class="sr-row"><span class="sr-key">Date &amp; Time</span><span class="sr-val" id="sr-date">—</span></div>
+            <div class="sr-row"><span class="sr-key">Venue</span><span class="sr-val" id="sr-venue">—</span></div>
+            <div class="sr-row"><span class="sr-key">Section / Row / Seat</span><span class="sr-val mint" id="sr-seat">—</span></div>
+            <div class="sr-row"><span class="sr-key">Face Value</span><span class="sr-val gold" id="sr-face">—</span></div>
+          </div>
+          <div class="sr-actions">
+            <button class="btn btn-mint btn-sm" onclick="applyTicketData()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Use These Details
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="rescanTicket()">Rescan</button>
+            <button class="btn btn-ghost btn-sm" onclick="editTicketResult()">Edit</button>
+          </div>
+        </div>
+
+        <!-- SCAN WARNING -->
+        <div class="scan-warn" id="scan-warn">
+          <div class="sw-title" id="sw-title">Could Not Read Ticket</div>
+          <div class="sw-msg" id="sw-msg">—</div>
+          <div class="sw-actions">
+            <button class="btn btn-ghost btn-sm" onclick="rescanTicket()">Try Again</button>
+            <button class="btn btn-ghost btn-sm" onclick="setScanMode('manual',document.querySelectorAll('.scan-tab')[2])">Enter Manually</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="trust-strip">
+      <div class="trust-item"><div class="trust-dot"></div>No listing fees</div>
+      <div class="trust-item"><div class="trust-dot"></div>Instant payment</div>
+      <div class="trust-item"><div class="trust-dot"></div>XRPL blockchain secured</div>
+      <div class="trust-item"><div class="trust-dot"></div>Instant payment on sale</div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 2: PRICE ══ -->
+  <div id="step-2" style="display:none;">
+
+    <!-- Ticket preview -->
+    <div class="ticket-preview" id="ticket-preview">
+      <div class="tp-sport" id="tp-sport">Ticket</div>
+      <div class="tp-game" id="tp-game">—</div>
+      <div class="tp-date" id="tp-date">—</div>
+      <div class="tp-details">
+        <div class="tp-detail"><div class="tp-detail-label">Section</div><div class="tp-detail-val" id="tp-section">—</div></div>
+        <div class="tp-detail"><div class="tp-detail-label">Row</div><div class="tp-detail-val" id="tp-row">—</div></div>
+        <div class="tp-detail"><div class="tp-detail-label">Seat</div><div class="tp-detail-val" id="tp-seat">—</div></div>
+      </div>
+      <button class="tp-edit" onclick="goToStep1()">✎ Edit</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <div>
+          <div class="card-title">Choose How to List</div>
+          <div class="card-sub">Sell the whole ticket or offer fractional shares to fans</div>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <div style="background:var(--bg-input);border:1px solid var(--border-gold);border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+          <div style="font-size:22px;">🎟️</div>
+          <div>
+            <div style="font-size:14px;font-weight:500;color:var(--text);">Whole Ticket Sale</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;">One buyer gets your full seat. Payment held securely until ticket is delivered.</div>
+          </div>
+        </div>
+
+        <!-- WHOLE TICKET PRICE -->
+        <div id="whole-opts">
+          <div class="field">
+            <label>Your Asking Price (USD)</label>
+            <input type="number" id="whole-price" placeholder="e.g. 85.00" min="1" step="0.01" oninput="updateWholePriceSummary()">
+            <div class="field-hint">Face value was <span id="face-value-hint">—</span>. You set the price — no markup limits.</div>
+          </div>
+          <div class="price-summary" id="whole-price-summary">
+            <div class="ps-row"><span class="ps-label">Asking price</span><span class="ps-val" id="wp-asking">—</span></div>
+            <div class="ps-row"><span class="ps-label">MintSeat fee (2%)</span><span class="ps-val" id="wp-fee">—</span></div>
+            <div class="ps-divider"></div>
+            <div class="ps-row"><span class="ps-total-label">You receive</span><span class="ps-total-val" id="wp-receive">—</span></div>
+            <div class="ps-note">Payment routes instantly to your connected wallet or bank account on sale.</div>
+          </div>
+        </div>
+
+<!-- Fractional shares available on resell page -->
+
+        <div style="margin-top:20px;">
+          <button class="btn btn-gold" onclick="proceedToConnect()">
+            Continue to Listing →
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ STEP 3: CONNECT & LIST ══ -->
+  <div id="step-3" style="display:none;">
+
+    <!-- Ticket preview mini -->
+    <div class="ticket-preview" id="ticket-preview-2" style="margin-bottom:14px;">
+      <div class="tp-sport" id="tp-sport-2">Ticket</div>
+      <div class="tp-game" id="tp-game-2">—</div>
+      <div class="tp-date" id="tp-date-2">—</div>
+      <div class="tp-details">
+        <div class="tp-detail"><div class="tp-detail-label">Section</div><div class="tp-detail-val" id="tp-section-2">—</div></div>
+        <div class="tp-detail"><div class="tp-detail-label">Row</div><div class="tp-detail-val" id="tp-row-2">—</div></div>
+        <div class="tp-detail"><div class="tp-detail-label">Seat</div><div class="tp-detail-val" id="tp-seat-2">—</div></div>
+      </div>
+      <button class="tp-edit" onclick="goToStep2()">✎ Edit</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="card-title">Connect to List</div>
+          <div class="card-sub">Choose how you want to receive payment</div>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <div class="connect-opts">
+          <div class="connect-opt selected" id="co-email" onclick="selectConnectOpt('email')">
+            <div class="co-icon">✉️</div>
+            <div>
+              <div class="co-title">Email &amp; Bank Transfer</div>
+              <div class="co-desc">Receive payment via Stripe to your bank account. No crypto needed.</div>
+            </div>
+            <div class="co-arrow">›</div>
+          </div>
+
+        </div>
+
+        <!-- EMAIL CONNECT -->
+        <div id="connect-email">
+          <div class="field">
+            <label>Your Email</label>
+            <input type="email" id="seller-email" placeholder="you@example.com">
+            <div class="field-hint">We'll send you a link to verify your listing and connect your bank account via Stripe.</div>
+          </div>
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" id="seller-name" placeholder="Your full name">
+          </div>
+        </div>
+
+
+
+        <!-- LISTING SUMMARY -->
+        <div class="price-summary" style="margin-top:4px;">
+          <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:10px;">Listing Summary</div>
+          <div class="ps-row"><span class="ps-label">Ticket</span><span class="ps-val" id="ls-game" style="font-size:13px;font-family:'Outfit',sans-serif;text-align:right;max-width:200px;">—</span></div>
+          <div class="ps-row"><span class="ps-label">Listing Type</span><span class="ps-val" id="ls-type">—</span></div>
+          <div class="ps-row"><span class="ps-label">You Receive</span><span class="ps-val" id="ls-receive" style="color:var(--gold-light);">—</span></div>
+          <div class="ps-divider"></div>
+          <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);line-height:1.7;">
+            By listing you confirm you own this ticket and have the right to sell or tokenize it.
+            MintSeat's <a href="/terms" style="color:var(--gold);text-decoration:none;">Terms of Service</a> apply.
+          </div>
+        </div>
+
+        <button class="btn btn-gold" style="margin-top:16px;" id="list-btn" onclick="submitListing()">
+          <span id="list-btn-text">List My Ticket</span>
+          <div class="spinner" id="list-spinner"></div>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ SUCCESS ══ -->
+  <div id="step-success" style="display:none;">
+    <div class="card">
+      <div class="listing-success" id="listing-success">
+        <div class="ls-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00E5A0" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="ls-title">Ticket Listed!</div>
+        <div class="ls-sub">Your listing is live on the MintSeat marketplace.<br>You'll be notified the moment it sells.</div>
+        <div class="ls-data">
+          <div class="ls-data-title">Listing Details</div>
+          <div class="ls-row"><span class="ls-key">Listing ID</span><span class="ls-val" id="ls-id">—</span></div>
+          <div class="ls-row"><span class="ls-key">Game</span><span class="ls-val" id="ls-game-success">—</span></div>
+          <div class="ls-row"><span class="ls-key">Type</span><span class="ls-val" id="ls-type-success">—</span></div>
+          <div class="ls-row"><span class="ls-key">Price</span><span class="ls-val" id="ls-price-success">—</span></div>
+          <div class="ls-row"><span class="ls-key">Status</span><span class="ls-val">Active — Live on Marketplace</span></div>
+        </div>
+        <div class="ls-share">
+          <button class="btn btn-mint" style="width:auto;padding:10px 20px;" onclick="copyListingLink()">Copy Listing Link</button>
+          <button class="btn btn-ghost" style="width:auto;padding:10px 20px;" onclick="location.reload()">List Another Ticket</button>
+          <a href="/market" style="text-decoration:none;"><button class="btn btn-ghost" style="width:auto;padding:10px 20px;">Browse Market</button></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /form-wrap -->
+
+<div style="background:var(--bg-card);border-top:1px solid var(--border-gold);padding:24px;text-align:center;">
+  <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Looking to resell at market price?</div>
+  <a href="/resell" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);text-decoration:none;letter-spacing:0.06em;">MintSeat for Professional Resellers →</a>
+</div>
+<footer>
+  <div class="footer-brand">MintSeat · Solmare Group LLC</div>
+  <ul class="footer-links" style="margin-top:8px;">
+    <li><a href="/privacy">Privacy</a></li>
+    <li><a href="/terms">Terms</a></li>
+    <li><a href="/vault">For Stores</a></li>
+    <li><a href="mailto:hello@mintseat.co">Support</a></li>
+  </ul>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-dot"></div><span class="toast-text" id="toast-text"></span></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const WORKER_URL    = 'https://mintseat-registry-worker.guillermojzamorano.workers.dev';
+const STORE_API_KEY = 'ms_live_b9k23BmUEXcNtUt6ecBlzSkHgiB4kRbm';
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let imgBase64      = null;
+let imgType        = null;
+let ticketData     = null;
+let listingType    = 'whole';
+let connectMethod  = 'email';
+let cameraStream   = null;
+
+// ─── STEP NAVIGATION ──────────────────────────────────────────────────────────
+function goToStep(step) {
+  ['step-1','step-2','step-3','step-success'].forEach((id,i) => {
+    document.getElementById(id).style.display = (i+1 === step || (step===4 && id==='step-success')) ? 'block' : 'none';
+  });
+  for (let i=1;i<=3;i++) {
+    const el = document.getElementById(`sp-${i}`);
+    el.classList.remove('active','done');
+    if (i < step) el.classList.add('done');
+    else if (i === step) el.classList.add('active');
+  }
+  for (let i=1;i<=2;i++) document.getElementById(`sp-line-${i}`).classList.toggle('done', i < step);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goToStep1() { goToStep(1); }
+function goToStep2() { goToStep(2); }
+
+// ─── SCAN MODE ────────────────────────────────────────────────────────────────
+function setScanMode(mode, btn) {
+  document.querySelectorAll('.scan-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  ['scan-upload','scan-camera','scan-manual','scanning-state','scan-result','scan-warn']
+    .forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+  const el = document.getElementById(`scan-${mode}`);
+  if (el) el.style.display = 'block';
+  if (mode === 'camera') startCamera(); else stopCamera();
+}
+
+// ─── FILE HANDLING ────────────────────────────────────────────────────────────
+function onDragOver(e) { e.preventDefault(); document.getElementById('scan-zone').classList.add('drag-over'); }
+function onDragLeave() { document.getElementById('scan-zone').classList.remove('drag-over'); }
+function onDrop(e) { e.preventDefault(); document.getElementById('scan-zone').classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f?.type.startsWith('image/')) loadFile(f); }
+function onFileSelect(e) { const f=e.target.files[0]; if(f) loadFile(f); }
+
+function loadFile(file) {
+  if (file.size > 10*1024*1024) { showToast('File too large. Use an image under 10MB.',true); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const url = e.target.result;
+    imgBase64 = url.split(',')[1];
+    imgType   = file.type;
+    document.getElementById('preview-img').src = url;
+    document.getElementById('scan-zone').style.display    = 'none';
+    document.getElementById('img-preview').style.display  = 'block';
+    document.getElementById('scan-result').style.display  = 'none';
+    document.getElementById('scan-warn').style.display    = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage() {
+  imgBase64 = null; imgType = null;
+  document.getElementById('img-preview').style.display  = 'none';
+  document.getElementById('scan-zone').style.display     = 'block';
+  document.getElementById('scan-result').style.display  = 'none';
+  document.getElementById('scan-warn').style.display    = 'none';
+}
+
+// ─── CAMERA ───────────────────────────────────────────────────────────────────
+async function startCamera() {
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:'environment',width:{ideal:1280}} });
+    document.getElementById('cam-video').srcObject = cameraStream;
+    document.getElementById('camera-wrap').style.display = 'block';
+  } catch {
+    showToast('Camera unavailable. Use the upload option.',true);
+    setScanMode('upload', document.querySelector('.scan-tab'));
+  }
+}
+function stopCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t=>t.stop()); cameraStream=null; }
+  document.getElementById('camera-wrap').style.display = 'none';
+}
+function captureTicket() {
+  const video=document.getElementById('cam-video'), canvas=document.getElementById('cam-canvas');
+  canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+  canvas.getContext('2d').drawImage(video,0,0);
+  imgBase64 = canvas.toDataURL('image/jpeg',.9).split(',')[1];
+  imgType   = 'image/jpeg';
+  stopCamera();
+  scanTicket();
+}
+
+// ─── SCAN TICKET ─────────────────────────────────────────────────────────────
+async function scanTicket() {
+  if (!imgBase64) { showToast('Upload or capture a photo first.',true); return; }
+  document.getElementById('img-preview').style.display     = 'none';
+  document.getElementById('scan-result').style.display     = 'none';
+  document.getElementById('scan-warn').style.display       = 'none';
+  document.getElementById('scanning-state').style.display  = 'block';
+  document.getElementById('scan-btn-text').style.display   = 'none';
+  document.getElementById('scan-spinner').style.display    = 'block';
+  animateScanSteps();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type:'image', source:{ type:'base64', media_type: imgType||'image/jpeg', data: imgBase64 } },
+            { type:'text', text:`You are a sports ticket expert. Analyze this image and extract ticket information.
+
+Extract these fields:
+- game: Teams playing or event name (e.g. "Chicago Cubs vs St. Louis Cardinals" or "Taylor Swift - Eras Tour")
+- sport: Sport or event type (e.g. "MLB", "NFL", "NBA", "NHL", "Concert", "Event")
+- date: Date of the event (e.g. "Saturday, May 10, 2025")
+- time: Start time (e.g. "7:05 PM CT")
+- venue: Stadium or venue name and city (e.g. "Wrigley Field, Chicago IL")
+- section: Section number or name
+- row: Row letter or number
+- seat: Seat number
+- face_value: Face value price in USD as a number only (e.g. 85.00)
+- confidence: Your confidence 0-100 that you correctly read the ticket details
+- notes: Any issues reading the ticket, or null
+
+If this is not a ticket or you cannot read it clearly, set confidence to 0.
+
+Respond ONLY with valid JSON, no markdown:
+{"game":"Chicago Cubs vs Cardinals","sport":"MLB","date":"Saturday May 10 2025","time":"1:20 PM CT","venue":"Wrigley Field Chicago IL","section":"204","row":"C","seat":"14","face_value":85.00,"confidence":92,"notes":null}` }
+          ]
+        }]
+      })
+    });
+
+    document.getElementById('scanning-state').style.display = 'none';
+    document.getElementById('scan-btn-text').style.display  = 'inline';
+    document.getElementById('scan-spinner').style.display   = 'none';
+
+    if (!response.ok) { const err=await response.json(); throw new Error(err.error?.message||`API error ${response.status}`); }
+
+    const apiData = await response.json();
+    const raw = apiData.content?.[0]?.text || '';
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch { throw new Error('Could not parse ticket data. Try a clearer photo.'); }
+
+    ticketData = parsed;
+    if (!parsed.game || parsed.confidence < 30) {
+      showScanWarn('Could Not Read Ticket', parsed.notes || 'The ticket details were not clearly visible. Try a sharper photo or enter the details manually.');
+      return;
+    }
+    displayScanResult(parsed);
+
+  } catch (err) {
+    document.getElementById('scanning-state').style.display = 'none';
+    document.getElementById('scan-btn-text').style.display  = 'inline';
+    document.getElementById('scan-spinner').style.display   = 'none';
+    showScanWarn('Scan Failed', err.message || 'Could not analyze the image. Try a clearer photo.');
+    console.error('[Scan]', err);
+  }
+}
+
+function animateScanSteps() {
+  const steps=['ss-1','ss-2','ss-3','ss-4'];
+  steps.forEach(id => { const el=document.getElementById(id); el.classList.remove('active','done'); });
+  let i=0;
+  const iv=setInterval(()=>{
+    if(i>0){const p=document.getElementById(steps[i-1]);p.classList.remove('active');p.classList.add('done');}
+    if(i<steps.length) document.getElementById(steps[i]).classList.add('active');
+    i++; if(i>steps.length) clearInterval(iv);
+  },600);
+}
+
+function displayScanResult(d) {
+  document.getElementById('sr-game').textContent  = d.game || '—';
+  document.getElementById('sr-date').textContent  = [d.date, d.time].filter(Boolean).join(' · ') || '—';
+  document.getElementById('sr-venue').textContent = d.venue || '—';
+  document.getElementById('sr-seat').textContent  = `Sec ${d.section||'?'} · Row ${d.row||'?'} · Seat ${d.seat||'?'}`;
+  document.getElementById('sr-face').textContent  = d.face_value ? `$${parseFloat(d.face_value).toFixed(2)}` : 'Not found';
+  document.getElementById('sr-conf').textContent  = `${d.confidence||0}% confidence`;
+  document.getElementById('scan-result').style.display = 'block';
+  document.getElementById('scan-warn').style.display   = 'none';
+}
+
+function showScanWarn(title, msg) {
+  document.getElementById('sw-title').textContent = title;
+  document.getElementById('sw-msg').textContent   = msg;
+  document.getElementById('scan-warn').style.display   = 'block';
+  document.getElementById('scan-result').style.display = 'none';
+}
+
+function rescanTicket() {
+  document.getElementById('scan-result').style.display = 'none';
+  document.getElementById('scan-warn').style.display   = 'none';
+  if (imgBase64) document.getElementById('img-preview').style.display = 'block';
+  else document.getElementById('scan-zone').style.display = 'block';
+}
+
+function editTicketResult() {
+  if (!ticketData) return;
+  setScanMode('manual', document.querySelectorAll('.scan-tab')[2]);
+  document.getElementById('m-team').value       = ticketData.game || '';
+  document.getElementById('m-venue').value      = ticketData.venue || '';
+  document.getElementById('m-section').value    = ticketData.section || '';
+  document.getElementById('m-row').value        = ticketData.row || '';
+  document.getElementById('m-seat').value       = ticketData.seat || '';
+  document.getElementById('m-face-value').value = ticketData.face_value || '';
+}
+
+// ─── APPLY TICKET DATA ────────────────────────────────────────────────────────
+function applyTicketData() {
+  if (!ticketData) return;
+  populateStep2(ticketData);
+  goToStep(2);
+}
+
+function applyManualTicket() {
+  const team = document.getElementById('m-team').value.trim();
+  if (!team) { showToast('Enter the team or event name.',true); return; }
+  ticketData = {
+    game:       team,
+    sport:      'Ticket',
+    date:       document.getElementById('m-date').value,
+    time:       document.getElementById('m-time').value,
+    venue:      document.getElementById('m-venue').value,
+    section:    document.getElementById('m-section').value,
+    row:        document.getElementById('m-row').value,
+    seat:       document.getElementById('m-seat').value,
+    face_value: parseFloat(document.getElementById('m-face-value').value) || 0,
+    confidence: 100,
+  };
+  populateStep2(ticketData);
+  goToStep(2);
+}
+
+function populateStep2(d) {
+  // Ticket preview
+  ['','2'].forEach(suffix => {
+    const s = suffix;
+    const el = (id) => document.getElementById(id+s);
+    if (el('tp-sport'))   el('tp-sport').textContent   = d.sport || 'Ticket';
+    if (el('tp-game'))    el('tp-game').textContent    = d.game || '—';
+    if (el('tp-date'))    el('tp-date').textContent    = [d.date,d.time].filter(Boolean).join(' · ') || '—';
+    if (el('tp-section')) el('tp-section').textContent = d.section || '—';
+    if (el('tp-row'))     el('tp-row').textContent     = d.row || '—';
+    if (el('tp-seat'))    el('tp-seat').textContent    = d.seat || '—';
+  });
+  // Pre-fill price with face value
+  if (d.face_value) {
+    document.getElementById('whole-price').value = d.face_value.toFixed(2);
+    document.getElementById('face-value-hint').textContent = `$${parseFloat(d.face_value).toFixed(2)}`;
+    updateWholePriceSummary();
+  }
+}
+
+// ─── LISTING TYPE ─────────────────────────────────────────────────────────────
+function selectListingType(type) { listingType = 'whole'; } // STH page — whole ticket only
+
+// ─── PRICE CALCULATORS ────────────────────────────────────────────────────────
+function updateWholePriceSummary() {
+  const price    = parseFloat(document.getElementById('whole-price').value) || 0;
+  const faceVal  = ticketData?.face_value || 0;
+  const maxPrice = faceVal > 0 ? faceVal * 1.20 : 0;
+  const fee      = price * 0.02;
+  const net      = price - fee;
+
+  document.getElementById('wp-asking').textContent  = price ? `$${price.toFixed(2)}` : '—';
+  document.getElementById('wp-fee').textContent     = price ? `-$${fee.toFixed(2)}` : '—';
+  document.getElementById('wp-receive').textContent = price ? `$${net.toFixed(2)}` : '—';
+
+  // Update max price hint
+  if (maxPrice > 0) {
+    document.getElementById('max-price-hint').textContent = `$${maxPrice.toFixed(2)}`;
+  }
+
+  // Show/hide cap warning
+  const warnEl = document.getElementById('price-cap-warn');
+  if (warnEl) {
+    warnEl.style.display = (price > maxPrice && maxPrice > 0) ? 'block' : 'none';
+  }
+
+  // Disable submit if over cap
+  const submitBtn = document.querySelector('#step-2 .btn-gold');
+  if (submitBtn && maxPrice > 0) {
+    submitBtn.disabled = price > maxPrice;
+    submitBtn.style.opacity = price > maxPrice ? '0.4' : '1';
+  }
+}
+
+// Fractional removed from STH page — see resell page
+
+// ─── CONNECT METHOD ───────────────────────────────────────────────────────────
+function selectConnectOpt(method) {
+  connectMethod = 'email'; // STH page — email/bank only
+}
+
+// ─── PROCEED TO CONNECT ───────────────────────────────────────────────────────
+function proceedToConnect() {
+  // Validate price
+  if (listingType === 'whole') {
+    const price = parseFloat(document.getElementById('whole-price').value);
+    if (!price || price < 1) { showToast('Enter a valid asking price.',true); return; }
+  } else {
+    const shares = parseInt(document.getElementById('frac-shares').value);
+    const price  = parseFloat(document.getElementById('frac-price').value);
+    if (!shares || shares < 2) { showToast('Enter at least 2 shares.',true); return; }
+    if (!price || price < 1)   { showToast('Enter a valid price per share.',true); return; }
+  }
+
+  // Populate step 3 summary
+  const d = ticketData;
+  document.getElementById('ls-game').textContent = d?.game || '—';
+  if (listingType === 'whole') {
+    const price = parseFloat(document.getElementById('whole-price').value);
+    document.getElementById('ls-type').textContent    = 'Whole Ticket';
+    document.getElementById('ls-receive').textContent = `$${(price * 0.98).toFixed(2)}`;
+  } else {
+    const shares = parseInt(document.getElementById('frac-shares').value);
+    const price  = parseFloat(document.getElementById('frac-price').value);
+    document.getElementById('ls-type').textContent    = `${shares} Fractional Shares @ $${price.toFixed(2)}`;
+    document.getElementById('ls-receive').textContent = `$${(shares * price * 0.98).toFixed(2)} + 7% royalties`;
+  }
+
+  // Populate ticket preview in step 3
+  ['tp-sport-2','tp-game-2','tp-date-2','tp-section-2','tp-row-2','tp-seat-2'].forEach(id => {
+    const src = document.getElementById(id.replace('-2',''));
+    const dst = document.getElementById(id);
+    if (src && dst) dst.textContent = src.textContent;
+  });
+
+  goToStep(3);
+}
+
+// ─── SUBMIT LISTING ───────────────────────────────────────────────────────────
+async function submitListing() {
+  // Validate contact
+  if (connectMethod === 'email') {
+    const email = document.getElementById('seller-email').value.trim();
+    const name  = document.getElementById('seller-name').value.trim();
+    if (!email || !email.includes('@')) { showToast('Enter a valid email address.',true); return; }
+    if (!name)                           { showToast('Enter your full name.',true); return; }
+  } else {
+    const wallet = document.getElementById('seller-wallet').value.trim();
+    if (!wallet || !wallet.startsWith('r')) { showToast('Enter a valid XRPL wallet address starting with r.',true); return; }
+  }
+
+  document.getElementById('list-btn-text').style.display = 'none';
+  document.getElementById('list-spinner').style.display  = 'block';
+
+  // Simulate API call — in production this hits your listing worker
+  await new Promise(r => setTimeout(r, 2000));
+
+  document.getElementById('list-btn-text').style.display = 'inline';
+  document.getElementById('list-spinner').style.display  = 'none';
+
+  // Show success
+  const listingId = 'LST-' + Math.random().toString(36).substring(2,10).toUpperCase();
+  document.getElementById('ls-id').textContent           = listingId;
+  document.getElementById('ls-game-success').textContent = ticketData?.game || '—';
+  document.getElementById('ls-type-success').textContent = listingType === 'whole' ? 'Whole Ticket' : 'Fractional Shares';
+  if (listingType === 'whole') {
+    const price = parseFloat(document.getElementById('whole-price').value);
+    document.getElementById('ls-price-success').textContent = `$${price.toFixed(2)}`;
+  } else {
+    const shares = parseInt(document.getElementById('frac-shares').value);
+    const price  = parseFloat(document.getElementById('frac-price').value);
+    document.getElementById('ls-price-success').textContent = `${shares} shares @ $${price.toFixed(2)}`;
+  }
+
+  goToStep(4);
+  showToast('Ticket listed successfully!');
+}
+
+function copyListingLink() {
+  navigator.clipboard.writeText('https://mintseat.co/market/LST-DEMO').then(() => showToast('Listing link copied!'));
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MintSeat for Resellers — List at Market Price</title>
+<meta name="description" content="Professional ticket reselling on MintSeat. 2% fee, market price listing, fractional shares, royalties on every resale. Built for serious sellers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#060E09;--bg-card:#0C1810;--bg-input:#080F0A;--bg-hover:#112016;
+  --gold:#C9A84C;--gold-light:#E2C46E;--gold-dim:#7A5F28;
+  --gold-glow:rgba(201,168,76,0.10);--gold-glow2:rgba(201,168,76,0.22);
+  --mint:#00E5A0;--mint-dim:#00A370;--mint-glow:rgba(0,229,160,0.08);--mint-glow2:rgba(0,229,160,0.18);
+  --red:#E05252;--red-glow:rgba(224,82,82,0.12);
+  --text:#E8F2EB;--text-dim:#7FA890;--text-muted:#3D6050;
+  --border:rgba(255,255,255,0.05);--border-gold:rgba(201,168,76,0.18);--border-mint:rgba(0,229,160,0.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
+
+/* ── NAV ── */
+.nav{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-gold);background:rgba(6,14,9,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-gem{width:26px;height:26px;background:linear-gradient(135deg,var(--gold-dim),var(--gold));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.nav-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-link{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color .2s;}
+.nav-link:hover{color:var(--gold);}
+
+/* ── HERO ── */
+.hero{padding:52px 24px 36px;text-align:center;max-width:680px;margin:0 auto;}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:20px;height:1px;background:var(--border-gold);}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,6vw,52px);font-weight:700;line-height:1.1;margin-bottom:12px;}
+.hero-title em{font-style:italic;color:var(--gold-light);}
+.hero-sub{font-size:16px;color:var(--text-dim);line-height:1.7;margin-bottom:28px;max-width:520px;margin-left:auto;margin-right:auto;}
+
+/* ── COMPARISON STRIP ── */
+.comp-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border-gold);border:1px solid var(--border-gold);border-radius:8px;overflow:hidden;max-width:560px;margin:0 auto 40px;}
+.cs-cell{background:var(--bg-card);padding:16px;text-align:center;}
+.cs-cell.highlight{background:linear-gradient(135deg,rgba(201,168,76,0.08),var(--bg-card));}
+.cs-platform{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.cs-fee{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;}
+.cs-fee.red{color:#E05252;}
+.cs-fee.amber{color:#E0A352;}
+.cs-fee.gold{color:var(--gold-light);}
+.cs-note{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:3px;}
+
+/* ── ADVANTAGES ── */
+.advantages{max-width:720px;margin:0 auto 40px;padding:0 16px;}
+.adv-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.adv-card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:8px;padding:18px;}
+.adv-icon{font-size:24px;margin-bottom:10px;}
+.adv-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;margin-bottom:5px;}
+.adv-desc{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.7;letter-spacing:0.02em;}
+.adv-highlight{color:var(--gold);font-weight:500;}
+
+/* ── MAIN FORM ── */
+.form-wrap{max-width:640px;margin:0 auto;padding:0 16px 80px;}
+.step-progress{display:flex;align-items:center;margin-bottom:28px;}
+.sp-step{display:flex;align-items:center;gap:8px;flex:1;}
+.sp-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;flex-shrink:0;border:1px solid var(--border);background:transparent;color:var(--text-muted);transition:all .3s;}
+.sp-step.active .sp-num{background:var(--gold);border-color:var(--gold);color:var(--bg);}
+.sp-step.done .sp-num{background:var(--mint);border-color:var(--mint);color:var(--bg);}
+.sp-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);transition:color .3s;}
+.sp-step.active .sp-label{color:var(--gold);}
+.sp-step.done .sp-label{color:var(--mint);}
+.sp-line{flex:1;height:1px;background:var(--border);margin:0 8px;transition:background .3s;}
+.sp-line.done{background:var(--mint-dim);}
+
+/* ── CARD ── */
+.card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:10px;overflow:hidden;margin-bottom:14px;}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border-gold);background:linear-gradient(135deg,rgba(201,168,76,0.06),transparent);display:flex;align-items:center;gap:12px;}
+.card-icon{width:34px;height:34px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;}
+.card-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;letter-spacing:0.04em;}
+.card-body{padding:20px;}
+
+/* ── SCAN TABS ── */
+.scan-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.scan-tab{flex:1;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:9px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-muted);transition:all .15s;text-align:center;}
+.scan-tab:hover{border-color:var(--border-gold);color:var(--text-dim);}
+.scan-tab.active{border-color:var(--border-gold);color:var(--gold);background:var(--gold-glow);}
+
+/* ── DROP ZONE ── */
+.scan-zone{border:2px dashed var(--border-gold);border-radius:8px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:rgba(201,168,76,0.02);}
+.scan-zone:hover,.scan-zone.drag-over{border-color:var(--gold);background:var(--gold-glow);}
+.scan-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.sz-icon{width:48px;height:48px;margin:0 auto 12px;background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.sz-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:5px;}
+.sz-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.8;}
+.sz-or{display:flex;align-items:center;gap:10px;margin:12px 0;font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
+.sz-or::before,.sz-or::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── IMAGE PREVIEW ── */
+.img-preview{display:none;border-radius:8px;overflow:hidden;margin-bottom:12px;}
+.img-preview img{width:100%;max-height:220px;object-fit:contain;background:#000;display:block;}
+.img-preview-bar{display:flex;gap:8px;margin-top:10px;}
+
+/* ── SCAN STATES ── */
+.scanning-state{display:none;padding:32px;text-align:center;}
+.scan-rings{width:48px;height:48px;position:relative;margin:0 auto 14px;}
+.sr1{position:absolute;inset:0;border-radius:50%;border:2px solid var(--border-gold);border-top-color:var(--gold);animation:spin .9s linear infinite;}
+.sr2{position:absolute;inset:8px;border-radius:50%;border:2px solid var(--border-gold);border-bottom-color:var(--mint);animation:spin 1.4s linear infinite reverse;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.scan-result{display:none;border:1px solid var(--border-mint);border-radius:8px;overflow:hidden;animation:fadeUp .3s ease;margin-bottom:14px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.sr-head{padding:10px 14px;background:var(--mint-glow);border-bottom:1px solid var(--border-mint);display:flex;align-items:center;justify-content:space-between;}
+.sr-dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint);}
+.sr-body{background:var(--bg-input);}
+.sr-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);}
+.sr-row:last-child{border-bottom:none;}
+.sr-key{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.sr-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--text);font-weight:500;}
+.sr-val.gold{color:var(--gold-light);}
+.sr-val.mint{color:var(--mint);}
+.sr-actions{padding:11px 14px;display:flex;gap:8px;border-top:1px solid var(--border-mint);}
+
+.scan-warn{display:none;border:1px solid rgba(224,82,82,.3);border-radius:8px;padding:14px;background:var(--red-glow);margin-bottom:12px;}
+
+/* ── MANUAL MODE ── */
+.manual-mode{display:none;}
+
+/* ── FIELDS ── */
+.field{margin-bottom:14px;}
+.field label{display:block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:var(--bg-input);border:1px solid var(--border-gold);border-radius:6px;padding:11px 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .15s;}
+.field input:focus,.field select:focus{border-color:var(--gold);}
+.field input::placeholder{color:var(--text-muted);}
+.field select option{background:var(--bg-card);}
+.field-hint{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:4px;line-height:1.5;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* ── LISTING TYPE ── */
+.listing-type{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+.lt-opt{border:2px solid var(--border-gold);border-radius:8px;padding:16px;cursor:pointer;transition:all .2s;background:transparent;}
+.lt-opt:hover{border-color:var(--gold);background:var(--gold-glow);}
+.lt-opt.sel{border-color:var(--gold);background:var(--gold-glow);}
+.lt-icon{font-size:22px;margin-bottom:8px;}
+.lt-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;margin-bottom:3px;}
+.lt-desc{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);line-height:1.6;}
+.lt-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 7px;border-radius:100px;margin-top:6px;}
+.lt-badge.simple{background:var(--mint-glow);border:1px solid var(--border-mint);color:var(--mint);}
+.lt-badge.pro{background:var(--gold-glow);border:1px solid var(--border-gold);color:var(--gold);}
+
+/* ── FRACTIONAL OPTS ── */
+.frac-opts{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.frac-opts.show{display:block;}
+
+/* ── ROYALTY SECTION ── */
+.royalty-section{background:var(--bg-input);border:1px solid var(--border-gold);border-radius:8px;padding:16px;margin:16px 0;}
+.rs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.rs-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);}
+.rs-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.rs-toggle-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.toggle{width:34px;height:18px;background:var(--text-muted);border-radius:9px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--gold);}
+.toggle::after{content:'';position:absolute;width:12px;height:12px;background:white;border-radius:50%;top:3px;left:3px;transition:transform .2s;}
+.toggle.on::after{transform:translateX(16px);}
+.rs-body{display:none;}
+.rs-body.show{display:block;}
+.rs-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+.rs-note{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.6;}
+
+/* ── PRICE SUMMARY ── */
+.price-summary{background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:14px;margin:14px 0;}
+.ps-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;}
+.ps-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);}
+.ps-val{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--text);}
+.ps-divider{height:1px;background:var(--border);margin:8px 0;}
+.ps-total-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);font-weight:500;}
+.ps-total-val{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold-light);}
+.ps-note{font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:8px;line-height:1.6;}
+
+/* ── CONNECT ── */
+.connect-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.connect-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border-gold);border-radius:7px;cursor:pointer;transition:all .2s;}
+.connect-opt:hover,.connect-opt.sel{background:var(--gold-glow);border-color:var(--gold);}
+.co-icon{font-size:18px;flex-shrink:0;}
+.co-title{font-size:14px;font-weight:500;}
+.co-desc{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;}
+
+/* ── SUCCESS ── */
+.success-wrap{display:none;text-align:center;padding:48px 24px;}
+.success-icon{width:60px;height:60px;background:var(--mint-glow);border:1px solid var(--border-mint);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;margin-bottom:6px;}
+.success-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-bottom:20px;line-height:1.7;}
+.success-stats{display:flex;justify-content:center;gap:28px;margin-bottom:20px;flex-wrap:wrap;}
+.ss-val{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--mint);}
+.ss-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-top:2px;}
+
+/* ── MINTSCORE BADGE ── */
+.mintscore-badge{background:var(--gold-glow);border:1px solid var(--border-gold);border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.mb-icon{font-size:22px;flex-shrink:0;}
+.mb-title{font-size:14px;font-weight:500;color:var(--gold-light);}
+.mb-desc{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:2px;line-height:1.5;}
+
+/* ── STH CTA ── */
+.sth-cta{background:var(--bg-card);border-top:1px solid var(--border-gold);padding:20px 24px;text-align:center;}
+.sth-cta-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.sth-cta a{font-family:'DM Mono',monospace;font-size:10px;color:var(--mint);text-decoration:none;letter-spacing:0.06em;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:12px 22px;border-radius:6px;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;font-weight:500;}
+.btn-gold{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--bg);font-weight:600;}
+.btn-gold:hover{box-shadow:0 5px 20px var(--gold-glow2);}
+.btn-mint{background:var(--mint-glow);border:1px solid var(--border-mint);color:var(--mint);}
+.btn-mint:hover{background:var(--mint-glow2);}
+.btn-ghost{background:transparent;border:1px solid var(--border-gold);color:var(--text-dim);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-full{width:100%;}
+.btn-lg{padding:13px 24px;font-size:10px;}
+.btn-sm{padding:6px 12px;font-size:9px;}
+.spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);z-index:1000;background:var(--bg-card);border:1px solid var(--border-mint);border-radius:8px;padding:11px 18px;display:flex;align-items:center;gap:8px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.toast.error{border-color:rgba(224,82,82,.4);}
+.toast-dot{width:6px;height:6px;border-radius:50%;background:var(--mint);}
+.toast.error .toast-dot{background:var(--red);}
+.toast-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);}
+
+@media(max-width:560px){
+  .adv-grid,.listing-type,.field-row,.rs-row{grid-template-columns:1fr;}
+  .comp-strip{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="/"><div class="nav-gem"></div><span class="nav-name">MintSeat</span></a>
+  <div class="nav-right">
+    <a class="nav-link" href="/sell">← Can't Make It?</a>
+    <a class="nav-link" href="/sell/bulk">Bulk Listing</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">For Professional Resellers</div>
+  <h1 class="hero-title">Market price.<br><em>2% fee. That's it.</em></h1>
+  <p class="hero-sub">List at any price. No markup caps. Fractional shares available. Earn royalties on every secondary sale. MintScore builds your reputation with every verified transaction.</p>
+
+  <div class="comp-strip">
+    <div class="cs-cell"><div class="cs-platform">StubHub</div><div class="cs-fee red">25%</div><div class="cs-note">combined fees</div></div>
+    <div class="cs-cell"><div class="cs-platform">Ticketmaster</div><div class="cs-fee amber">15%</div><div class="cs-note">seller fee</div></div>
+    <div class="cs-cell highlight"><div class="cs-platform">MintSeat</div><div class="cs-fee gold">2%</div><div class="cs-note">that's it</div></div>
+  </div>
+</div>
+
+<!-- ADVANTAGES -->
+<div class="advantages">
+  <div class="adv-grid">
+    <div class="adv-card">
+      <div class="adv-icon">💰</div>
+      <div class="adv-title">No Price Caps</div>
+      <div class="adv-desc">Set any price you want. Market rate, above market, below — your call. <span class="adv-highlight">You set the price, we take 2%.</span></div>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">🔷</div>
+      <div class="adv-title">Fractional Shares</div>
+      <div class="adv-desc">Split a ticket into shares. Sell partial ownership. <span class="adv-highlight">Earn 7% royalties automatically on every secondary trade — forever.</span></div>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">🎵</div>
+      <div class="adv-title">Artist & Team Royalties</div>
+      <div class="adv-desc">Route a percentage to the artist or team on every resale. <span class="adv-highlight">Makes your listings stand out. Artists remember who paid them.</span></div>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">⬡</div>
+      <div class="adv-title">MintScore</div>
+      <div class="adv-desc">Every verified delivery builds your on-chain reputation score. <span class="adv-highlight">High MintScore = buyers choose you first.</span> Can't be faked.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap">
+
+  <div class="step-progress">
+    <div class="sp-step active" id="sp-1"><div class="sp-num">1</div><div class="sp-label">Scan Ticket</div></div>
+    <div class="sp-line" id="sp-l1"></div>
+    <div class="sp-step" id="sp-2"><div class="sp-num">2</div><div class="sp-label">Set Price & Options</div></div>
+    <div class="sp-line" id="sp-l2"></div>
+    <div class="sp-step" id="sp-3"><div class="sp-num">3</div><div class="sp-label">Connect & List</div></div>
+  </div>
+
+  <!-- STEP 1: SCAN -->
+  <div id="step-1">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <div><div class="card-title">Scan Your Ticket</div><div class="card-sub">AI reads game, date, venue, seat — any ticket format</div></div>
+      </div>
+      <div class="card-body">
+        <div class="scan-tabs">
+          <button class="scan-tab active" onclick="setMode('upload',this)">📤 Upload</button>
+          <button class="scan-tab" onclick="setMode('camera',this)">📷 Camera</button>
+          <button class="scan-tab" onclick="setMode('manual',this)">✏️ Manual</button>
+        </div>
+
+        <div id="scan-upload">
+          <div class="scan-zone" id="scan-zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+            <input type="file" accept="image/*" onchange="onFileSelect(event)">
+            <div class="sz-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+            <div class="sz-title">Drop ticket photo here</div>
+            <div class="sz-sub">Physical stub, digital ticket, barcode screenshot</div>
+            <div class="sz-or">or</div>
+            <button class="btn btn-gold" style="width:auto;padding:9px 20px;" onclick="event.stopPropagation()">Choose File</button>
+          </div>
+          <div class="img-preview" id="img-preview">
+            <img id="preview-img" src="" alt="Ticket">
+            <div class="img-preview-bar">
+              <button class="btn btn-mint" style="flex:2;width:auto;" onclick="scanTicket()"><span id="scan-btn-text">Scan This Photo</span><div class="spinner" id="scan-spinner"></div></button>
+              <button class="btn btn-ghost btn-sm" onclick="clearImage()">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="scan-camera" style="display:none;">
+          <div style="background:var(--bg-input);border:1px solid var(--border-gold);border-radius:6px;padding:20px;text-align:center;">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);">Camera coming soon — use Upload or Manual for now</div>
+          </div>
+        </div>
+
+        <div id="scan-manual" class="manual-mode">
+          <div class="field"><label>Team / Event</label><input type="text" id="m-team" placeholder="e.g. New York Yankees vs Boston Red Sox"></div>
+          <div class="field-row">
+            <div class="field" style="margin-bottom:0;"><label>Date</label><input type="date" id="m-date"></div>
+            <div class="field" style="margin-bottom:0;"><label>Time</label><input type="time" id="m-time"></div>
+          </div>
+          <div class="field-row" style="margin-top:12px;">
+            <div class="field" style="margin-bottom:0;"><label>Section</label><input type="text" id="m-section" placeholder="e.g. 214"></div>
+            <div class="field" style="margin-bottom:0;"><label>Row</label><input type="text" id="m-row" placeholder="e.g. F"></div>
+          </div>
+          <div class="field-row" style="margin-top:12px;">
+            <div class="field" style="margin-bottom:0;"><label>Seat</label><input type="text" id="m-seat" placeholder="e.g. 8"></div>
+            <div class="field" style="margin-bottom:0;"><label>Venue</label><input type="text" id="m-venue" placeholder="e.g. Yankee Stadium, NY"></div>
+          </div>
+          <div class="field" style="margin-top:12px;"><label>Face Value (USD)</label><input type="number" id="m-face" placeholder="e.g. 125.00" min="1" step="0.01"></div>
+          <button class="btn btn-gold btn-full" style="margin-top:4px;" onclick="applyManual()">Continue →</button>
+        </div>
+
+        <div class="scanning-state" id="scanning-state">
+          <div class="scan-rings"><div class="sr1"></div><div class="sr2"></div></div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;margin-bottom:4px;">Reading Ticket</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);">AI extracting game details...</div>
+        </div>
+
+        <div class="scan-result" id="scan-result">
+          <div class="sr-head"><div style="display:flex;align-items:center;gap:8px;"><div class="sr-dot"></div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--mint);text-transform:uppercase;">Ticket Read</div></div><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);" id="sr-conf">—</div></div>
+          <div class="sr-body">
+            <div class="sr-row"><span class="sr-key">Game</span><span class="sr-val gold" id="sr-game">—</span></div>
+            <div class="sr-row"><span class="sr-key">Date &amp; Time</span><span class="sr-val" id="sr-date">—</span></div>
+            <div class="sr-row"><span class="sr-key">Venue</span><span class="sr-val" id="sr-venue">—</span></div>
+            <div class="sr-row"><span class="sr-key">Seat</span><span class="sr-val mint" id="sr-seat">—</span></div>
+            <div class="sr-row"><span class="sr-key">Face Value</span><span class="sr-val gold" id="sr-face">—</span></div>
+          </div>
+          <div class="sr-actions">
+            <button class="btn btn-mint btn-sm" onclick="applyTicket()">✓ Use These Details</button>
+            <button class="btn btn-ghost btn-sm" onclick="rescan()">Rescan</button>
+          </div>
+        </div>
+
+        <div class="scan-warn" id="scan-warn">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;" id="warn-title">Could Not Read</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim);line-height:1.6;" id="warn-msg">—</div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="rescan()">Try Again</button>
+            <button class="btn btn-ghost btn-sm" onclick="setMode('manual',document.querySelectorAll('.scan-tab')[2])">Enter Manually</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: PRICE & OPTIONS -->
+  <div id="step-2" style="display:none;">
+
+    <!-- Ticket preview -->
+    <div style="background:linear-gradient(135deg,#0D1E14,#091410);border:1px solid var(--border-gold);border-radius:8px;padding:16px 18px;margin-bottom:14px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-dim),var(--gold),var(--gold-dim));"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;" id="tp-sport">Ticket</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;margin-bottom:3px;" id="tp-game">—</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-bottom:10px;" id="tp-date">—</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;padding:5px 10px;"><div style="font-family:'DM Mono',monospace;font-size:7px;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px;">Section</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold-light);" id="tp-section">—</div></div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;padding:5px 10px;"><div style="font-family:'DM Mono',monospace;font-size:7px;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px;">Row</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold-light);" id="tp-row">—</div></div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;padding:5px 10px;"><div style="font-family:'DM Mono',monospace;font-size:7px;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px;">Seat</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold-light);" id="tp-seat">—</div></div>
+      </div>
+      <button style="position:absolute;top:12px;right:12px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border:1px solid var(--border-gold);background:none;color:var(--text-muted);cursor:pointer;border-radius:3px;" onclick="goStep(1)">✎ Edit</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <div><div class="card-title">Pricing &amp; Options</div><div class="card-sub">No price caps — full market flexibility</div></div>
+      </div>
+      <div class="card-body">
+
+        <!-- Listing type -->
+        <div class="listing-type">
+          <div class="lt-opt sel" id="lt-whole" onclick="selectType('whole')">
+            <div class="lt-icon">🎟️</div>
+            <div class="lt-title">Whole Ticket</div>
+            <div class="lt-desc">One buyer, full seat, instant sale.</div>
+            <div class="lt-badge simple">Simple</div>
+          </div>
+          <div class="lt-opt" id="lt-frac" onclick="selectType('fractional')">
+            <div class="lt-icon">🔷</div>
+            <div class="lt-title">Fractional Shares</div>
+            <div class="lt-desc">Split into shares. Earn royalties on every resale forever.</div>
+            <div class="lt-badge pro">Earn Royalties</div>
+          </div>
+        </div>
+
+        <!-- Whole ticket price -->
+        <div id="whole-opts">
+          <div class="field">
+            <label>Your Asking Price (USD) — No Cap</label>
+            <input type="number" id="whole-price" placeholder="e.g. 350.00" min="1" step="0.01" oninput="updateWholeSummary()">
+            <div class="field-hint">Face value: <span id="face-hint">—</span> · Set any price you want — market rate, above or below.</div>
+          </div>
+          <div class="price-summary">
+            <div class="ps-row"><span class="ps-label">Asking price</span><span class="ps-val" id="wp-ask">—</span></div>
+            <div class="ps-row"><span class="ps-label">MintSeat fee (2%)</span><span class="ps-val" id="wp-fee">—</span></div>
+            <div class="ps-divider"></div>
+            <div class="ps-row"><span class="ps-total-label">You receive</span><span class="ps-total-val" id="wp-net">—</span></div>
+          </div>
+        </div>
+
+        <!-- Fractional opts -->
+        <div class="frac-opts" id="frac-opts">
+          <div class="field-row">
+            <div class="field" style="margin-bottom:0;"><label>Number of Shares</label><input type="number" id="frac-shares" placeholder="e.g. 10" min="2" max="10000" oninput="updateFracSummary()"><div class="field-hint">Min 2, max 10,000</div></div>
+            <div class="field" style="margin-bottom:0;"><label>Price per Share (USD)</label><input type="number" id="frac-price" placeholder="e.g. 35.00" min="1" step="0.01" oninput="updateFracSummary()"></div>
+          </div>
+          <div class="price-summary" style="margin-top:12px;">
+            <div class="ps-row"><span class="ps-label">Total raise (if all sold)</span><span class="ps-val" id="fp-total">—</span></div>
+            <div class="ps-row"><span class="ps-label">MintSeat fee (2%)</span><span class="ps-val" id="fp-fee">—</span></div>
+            <div class="ps-row"><span class="ps-label">Your royalty on resales</span><span class="ps-val" style="color:var(--mint);">7% forever</span></div>
+            <div class="ps-divider"></div>
+            <div class="ps-row"><span class="ps-total-label">You receive (primary)</span><span class="ps-total-val" id="fp-net">—</span></div>
+            <div class="ps-note">Plus 7% paid to you automatically on every secondary trade — on-chain, forever.</div>
+          </div>
+        </div>
+
+        <!-- Royalty section -->
+        <div class="royalty-section">
+          <div class="rs-header">
+            <div class="rs-title">🎵 Artist / Team Royalty (Optional)</div>
+            <div class="rs-toggle" onclick="toggleRoyalty()">
+              <div class="rs-toggle-label" id="royalty-toggle-label">Off</div>
+              <div class="toggle" id="royalty-toggle"></div>
+            </div>
+          </div>
+          <div class="rs-body" id="royalty-body">
+            <div class="rs-row">
+              <div class="field" style="margin-bottom:0;"><label>Recipient Name</label><input type="text" id="royalty-name" placeholder="e.g. Taylor Swift, Chicago Cubs"></div>
+              <div class="field" style="margin-bottom:0;"><label>Royalty % (of resale)</label><input type="number" id="royalty-pct" value="7" min="1" max="30" step="0.5" oninput="updateWholeSummary();updateFracSummary()"></div>
+            </div>
+            <div class="field"><label>Recipient Wallet Address (XRPL)</label><input type="text" id="royalty-wallet" placeholder="r... (XRPL wallet)"></div>
+            <div class="rs-note">The royalty routes automatically on every resale. This is shown transparently to buyers and makes your listing stand out. Artists and teams remember who pays them.</div>
+          </div>
+        </div>
+
+        <!-- MintScore badge -->
+        <div class="mintscore-badge">
+          <div class="mb-icon">⬡</div>
+          <div>
+            <div class="mb-title">This listing builds your MintScore</div>
+            <div class="mb-desc">Every verified delivery earns reputation points. High MintScore = buyers choose you first. Stored on-chain — cannot be faked or reset.</div>
+          </div>
+        </div>
+
+        <button class="btn btn-gold btn-full btn-lg" onclick="goStep(3)">Continue to List →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: CONNECT -->
+  <div id="step-3" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div><div class="card-title">Connect to List</div><div class="card-sub" id="step3-sub">Choose how you receive payment</div></div>
+      </div>
+      <div class="card-body">
+        <div class="connect-opts">
+          <div class="connect-opt sel" id="co-email" onclick="selectConnect('email')">
+            <div class="co-icon">✉️</div>
+            <div><div class="co-title">Email &amp; Bank Transfer</div><div class="co-desc">Payment via Stripe. No crypto needed.</div></div>
+          </div>
+          <div class="connect-opt" id="co-wallet" onclick="selectConnect('wallet')">
+            <div class="co-icon">🔗</div>
+            <div><div class="co-title">XRPL Wallet</div><div class="co-desc">Receive XRP directly. Required for fractional shares &amp; royalties.</div></div>
+          </div>
+        </div>
+
+        <div id="email-fields">
+          <div class="field"><label>Your Email</label><input type="email" id="seller-email" placeholder="you@example.com"><div class="field-hint">We'll notify you when your ticket sells.</div></div>
+          <div class="field"><label>Full Name</label><input type="text" id="seller-name" placeholder="Your full name"></div>
+        </div>
+
+        <div id="wallet-fields" style="display:none;">
+          <div class="field"><label>XRPL Wallet Address</label><input type="text" id="seller-wallet" placeholder="r... (starts with r)"><div class="field-hint">Required for fractional shares and royalty collection.</div></div>
+          <div class="field"><label>Email for Notifications</label><input type="email" id="seller-wallet-email" placeholder="you@example.com"></div>
+        </div>
+
+        <div style="background:var(--bg-input);border-radius:6px;padding:12px;margin-bottom:14px;">
+          <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Listing Summary</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);line-height:1.8;" id="listing-summary-text">—</div>
+          <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:8px;">By listing you confirm you own this ticket and agree to our <a href="/terms" style="color:var(--gold);text-decoration:none;">Terms</a> and <a href="/privacy" style="color:var(--gold);text-decoration:none;">Privacy Policy</a>.</div>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+          <button class="btn btn-gold btn-lg" style="flex:2;" onclick="submitListing()">
+            <span id="submit-text">List My Ticket</span>
+            <div class="spinner" id="submit-spinner"></div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-wrap" id="step-success">
+    <div class="success-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00E5A0" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="success-title">Ticket Listed!</div>
+    <div class="success-sub">Live on the MintSeat marketplace. You'll be notified the moment it sells.<br>Every sale builds your MintScore.</div>
+    <div class="success-stats">
+      <div><div class="ss-val" id="ss-price">—</div><div class="ss-label">Listing Price</div></div>
+      <div><div class="ss-val" id="ss-net">—</div><div class="ss-label">You Receive</div></div>
+      <div><div class="ss-val">⬡</div><div class="ss-label">MintScore +1</div></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-mint btn-lg" onclick="location.reload()">List Another</button>
+      <a href="/sell/bulk"><button class="btn btn-ghost btn-lg">Bulk Listing</button></a>
+    </div>
+  </div>
+
+</div><!-- /form-wrap -->
+
+<!-- STH CTA -->
+<div class="sth-cta">
+  <div class="sth-cta-label">Just can't make it to a game?</div>
+  <a href="/sell">MintSeat for Season Ticket Holders — face value, no hassle →</a>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-dot"></div><span class="toast-text" id="toast-text"></span></div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let imgBase64    = null;
+let imgType      = null;
+let ticketData   = null;
+let listingType  = 'whole';
+let connectMethod = 'email';
+let royaltyOn    = false;
+
+// ─── STEP NAV ─────────────────────────────────────────────────────────────────
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById(`step-${i}`).style.display = i === n ? 'block' : 'none';
+    const sp = document.getElementById(`sp-${i}`);
+    sp.className = `sp-step${i < n ? ' done' : i === n ? ' active' : ''}`;
+    if (i < 3) document.getElementById(`sp-l${i}`).classList.toggle('done', i < n);
+  });
+  document.getElementById('step-success').style.display = 'none';
+  if (n === 2) populateStep2();
+  if (n === 3) populateStep3();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ─── SCAN MODE ────────────────────────────────────────────────────────────────
+function setMode(mode, btn) {
+  document.querySelectorAll('.scan-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  ['scan-upload','scan-camera','scan-manual','scanning-state','scan-result','scan-warn']
+    .forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+  document.getElementById(`scan-${mode}`).style.display = 'block';
+}
+
+// ─── FILE HANDLING ────────────────────────────────────────────────────────────
+function onDragOver(e){e.preventDefault();document.getElementById('scan-zone').classList.add('drag-over');}
+function onDragLeave(){document.getElementById('scan-zone').classList.remove('drag-over');}
+function onDrop(e){e.preventDefault();document.getElementById('scan-zone').classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f?.type.startsWith('image/'))loadFile(f);}
+function onFileSelect(e){const f=e.target.files[0];if(f)loadFile(f);}
+
+function loadFile(file) {
+  if (file.size > 10*1024*1024){showToast('File too large. Use under 10MB.',true);return;}
+  const reader = new FileReader();
+  reader.onload = e => {
+    imgBase64 = e.target.result.split(',')[1];
+    imgType   = file.type;
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('scan-zone').style.display  = 'none';
+    document.getElementById('img-preview').style.display = 'block';
+    document.getElementById('scan-result').style.display = 'none';
+    document.getElementById('scan-warn').style.display   = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage(){
+  imgBase64=null;imgType=null;
+  document.getElementById('img-preview').style.display = 'none';
+  document.getElementById('scan-zone').style.display   = 'block';
+}
+
+// ─── SCAN ─────────────────────────────────────────────────────────────────────
+async function scanTicket() {
+  if (!imgBase64){showToast('Upload a photo first.',true);return;}
+  document.getElementById('img-preview').style.display    = 'none';
+  document.getElementById('scanning-state').style.display = 'block';
+  document.getElementById('scan-result').style.display    = 'none';
+  document.getElementById('scan-warn').style.display      = 'none';
+  document.getElementById('scan-btn-text').style.display  = 'none';
+  document.getElementById('scan-spinner').style.display   = 'block';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        messages: [{ role: 'user', content: [
+          { type:'image', source:{ type:'base64', media_type: imgType||'image/jpeg', data: imgBase64 } },
+          { type:'text', text:`Extract ticket info. Return ONLY valid JSON:\n{"game":"Team A vs Team B","sport":"MLB","date":"May 6 2025","time":"7:05 PM CT","venue":"Wrigley Field Chicago IL","section":"214","row":"F","seat":"8","face_value":125.00,"confidence":90}\nIf not a ticket: {"confidence":0,"game":null}` }
+        ]}]
+      })
+    });
+    document.getElementById('scanning-state').style.display = 'none';
+    document.getElementById('scan-btn-text').style.display  = 'inline';
+    document.getElementById('scan-spinner').style.display   = 'none';
+
+    if (!response.ok) throw new Error(`API error ${response.status}`);
+    const data = await response.json();
+    const raw  = data.content?.[0]?.text || '';
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); } catch { throw new Error('Parse error'); }
+    if (!parsed.game || parsed.confidence < 25) {
+      showWarn('Could Not Read Ticket', 'Try a clearer photo or enter the details manually.');
+      return;
+    }
+    ticketData = parsed;
+    document.getElementById('sr-game').textContent  = parsed.game;
+    document.getElementById('sr-date').textContent  = [parsed.date,parsed.time].filter(Boolean).join(' · ');
+    document.getElementById('sr-venue').textContent = parsed.venue || '—';
+    document.getElementById('sr-seat').textContent  = `Sec ${parsed.section||'?'} · Row ${parsed.row||'?'} · Seat ${parsed.seat||'?'}`;
+    document.getElementById('sr-face').textContent  = parsed.face_value ? `$${parsed.face_value.toFixed(2)}` : '—';
+    document.getElementById('sr-conf').textContent  = `${parsed.confidence}% confidence`;
+    document.getElementById('scan-result').style.display = 'block';
+  } catch(err) {
+    document.getElementById('scanning-state').style.display = 'none';
+    document.getElementById('scan-btn-text').style.display  = 'inline';
+    document.getElementById('scan-spinner').style.display   = 'none';
+    showWarn('Scan Failed', err.message || 'Could not analyze image. Try again or enter manually.');
+  }
+}
+
+function showWarn(title, msg) {
+  document.getElementById('warn-title').textContent = title;
+  document.getElementById('warn-msg').textContent   = msg;
+  document.getElementById('scan-warn').style.display   = 'block';
+  document.getElementById('scan-result').style.display = 'none';
+}
+
+function rescan() {
+  document.getElementById('scan-result').style.display = 'none';
+  document.getElementById('scan-warn').style.display   = 'none';
+  if (imgBase64) document.getElementById('img-preview').style.display = 'block';
+  else document.getElementById('scan-zone').style.display = 'block';
+}
+
+function applyTicket() { goStep(2); }
+
+function applyManual() {
+  const team = document.getElementById('m-team').value.trim();
+  if (!team){showToast('Enter the team or event name.',true);return;}
+  ticketData = {
+    game: team, sport: 'Ticket',
+    date: document.getElementById('m-date').value,
+    time: document.getElementById('m-time').value,
+    venue: document.getElementById('m-venue').value,
+    section: document.getElementById('m-section').value,
+    row: document.getElementById('m-row').value,
+    seat: document.getElementById('m-seat').value,
+    face_value: parseFloat(document.getElementById('m-face').value) || 0,
+    confidence: 100,
+  };
+  goStep(2);
+}
+
+// ─── STEP 2 ───────────────────────────────────────────────────────────────────
+function populateStep2() {
+  if (!ticketData) return;
+  document.getElementById('tp-sport').textContent   = ticketData.sport || 'Ticket';
+  document.getElementById('tp-game').textContent    = ticketData.game || '—';
+  document.getElementById('tp-date').textContent    = [ticketData.date,ticketData.time].filter(Boolean).join(' · ');
+  document.getElementById('tp-section').textContent = ticketData.section || '—';
+  document.getElementById('tp-row').textContent     = ticketData.row || '—';
+  document.getElementById('tp-seat').textContent    = ticketData.seat || '—';
+  if (ticketData.face_value) {
+    document.getElementById('whole-price').value = ticketData.face_value.toFixed(2);
+    document.getElementById('face-hint').textContent = `$${ticketData.face_value.toFixed(2)}`;
+    updateWholeSummary();
+  }
+}
+
+function selectType(type) {
+  listingType = type;
+  document.getElementById('lt-whole').classList.toggle('sel', type==='whole');
+  document.getElementById('lt-frac').classList.toggle('sel', type==='fractional');
+  document.getElementById('whole-opts').style.display = type==='whole' ? 'block' : 'none';
+  document.getElementById('frac-opts').classList.toggle('show', type==='fractional');
+}
+
+function updateWholeSummary() {
+  const price = parseFloat(document.getElementById('whole-price').value) || 0;
+  const fee   = price * 0.02;
+  const net   = price - fee;
+  document.getElementById('wp-ask').textContent = price ? `$${price.toFixed(2)}` : '—';
+  document.getElementById('wp-fee').textContent = price ? `-$${fee.toFixed(2)}` : '—';
+  document.getElementById('wp-net').textContent = price ? `$${net.toFixed(2)}` : '—';
+}
+
+function updateFracSummary() {
+  const shares = parseInt(document.getElementById('frac-shares').value)||0;
+  const price  = parseFloat(document.getElementById('frac-price').value)||0;
+  const total  = shares * price;
+  const fee    = total * 0.02;
+  const net    = total - fee;
+  document.getElementById('fp-total').textContent = total ? `$${total.toFixed(2)}` : '—';
+  document.getElementById('fp-fee').textContent   = total ? `-$${fee.toFixed(2)}` : '—';
+  document.getElementById('fp-net').textContent   = net   ? `$${net.toFixed(2)}` : '—';
+}
+
+function toggleRoyalty() {
+  royaltyOn = !royaltyOn;
+  document.getElementById('royalty-toggle').classList.toggle('on', royaltyOn);
+  document.getElementById('royalty-toggle-label').textContent = royaltyOn ? 'On' : 'Off';
+  document.getElementById('royalty-body').classList.toggle('show', royaltyOn);
+}
+
+// ─── STEP 3 ───────────────────────────────────────────────────────────────────
+function populateStep3() {
+  let summary = `${ticketData?.game || 'Ticket'}\n`;
+  if (listingType === 'whole') {
+    const price = parseFloat(document.getElementById('whole-price').value)||0;
+    summary += `Whole ticket · $${price.toFixed(2)} · You receive $${(price*0.98).toFixed(2)}`;
+  } else {
+    const shares = parseInt(document.getElementById('frac-shares').value)||0;
+    const price  = parseFloat(document.getElementById('frac-price').value)||0;
+    summary += `${shares} shares @ $${price.toFixed(2)} · Total $${(shares*price).toFixed(2)} + 7% royalties`;
+  }
+  if (royaltyOn) {
+    const name = document.getElementById('royalty-name').value;
+    const pct  = document.getElementById('royalty-pct').value;
+    if (name) summary += `\n${pct}% royalty → ${name}`;
+  }
+  document.getElementById('listing-summary-text').textContent = summary;
+}
+
+function selectConnect(method) {
+  connectMethod = method;
+  document.getElementById('co-email').classList.toggle('sel', method==='email');
+  document.getElementById('co-wallet').classList.toggle('sel', method==='wallet');
+  document.getElementById('email-fields').style.display  = method==='email'  ? 'block' : 'none';
+  document.getElementById('wallet-fields').style.display = method==='wallet' ? 'block' : 'none';
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────────────────────────
+async function submitListing() {
+  const email = connectMethod === 'email'
+    ? document.getElementById('seller-email').value.trim()
+    : document.getElementById('seller-wallet-email').value.trim();
+  const name = document.getElementById('seller-name').value?.trim() || '';
+
+  if (!email || !email.includes('@')){showToast('Enter a valid email address.',true);return;}
+  if (connectMethod === 'email' && !name){showToast('Enter your full name.',true);return;}
+
+  let price = 0;
+  if (listingType === 'whole') {
+    price = parseFloat(document.getElementById('whole-price').value)||0;
+    if (!price){showToast('Set your asking price first.',true);return;}
+  } else {
+    const shares = parseInt(document.getElementById('frac-shares').value)||0;
+    const pp     = parseFloat(document.getElementById('frac-price').value)||0;
+    if (!shares||!pp){showToast('Set shares and price per share.',true);return;}
+    price = shares * pp;
+  }
+
+  document.getElementById('submit-text').style.display    = 'none';
+  document.getElementById('submit-spinner').style.display = 'block';
+
+  await new Promise(r => setTimeout(r, 1800));
+
+  document.getElementById('submit-text').style.display    = 'inline';
+  document.getElementById('submit-spinner').style.display = 'none';
+
+  // Show success
+  [1,2,3].forEach(i => document.getElementById(`step-${i}`).style.display = 'none');
+  document.getElementById('step-success').style.display = 'flex';
+  document.getElementById('step-success').style.flexDirection = 'column';
+  document.getElementById('step-success').style.alignItems = 'center';
+  document.getElementById('ss-price').textContent = `$${price.toFixed(2)}`;
+  document.getElementById('ss-net').textContent   = `$${(price*0.98).toFixed(2)}`;
+  window.scrollTo({top:0,behavior:'smooth'});
+  showToast('Ticket listed on MintSeat marketplace!');
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>
