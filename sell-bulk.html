@@ -248,7 +248,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
         <div>
-          <div class="card-title">Forward to list@mintseat.co</div>
+          <div class="card-title">Forward to list@tickets.mintseat.co</div>
           <div class="card-sub">We read your email and extract every ticket automatically</div>
         </div>
       </div>
@@ -256,7 +256,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font
 
         <div class="email-address-box">
           <div class="ea-label">Forward your ticket email to</div>
-          <div class="ea-address">list@mintseat.co</div>
+          <div class="ea-address">list@tickets.mintseat.co</div>
           <div class="ea-copy" onclick="copyEmail()">📋 Copy address</div>
         </div>
 
@@ -271,7 +271,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font
           <li class="step-item">
             <div class="step-circle">2</div>
             <div class="step-content">
-              <div class="step-title">Forward it to list@mintseat.co</div>
+              <div class="step-title">Forward it to list@tickets.mintseat.co</div>
               <div class="step-desc">Hit forward in your email app. Send the whole email as-is — no need to edit anything. Subject line doesn't matter.</div>
             </div>
           </li>
@@ -527,16 +527,16 @@ function selectMethod(method, el) {
 
 // ─── EMAIL METHOD ─────────────────────────────────────────────────────────────
 function copyEmail() {
-  navigator.clipboard.writeText('list@mintseat.co').then(() => showToast('Email address copied!'));
+  navigator.clipboard.writeText('list@tickets.mintseat.co').then(() => showToast('Email address copied!'));
 }
 
 function copyEmailAndShowConfirm() {
-  navigator.clipboard.writeText('list@mintseat.co').then(() => {
+  navigator.clipboard.writeText('list@tickets.mintseat.co').then(() => {
     showToast('Copied! Now open your email app and forward your ticket email.');
     // Try to open default email app
     const notifyEmail = document.getElementById('notify-email').value.trim();
     const subject = encodeURIComponent('My season tickets');
-    window.location.href = `mailto:list@mintseat.co?subject=${subject}`;
+    window.location.href = `mailto:list@tickets.mintseat.co?subject=${subject}`;
   });
 }
 
