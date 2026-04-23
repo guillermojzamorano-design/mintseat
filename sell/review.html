@@ -457,10 +457,17 @@ function renderTickets() {
         <div class="tc-field">
           <div class="tc-field-label">Listing Type</div>
           <select class="tc-field-select" onchange="updateTicketType(${i}, this.value)" onclick="event.stopPropagation()">
-            <option value="whole" ${t.listing_type === 'whole' ? 'selected' : ''}>Whole Ticket</option>
-            <option value="fractional" ${t.listing_type === 'fractional' ? 'selected' : ''}>Fractional Shares</option>
+            ${t.quantity > 1
+              ? `<option value="pair" ${t.listing_type !== 'individual' ? 'selected' : ''}>Both Seats (${t.seat})</option>
+                 <option value="individual" ${t.listing_type === 'individual' ? 'selected' : ''}>Individual Seats</option>`
+              : `<option value="whole" selected>Single Seat</option>`
+            }
           </select>
-          <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:4px;">${t.listing_type === 'fractional' ? '7% royalty on resales' : 'Single buyer gets full seat'}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:4px;">${
+            t.quantity > 1
+              ? (t.listing_type === 'individual' ? `Lists as 2 separate tickets` : `One buyer gets both seats`)
+              : 'Single buyer gets this seat'
+          }</div>
         </div>
       </div>
     </div>
@@ -488,7 +495,9 @@ function updateTicketPrice(i, val) {
 
 function updateTicketType(i, val) {
   tickets[i].listing_type = val;
-  renderTickets(); // re-render to update description
+  // If splitting into individual seats, double the count in summary
+  // but keep asking_price per seat
+  renderTickets();
   updateSummary();
 }
 
