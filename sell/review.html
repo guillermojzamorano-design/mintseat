@@ -268,7 +268,6 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font
     <select class="bc-select" id="bulk-type" onchange="applyBulkType()">
       <option value="pair">Both Seats</option>
       <option value="individual">Individual Seats</option>
-      <option value="whole">Single Seat</option>
     </select>
     <button class="btn btn-ghost btn-sm" onclick="applyBulkPrice();applyBulkType();">Apply to All</button>
     <div class="bc-divider"></div>
@@ -459,17 +458,32 @@ function renderTickets() {
         <div class="tc-field">
           <div class="tc-field-label">Listing Type</div>
           <select class="tc-field-select" onchange="updateTicketType(${i}, this.value)" onclick="event.stopPropagation()">
-            ${t.quantity > 1
-              ? `<option value="pair" ${t.listing_type === 'pair' ? 'selected' : ''}>Both Seats (${t.seat})</option>
-                 <option value="individual" ${t.listing_type === 'individual' ? 'selected' : ''}>Individual Seats</option>
-                 <option value="whole" ${t.listing_type === 'whole' ? 'selected' : ''}>Single Seat</option>`
-              : `<option value="whole" selected>Single Seat</option>`
-            }
+            ${(function() {
+              if (t.quantity <= 1) {
+                return `<option value="whole" selected>${t.seat ? `Seat ${t.seat}` : 'Single Seat'}</option>`;
+              }
+              // Parse seat numbers from range e.g. "22-23" → ["22","23"]
+              const seatNums = t.seat ? t.seat.toString().split('-').map(s => s.trim()) : [];
+              const pairLabel = seatNums.length >= 2 ? `Both Seats (${seatNums.join(' & ')})` : `Both Seats (${t.seat})`;
+              const opts = [`<option value="pair" ${t.listing_type === 'pair' ? 'selected' : ''}>${pairLabel}</option>`];
+              if (seatNums.length >= 2) {
+                seatNums.forEach(sn => {
+                  opts.push(`<option value="seat_${sn}" ${t.listing_type === 'seat_'+sn ? 'selected' : ''}>Seat ${sn} only</option>`);
+                });
+              } else {
+                opts.push(`<option value="individual" ${t.listing_type === 'individual' ? 'selected' : ''}>Individual Seats</option>`);
+              }
+              return opts.join('');
+            })()}
           </select>
           <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:4px;">${
-            t.quantity > 1
-              ? (t.listing_type === 'individual' ? `Lists as 2 separate tickets` : t.listing_type === 'whole' ? `Single seat listed individually` : `One buyer gets both seats`)
-              : 'Single buyer gets this seat'
+            (function() {
+              if (t.quantity <= 1) return 'Single buyer gets this seat';
+              if (t.listing_type === 'pair') return 'One buyer gets both seats';
+              if (t.listing_type === 'individual') return 'Lists as 2 separate tickets';
+              if (t.listing_type && t.listing_type.startsWith('seat_')) return `Lists seat ${t.listing_type.replace('seat_','')} as a single ticket`;
+              return 'One buyer gets both seats';
+            })()
           }</div>
         </div>
       </div>
@@ -501,21 +515,18 @@ function updateTicketType(i, val) {
   const qty  = tickets[i].quantity || 1;
   tickets[i].listing_type = val;
 
-  // Adjust asking_price based on listing type change
   if (qty > 1 && tickets[i].asking_price) {
-    if (val === 'individual' && prev === 'pair') {
-      // Switching to per-seat: divide by quantity
+    const prevIsSingle = prev === 'individual' || prev === 'whole' || (prev && prev.startsWith('seat_'));
+    const newIsSingle  = val  === 'individual' || val  === 'whole' || (val  && val.startsWith('seat_'));
+
+    if (!prevIsSingle && newIsSingle) {
+      // pair → single seat: divide by quantity
       tickets[i].asking_price = parseFloat((tickets[i].asking_price / qty).toFixed(2));
-    } else if (val === 'pair' && prev === 'individual') {
-      // Switching back to both seats: multiply by quantity
-      tickets[i].asking_price = parseFloat((tickets[i].asking_price * qty).toFixed(2));
-    } else if (val === 'whole' && prev === 'pair') {
-      // Single seat from pair: divide by quantity
-      tickets[i].asking_price = parseFloat((tickets[i].asking_price / qty).toFixed(2));
-    } else if (val === 'pair' && prev === 'whole') {
-      // Back to pair from single: multiply by quantity
+    } else if (prevIsSingle && !newIsSingle) {
+      // single seat → pair: multiply by quantity
       tickets[i].asking_price = parseFloat((tickets[i].asking_price * qty).toFixed(2));
     }
+    // single → different single: price stays the same (already per-seat)
   }
 
   renderTickets();
@@ -549,14 +560,14 @@ function applyBulkType() {
   tickets.forEach(t => {
     if (!t.selected || t.quantity <= 1) { t.listing_type = type; return; }
     const prev = t.listing_type;
+    const prevIsSingle = prev === 'individual' || prev === 'whole' || (prev && prev.startsWith('seat_'));
+    const newIsSingle  = type === 'individual' || type === 'whole' || (type && type.startsWith('seat_'));
     t.listing_type = type;
     if (!t.asking_price) return;
-    if (type === 'individual' && prev === 'pair') {
+    if (!prevIsSingle && newIsSingle) {
       t.asking_price = parseFloat((t.asking_price / t.quantity).toFixed(2));
-    } else if (type === 'pair' && (prev === 'individual' || prev === 'whole')) {
+    } else if (prevIsSingle && !newIsSingle) {
       t.asking_price = parseFloat((t.asking_price * t.quantity).toFixed(2));
-    } else if (type === 'whole' && prev === 'pair') {
-      t.asking_price = parseFloat((t.asking_price / t.quantity).toFixed(2));
     }
   });
   renderTickets();
