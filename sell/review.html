@@ -495,9 +495,19 @@ function renderTickets() {
 
 function toggleTicket(i) {
   tickets[i].selected = !tickets[i].selected;
+
+  // When checking a ticket, apply current global markup from face_value
+  if (tickets[i].selected && tickets[i].face_value && globalMarkup >= 0) {
+    const multiplier = 1 + (globalMarkup / 100);
+    const isSingle   = tickets[i].listing_type && (tickets[i].listing_type.startsWith('seat_') || tickets[i].listing_type === 'individual' || tickets[i].listing_type === 'whole');
+    const qty        = isSingle ? 1 : (tickets[i].quantity || 1);
+    tickets[i].asking_price = parseFloat((tickets[i].face_value * qty * multiplier).toFixed(2));
+  }
+
   const card = document.getElementById(`card-${i}`);
   card.className = `ticket-card ${tickets[i].selected ? 'selected' : 'deselected'}`;
   card.querySelector('.tc-check').checked = tickets[i].selected;
+  renderTickets();
   updateSummary();
 }
 
@@ -528,14 +538,22 @@ function updateTicketType(i, val) {
 }
 
 function selectAll(sel) {
+  const multiplier = 1 + (globalMarkup / 100);
   tickets.forEach((t, i) => {
     t.selected = sel;
+    // Apply markup when selecting
+    if (sel && t.face_value) {
+      const isSingle = t.listing_type && (t.listing_type.startsWith('seat_') || t.listing_type === 'individual' || t.listing_type === 'whole');
+      const qty      = isSingle ? 1 : (t.quantity || 1);
+      t.asking_price = parseFloat((t.face_value * qty * multiplier).toFixed(2));
+    }
     const card = document.getElementById(`card-${i}`);
     if (card) {
       card.className = `ticket-card ${sel ? 'selected' : 'deselected'}`;
       card.querySelector('.tc-check').checked = sel;
     }
   });
+  renderTickets();
   updateSummary();
 }
 
