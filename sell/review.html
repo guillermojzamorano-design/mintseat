@@ -254,6 +254,12 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font
     <div class="sb-cell"><div class="sb-label">You Receive</div><div class="sb-val mint" id="sum-receive">—</div></div>
   </div>
 
+  <!-- Season package notice -->
+  <div id="season-notice" style="display:none;background:var(--mint-glow);border:1px solid var(--border-mint);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-family:'DM Mono',monospace;font-size:9px;color:var(--mint);line-height:1.8;">
+    <strong style="display:block;margin-bottom:4px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;">Season Package Mode</strong>
+    Games are unchecked by default. Check only the games you <strong>CAN'T attend</strong> — those will be listed for sale. Games you plan to attend stay unchecked and won't be listed.
+  </div>
+
   <!-- Bulk controls -->
   <div class="bulk-controls">
     <span class="bc-label">Set price for all:</span>
@@ -368,7 +374,7 @@ async function loadBatch() {
     batchData = data;
     tickets   = (data.tickets || []).map(t => ({
       ...t,
-      selected:     true,
+      selected:     t.selected !== undefined ? t.selected : true,
       asking_price: t.face_value || null,
       listing_type: 'whole',
     }));
@@ -389,14 +395,38 @@ function renderUI() {
   const count = tickets.length;
   const source = batchData.tickets?.[0]?.source || 'Email';
 
-  document.getElementById('hero-sub').textContent =
-    `We found ${count} ticket${count !== 1 ? 's' : ''} in your forwarded email. Review the details, set your prices, and confirm to go live instantly.`;
+  const isSeasonPkg = batchData.emailType === 'season_package';
+  const seatInfo    = batchData.seatInfo;
+
+  if (isSeasonPkg && seatInfo) {
+    const games = Math.round(count / (seatInfo.seats?.length || 1));
+    document.getElementById('hero-sub').textContent =
+      `We pulled your full ${seatInfo.isSpringTraining ? 'Spring Training' : 'season'} schedule — ${games} home games, ${count} total listings across your ${seatInfo.seats?.length || 1} seat group${(seatInfo.seats?.length || 1) !== 1 ? 's' : ''}. Check the games you CAN'T attend and we'll list them automatically.`;
+    // Update hero title for season packages
+    const titleEl = document.querySelector('.hero-title');
+    if (titleEl) titleEl.innerHTML = `Your <em>${seatInfo.team}</em><br>schedule, ready.`;
+    // Update step label
+    const tagEl = document.querySelector('.hero-tag');
+    if (tagEl) tagEl.textContent = 'Step 2 of 3 — Select Games to List';
+    // Update confirm button text
+    const confirmText = document.getElementById('confirm-text');
+    if (confirmText) confirmText.textContent = 'List Selected Games';
+  } else {
+    document.getElementById('hero-sub').textContent =
+      `We found ${count} ticket${count !== 1 ? 's' : ''} in your forwarded email. Review the details, set your prices, and confirm to go live instantly.`;
+  }
 
   document.getElementById('sum-total').textContent = count;
 
   // Start expiry countdown
   if (batchData.expires_at) {
     startExpiryCountdown(new Date(batchData.expires_at));
+  }
+
+  // Show season package notice if applicable
+  if (isSeasonPkg) {
+    const notice = document.getElementById('season-notice');
+    if (notice) notice.style.display = 'block';
   }
 
   renderTickets();
@@ -422,7 +452,7 @@ function renderTickets() {
         <div class="tc-field">
           <div class="tc-field-label">Asking Price (USD)</div>
           <input class="tc-field-input" type="number" value="${t.asking_price || ''}" placeholder="${t.face_value ? `Face: $${t.face_value}` : 'Set price'}" min="1" step="0.01" onchange="updateTicketPrice(${i}, this.value)" onclick="event.stopPropagation()">
-          ${t.asking_price ? `<div class="tc-payout">You receive: <span>$${(t.asking_price * 0.98).toFixed(2)}</span></div>` : ''}
+          ${t.asking_price ? `<div class="tc-payout">You receive: <span>$${(t.asking_price * 0.95).toFixed(2)}</span></div>` : ''}
         </div>
         <div class="tc-field">
           <div class="tc-field-label">Listing Type</div>
