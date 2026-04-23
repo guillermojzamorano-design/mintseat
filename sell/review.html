@@ -169,7 +169,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font
 @media(max-width:600px){
   .summary-bar{grid-template-columns:1fr 1fr;}
   .tc-body{grid-template-columns:1fr 1fr;}
-  .bulk-controls{flex-direction:column;align-items:flex-start;}
+  .bulk-controls{flex-direction:column;align-items:flex-start;gap:10px;}
   .bc-actions{margin-left:0;}
   .ss-stats{gap:20px;}
 }
@@ -262,14 +262,15 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font
 
   <!-- Bulk controls -->
   <div class="bulk-controls">
-    <span class="bc-label">Set price for all:</span>
-    <input class="bc-input" type="number" id="bulk-price" placeholder="$0.00" min="1" step="0.01" oninput="applyBulkPrice()">
-    <span class="bc-label">Type:</span>
-    <select class="bc-select" id="bulk-type" onchange="applyBulkType()">
-      <option value="pair">Both Seats</option>
-      <option value="individual">Individual Seats</option>
-    </select>
-    <button class="btn btn-ghost btn-sm" onclick="applyBulkPrice();applyBulkType();">Apply to All</button>
+    <span class="bc-label">Markup above face value:</span>
+    <input class="bc-input" type="number" id="bulk-markup" placeholder="0" min="0" max="500" step="1" oninput="applyMarkup()" style="width:70px;">
+    <span class="bc-label" style="margin-left:-6px;">%</span>
+    <div style="display:flex;gap:5px;">
+      <button class="btn btn-ghost btn-sm" onclick="setMarkup(0)">Face</button>
+      <button class="btn btn-ghost btn-sm" onclick="setMarkup(10)">+10%</button>
+      <button class="btn btn-ghost btn-sm" onclick="setMarkup(25)">+25%</button>
+      <button class="btn btn-ghost btn-sm" onclick="setMarkup(50)">+50%</button>
+    </div>
     <div class="bc-divider"></div>
     <div class="bc-actions">
       <button class="btn btn-ghost btn-sm" onclick="selectAll(true)">Select All</button>
@@ -343,6 +344,7 @@ let batchData    = null;
 let tickets      = [];
 let connectMethod = 'email';
 let expiryTimer  = null;
+let globalMarkup = 0; // markup % above face value, applied to all selected tickets
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
@@ -511,22 +513,14 @@ function updateTicketPrice(i, val) {
 }
 
 function updateTicketType(i, val) {
-  const prev = tickets[i].listing_type;
-  const qty  = tickets[i].quantity || 1;
   tickets[i].listing_type = val;
+  const multiplier = 1 + (globalMarkup / 100);
 
-  if (qty > 1 && tickets[i].asking_price) {
-    const prevIsSingle = prev === 'individual' || prev === 'whole' || (prev && prev.startsWith('seat_'));
-    const newIsSingle  = val  === 'individual' || val  === 'whole' || (val  && val.startsWith('seat_'));
-
-    if (!prevIsSingle && newIsSingle) {
-      // pair → single seat: divide by quantity
-      tickets[i].asking_price = parseFloat((tickets[i].asking_price / qty).toFixed(2));
-    } else if (prevIsSingle && !newIsSingle) {
-      // single seat → pair: multiply by quantity
-      tickets[i].asking_price = parseFloat((tickets[i].asking_price * qty).toFixed(2));
-    }
-    // single → different single: price stays the same (already per-seat)
+  // Always recalculate from face_value based on new type
+  if (tickets[i].face_value) {
+    const isSingle = val && (val.startsWith('seat_') || val === 'individual' || val === 'whole');
+    const qty = isSingle ? 1 : (tickets[i].quantity || 1);
+    tickets[i].asking_price = parseFloat((tickets[i].face_value * qty * multiplier).toFixed(2));
   }
 
   renderTickets();
@@ -545,31 +539,23 @@ function selectAll(sel) {
   updateSummary();
 }
 
-function applyBulkPrice() {
-  const price = parseFloat(document.getElementById('bulk-price').value);
-  if (!price) return;
-  tickets.forEach((t, i) => {
-    if (t.selected) t.asking_price = price;
-  });
-  renderTickets();
-  updateSummary();
+function setMarkup(pct) {
+  globalMarkup = pct;
+  document.getElementById('bulk-markup').value = pct;
+  applyMarkup();
 }
 
-function applyBulkType() {
-  const type = document.getElementById('bulk-type').value;
+function applyMarkup() {
+  globalMarkup = parseFloat(document.getElementById('bulk-markup').value) || 0;
+  const multiplier = 1 + (globalMarkup / 100);
+
   tickets.forEach(t => {
-    if (!t.selected || t.quantity <= 1) { t.listing_type = type; return; }
-    const prev = t.listing_type;
-    const prevIsSingle = prev === 'individual' || prev === 'whole' || (prev && prev.startsWith('seat_'));
-    const newIsSingle  = type === 'individual' || type === 'whole' || (type && type.startsWith('seat_'));
-    t.listing_type = type;
-    if (!t.asking_price) return;
-    if (!prevIsSingle && newIsSingle) {
-      t.asking_price = parseFloat((t.asking_price / t.quantity).toFixed(2));
-    } else if (prevIsSingle && !newIsSingle) {
-      t.asking_price = parseFloat((t.asking_price * t.quantity).toFixed(2));
-    }
+    if (!t.selected || !t.face_value) return;
+    const isSingle = t.listing_type && (t.listing_type.startsWith('seat_') || t.listing_type === 'individual' || t.listing_type === 'whole');
+    const qty = isSingle ? 1 : (t.quantity || 1);
+    t.asking_price = parseFloat((t.face_value * qty * multiplier).toFixed(2));
   });
+
   renderTickets();
   updateSummary();
 }
