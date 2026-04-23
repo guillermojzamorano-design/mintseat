@@ -497,9 +497,27 @@ function updateTicketPrice(i, val) {
 }
 
 function updateTicketType(i, val) {
+  const prev = tickets[i].listing_type;
+  const qty  = tickets[i].quantity || 1;
   tickets[i].listing_type = val;
-  // If splitting into individual seats, double the count in summary
-  // but keep asking_price per seat
+
+  // Adjust asking_price based on listing type change
+  if (qty > 1 && tickets[i].asking_price) {
+    if (val === 'individual' && prev === 'pair') {
+      // Switching to per-seat: divide by quantity
+      tickets[i].asking_price = parseFloat((tickets[i].asking_price / qty).toFixed(2));
+    } else if (val === 'pair' && prev === 'individual') {
+      // Switching back to both seats: multiply by quantity
+      tickets[i].asking_price = parseFloat((tickets[i].asking_price * qty).toFixed(2));
+    } else if (val === 'whole' && prev === 'pair') {
+      // Single seat from pair: divide by quantity
+      tickets[i].asking_price = parseFloat((tickets[i].asking_price / qty).toFixed(2));
+    } else if (val === 'pair' && prev === 'whole') {
+      // Back to pair from single: multiply by quantity
+      tickets[i].asking_price = parseFloat((tickets[i].asking_price * qty).toFixed(2));
+    }
+  }
+
   renderTickets();
   updateSummary();
 }
@@ -528,7 +546,19 @@ function applyBulkPrice() {
 
 function applyBulkType() {
   const type = document.getElementById('bulk-type').value;
-  tickets.forEach(t => { if (t.selected) t.listing_type = type; });
+  tickets.forEach(t => {
+    if (!t.selected || t.quantity <= 1) { t.listing_type = type; return; }
+    const prev = t.listing_type;
+    t.listing_type = type;
+    if (!t.asking_price) return;
+    if (type === 'individual' && prev === 'pair') {
+      t.asking_price = parseFloat((t.asking_price / t.quantity).toFixed(2));
+    } else if (type === 'pair' && (prev === 'individual' || prev === 'whole')) {
+      t.asking_price = parseFloat((t.asking_price * t.quantity).toFixed(2));
+    } else if (type === 'whole' && prev === 'pair') {
+      t.asking_price = parseFloat((t.asking_price / t.quantity).toFixed(2));
+    }
+  });
   renderTickets();
   updateSummary();
 }
