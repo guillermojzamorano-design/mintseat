@@ -376,8 +376,8 @@ async function loadBatch() {
     tickets   = (data.tickets || []).map(t => ({
       ...t,
       selected:     t.selected !== undefined ? t.selected : true,
-      asking_price: t.face_value || null,
-      listing_type: 'whole',
+      asking_price: t.asking_price || t.face_value || null,
+      listing_type: (t.quantity > 1) ? 'pair' : 'whole',
     }));
 
     renderUI();
@@ -452,7 +452,7 @@ function renderTickets() {
         </div>
         <div class="tc-field">
           <div class="tc-field-label">Asking Price (USD)</div>
-          <input class="tc-field-input" type="number" value="${t.asking_price || ''}" placeholder="${t.face_value ? `Face: $${t.face_value}` : 'Set price'}" min="1" step="0.01" onchange="updateTicketPrice(${i}, this.value)" onclick="event.stopPropagation()">
+          <input class="tc-field-input" type="number" value="${t.asking_price || ''}" placeholder="${t.face_value ? `Face: $${t.face_value}${t.quantity > 1 ? '/seat' : ''}` : 'Set price'}" min="1" step="0.01" onchange="updateTicketPrice(${i}, this.value)" onclick="event.stopPropagation()">
           ${t.asking_price ? `<div class="tc-payout">You receive: <span>$${(t.asking_price * 0.95).toFixed(2)}</span></div>` : ''}
 
         </div>
@@ -460,14 +460,15 @@ function renderTickets() {
           <div class="tc-field-label">Listing Type</div>
           <select class="tc-field-select" onchange="updateTicketType(${i}, this.value)" onclick="event.stopPropagation()">
             ${t.quantity > 1
-              ? `<option value="pair" ${t.listing_type !== 'individual' ? 'selected' : ''}>Both Seats (${t.seat})</option>
-                 <option value="individual" ${t.listing_type === 'individual' ? 'selected' : ''}>Individual Seats</option>`
+              ? `<option value="pair" ${t.listing_type === 'pair' ? 'selected' : ''}>Both Seats (${t.seat})</option>
+                 <option value="individual" ${t.listing_type === 'individual' ? 'selected' : ''}>Individual Seats</option>
+                 <option value="whole" ${t.listing_type === 'whole' ? 'selected' : ''}>Single Seat</option>`
               : `<option value="whole" selected>Single Seat</option>`
             }
           </select>
           <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:4px;">${
             t.quantity > 1
-              ? (t.listing_type === 'individual' ? `Lists as 2 separate tickets` : `One buyer gets both seats`)
+              ? (t.listing_type === 'individual' ? `Lists as 2 separate tickets` : t.listing_type === 'whole' ? `Single seat listed individually` : `One buyer gets both seats`)
               : 'Single buyer gets this seat'
           }</div>
         </div>
