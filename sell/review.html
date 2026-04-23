@@ -266,8 +266,9 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font
     <input class="bc-input" type="number" id="bulk-price" placeholder="$0.00" min="1" step="0.01" oninput="applyBulkPrice()">
     <span class="bc-label">Type:</span>
     <select class="bc-select" id="bulk-type" onchange="applyBulkType()">
-      <option value="whole">Whole Ticket</option>
-      <option value="fractional">Fractional</option>
+      <option value="pair">Both Seats</option>
+      <option value="individual">Individual Seats</option>
+      <option value="whole">Single Seat</option>
     </select>
     <button class="btn btn-ghost btn-sm" onclick="applyBulkPrice();applyBulkType();">Apply to All</button>
     <div class="bc-divider"></div>
